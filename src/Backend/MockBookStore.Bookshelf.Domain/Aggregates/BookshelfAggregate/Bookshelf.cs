@@ -50,16 +50,19 @@ namespace MockBookStore.Bookshelf.Domain.Aggregates.BookshelfAggregate
 
         public void Apply(AddedBookToBookshelf @event)
         {
+            Version++;
             this._booksIds.Add(@event.BookId);
         }
         
         public void Apply(RemovedBookFromBookshelf @event)
         {
+            Version++;
             this._booksIds.Remove(@event.BookId);
         }
         
         public void Apply(RenamedBookshelf @event)
         {
+            Version++;
             this.Name = @event.NewName;
         }
         #endregion
