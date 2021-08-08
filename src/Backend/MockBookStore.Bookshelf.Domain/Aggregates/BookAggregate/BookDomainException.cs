@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Runtime.Serialization;
 
 namespace MockBookStore.Bookshelf.Domain.Aggregates.BookAggregate

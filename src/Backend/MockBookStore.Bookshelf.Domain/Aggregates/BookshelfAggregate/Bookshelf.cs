@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using MediatR;
-using MockBookStore.Bookshelf.Domain.Aggregates.BookAggregate;
 using MockBookStore.Bookshelf.Domain.Aggregates.BookshelfAggregate.Events;
 using MockBookStore.Bookshelf.Domain.SeedWork;
 
@@ -14,6 +12,13 @@ namespace MockBookStore.Bookshelf.Domain.Aggregates.BookshelfAggregate
         public IReadOnlyCollection<Guid> Books => _booksIds;
         public long OwnerId { get; private set; }
 
+        public Bookshelf(string name, long ownerId)
+        {
+            _booksIds = new List<Guid>();
+            OwnerId = ownerId;
+            Name = name;
+        }
+        
         public void AddBook(Guid bookId)
         {
             if (_booksIds.Contains(bookId))

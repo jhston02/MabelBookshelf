@@ -1,16 +1,15 @@
 ﻿using System;
-using MediatR;
 using MockBookStore.Bookshelf.Domain.Aggregates.BookAggregate.Events;
-using MockBookStore.Bookshelf.Domain.Aggregates.BookshelfAggregate;
 using MockBookStore.Bookshelf.Domain.SeedWork;
 
 namespace MockBookStore.Bookshelf.Domain.Aggregates.BookAggregate
 {
+    //TODO: check isbn format
     public class Book : Entity<Guid>
     {
         public string Title { get; private set; }
         public string[] Authors { get; private set; }
-        public string ISBN  { get; private set; }
+        public string Isbn  { get; private set; }
         public string ExternalId { get; private set; }
         public BookStatus Status { get; private set; }
         public int TotalPages { get; private set; }
@@ -21,15 +20,17 @@ namespace MockBookStore.Bookshelf.Domain.Aggregates.BookAggregate
             this.Id = id;
             this.Title = title;
             this.Authors = authors;
-            this.ISBN = isbn;
+            this.Isbn = isbn;
             this.ExternalId = externalId;
             this.TotalPages = totalPages;
             this.Status = status;
 
-            if (this.Status == BookStatus.Finish)
+            if (this.Status == BookStatus.Finished)
                 CurrentPageNumber = totalPages;
             else
                 CurrentPageNumber = 0;
+
+            this.AddEvent(new BookCreatedDomainEvent(this));
         }
 
         public void StartReading()
@@ -42,12 +43,12 @@ namespace MockBookStore.Bookshelf.Domain.Aggregates.BookAggregate
             this.Apply(@event);
         }
 
-        public void FinishedReading()
+        public void FinishReading()
         {
-            if (Status == BookStatus.Finish)
+            if (Status == BookStatus.Finished)
                 throw new BookDomainException("Already finished this book");
             
-            if (Status == BookStatus.DNF)
+            if (Status == BookStatus.Dnf)
                 throw new BookDomainException("This book was not finished");
             
             var @event = new BookFinishedDomainEvent(this.Id, this.Version);
@@ -55,9 +56,9 @@ namespace MockBookStore.Bookshelf.Domain.Aggregates.BookAggregate
             this.Apply(@event);
         }
 
-        public void DecidedNotFinish()
+        public void DecideNotToFinish()
         {
-            if (Status == BookStatus.Finish)
+            if (Status == BookStatus.Finished)
                 throw new BookDomainException("Already finished this book");
             var @event = new DecidedNotToFinishDomainEvent(this.Id, this.Version);
             this.AddEvent(@event);
@@ -74,13 +75,17 @@ namespace MockBookStore.Bookshelf.Domain.Aggregates.BookAggregate
         public void ReadToPage(int pageNumber)
         {
             if (pageNumber <= 0 || pageNumber > TotalPages)
-            {
                 throw new BookDomainException("Please enter valid page number");
-            }
+
+            if (Status != BookStatus.Reading)
+                this.StartReading();
             
             var @event = new ReadToPageDomainEvent(this.Id, this.CurrentPageNumber, pageNumber, this.Version);
             this.AddEvent(@event);
             this.Apply(@event);
+
+            if (this.CurrentPageNumber == TotalPages)
+                this.FinishReading();
         }
 
         #region Apply Events
@@ -88,13 +93,13 @@ namespace MockBookStore.Bookshelf.Domain.Aggregates.BookAggregate
         private void Apply(DecidedNotToFinishDomainEvent @event)
         {
             Version++;
-            Status = BookStatus.DNF;
+            Status = BookStatus.Dnf;
         }
 
         private void Apply(BookFinishedDomainEvent @event)
         {
             Version++;
-            Status = BookStatus.Finish;
+            Status = BookStatus.Finished;
         }
         
         private void Apply(BookStartedDomainEvent @event)

@@ -4,7 +4,7 @@
     {
         Want,
         Reading,
-        DNF,
-        Finish
+        Dnf,
+        Finished
     }
 }

@@ -1,5 +1,4 @@
 ﻿using System;
-using MediatR;
 using MockBookStore.Bookshelf.Domain.SeedWork;
 
 namespace MockBookStore.Bookshelf.Domain.Aggregates.BookAggregate.Events
