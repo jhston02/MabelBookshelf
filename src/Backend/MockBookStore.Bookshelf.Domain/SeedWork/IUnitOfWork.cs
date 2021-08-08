@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace MockBookStore.Catalog.Domain.SeedWork
+namespace MockBookStore.Bookshelf.Domain.SeedWork
 {
     public interface IUnitOfWork
     {

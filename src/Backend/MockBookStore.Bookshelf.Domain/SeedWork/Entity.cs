@@ -1,14 +1,15 @@
 ﻿using System.Collections.Generic;
 using MediatR;
 
-namespace MockBookStore.Catalog.Domain.SeedWork
+namespace MockBookStore.Bookshelf.Domain.SeedWork
 {
-    public class Entity
+    public abstract class Entity<T>
     {
-        public long Id { get; private set; }
-        protected bool Equals(Entity other)
+        public T Id { get; protected set; }
+        public long Version { get; protected set; }
+        protected bool Equals(Entity<T> other)
         {
-            if (Id == other.Id)
+            if (Id.Equals(other.Id))
                 return true;
             else
                 return false;
@@ -19,12 +20,12 @@ namespace MockBookStore.Catalog.Domain.SeedWork
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != this.GetType()) return false;
-            return Equals((Entity) obj);
+            return Equals((Entity<T>) obj);
         }
 
         public override int GetHashCode()
         {
-            if (Id != default(long))
+            if (!Id.Equals(default(T)))
             {
                 return Id.GetHashCode();
             }
@@ -46,5 +47,7 @@ namespace MockBookStore.Catalog.Domain.SeedWork
         {
             domainEvents.Clear();
         }
+
+        public virtual void Apply(DomainEvent<T> @event) { }
     }
 }
