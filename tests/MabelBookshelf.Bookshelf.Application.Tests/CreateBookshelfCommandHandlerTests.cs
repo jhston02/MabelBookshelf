@@ -33,6 +33,11 @@ namespace MabelBookshelf.Bookshelf.Application.Tests
                 Bookshelfs.Add(bookshelf);
                 return Task.FromResult(bookshelf);
             }
+
+            public Task<Bookshelf> Get(Guid id)
+            {
+                throw new NotImplementedException();
+            }
         }
         
         private  class MockUnitOfWork : IUnitOfWork

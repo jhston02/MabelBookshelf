@@ -1,10 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using EventStore.Client;
 using MabelBookshelf.Bookshelf.Domain.Aggregates.BookshelfAggregate;
+using MabelBookshelf.Bookshelf.Domain.Aggregates.BookshelfAggregate.Exceptions;
 using MabelBookshelf.Bookshelf.Domain.SeedWork;
 using MabelBookshelf.Bookshelf.Infrastructure.Infrastructure;
 using MediatR;
@@ -26,27 +28,39 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Bookshelf
         public IUnitOfWork UnitOfWork => new NoOpUnitOfWork();
         public async Task<Domain.Aggregates.BookshelfAggregate.Bookshelf> Add(Domain.Aggregates.BookshelfAggregate.Bookshelf bookshelf)
         {
-            var eventData = new List<EventData>();
-            foreach (var @event in bookshelf.DomainEvents)
+            try
             {
-                await _mediator.Publish(@event);
-                var serializedData = JsonSerializer.SerializeToUtf8Bytes(@event);
-                eventData.Add(
-                    new EventData(
-                        Uuid.FromGuid(@event.EventId),
-                        @event.GetType().Name,
-                        serializedData
-                    ));
+                var eventData = new List<EventData>();
+                foreach (var @event in bookshelf.DomainEvents)
+                {
+                    await _mediator.Publish(@event);
+                    var serializedData = JsonSerializer.SerializeToUtf8Bytes(@event);
+                    eventData.Add(
+                        new EventData(
+                            Uuid.FromGuid(@event.EventId),
+                            @event.GetType().Name,
+                            serializedData
+                        ));
+                }
+
+                await _client.AppendToStreamAsync(
+                    PrependStreamName + bookshelf.Id,
+                    StreamState.NoStream,
+                    eventData
+                );
+
+                bookshelf.ClearEvents();
+                return bookshelf;
             }
+            catch (WrongExpectedVersionException e)
+            {
+                throw new DuplicateBookshelfException(bookshelf.Id);
+            }
+        }
 
-            await _client.AppendToStreamAsync(
-                PrependStreamName + bookshelf.Id,
-                StreamState.NoStream,
-                eventData
-            );
-
-            bookshelf.ClearEvents();
-            return bookshelf;
+        public Task<Domain.Aggregates.BookshelfAggregate.Bookshelf> Get(Guid id)
+        {
+            throw new NotImplementedException();
         }
     }
 }
