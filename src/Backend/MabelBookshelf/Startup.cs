@@ -1,3 +1,11 @@
+using EventStore.Client;
+using FluentValidation;
+using MabelBookshelf.Bookshelf.Application.Bookshelf.Commands;
+using MabelBookshelf.Bookshelf.Application.Infrastructure.Behaviors;
+using MabelBookshelf.Bookshelf.Domain.Aggregates.BookshelfAggregate;
+using MabelBookshelf.Bookshelf.Domain.SeedWork;
+using MabelBookshelf.Bookshelf.Infrastructure.Bookshelf;
+using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -33,6 +41,25 @@ namespace MabelBookshelf
             {
                 c.SwaggerDoc("v1", new OpenApiInfo {Title = "MabelBookshelf", Version = "v1"});
             });
+
+            ConfigureDomainServices(services);
+        }
+
+        private void ConfigureDomainServices(IServiceCollection services)
+        {
+            services.AddSingleton<EventStoreClient>((x) =>
+            {
+                var cs = Configuration.GetConnectionString("EventStoreDbConnectionString");
+                var settings = EventStoreClientSettings
+                    .Create(Configuration.GetConnectionString("EventStoreDbConnectionString"));
+                return new EventStoreClient(settings);
+            });
+            
+            services.AddMediatR(typeof(Startup), typeof(CreateBookshelfCommand), typeof(Entity<>), typeof(EventStoreDBBookshelfRepository));
+            AssemblyScanner.FindValidatorsInAssembly(typeof(CreateBookshelfCommand).Assembly)
+                .ForEach(item => services.AddScoped(item.InterfaceType, item.ValidatorType));
+            services.AddScoped(typeof(IPipelineBehavior<,>), typeof(ValidationPipelineBehavior<,>));
+            services.AddScoped<IBookshelfRepository,EventStoreDBBookshelfRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
