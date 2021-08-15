@@ -1,18 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using MockBookStore.Bookshelf.Domain.Aggregates.BookshelfAggregate;
+using MabelBookshelf.Bookshelf.Domain.Aggregates.BookshelfAggregate;
 using Xunit;
 
 namespace MabelBookshelf.Bookshelf.Domain.Tests
 {
-    using Bookshelf=MockBookStore.Bookshelf.Domain.Aggregates.BookshelfAggregate.Bookshelf;
+    using Bookshelf=Domain.Aggregates.BookshelfAggregate.Bookshelf;
     
     public class BookshelfTests
     {
         private Bookshelf GetBookshelf(string name)
         {
-            return new Bookshelf(name, 0);
+            return new Bookshelf(Guid.NewGuid(),name, 0);
         }
 
         [Fact]

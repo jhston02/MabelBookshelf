@@ -1,6 +1,6 @@
 using System;
 using Xunit;
-using MockBookStore.Bookshelf.Domain.Aggregates.BookAggregate;
+using MabelBookshelf.Bookshelf.Domain.Aggregates.BookAggregate;
 
 namespace MabelBookshelf.Bookshelf.Domain.Tests
 {
@@ -8,7 +8,14 @@ namespace MabelBookshelf.Bookshelf.Domain.Tests
     {
         private Book GetBook(BookStatus status)
         {
-            return new Book(Guid.NewGuid(), "blah", new[] {"test"}, "blah", "blah", 500, status);
+            var book =  new Book(Guid.NewGuid(), "blah", new[] {"test"}, "blah", "blah", 500);
+            if(status == BookStatus.Reading)
+                book.ReadToPage(1);
+            else if(status == BookStatus.Dnf)
+                book.MarkAsNotFinished();
+            else if(status == BookStatus.Finished)
+                book.FinishReading();
+            return book;
         }
         
         [Fact]
@@ -31,7 +38,7 @@ namespace MabelBookshelf.Bookshelf.Domain.Tests
         public void WantedBook_DNFinished_StatusIsDNFinished()
         {
             var book = GetBook(BookStatus.Want);
-            book.DecideNotToFinish();
+            book.MarkAsNotFinished();
             Assert.Equal(BookStatus.Dnf, book.Status);
         }
         
@@ -60,7 +67,7 @@ namespace MabelBookshelf.Bookshelf.Domain.Tests
         public void FinishedBook_GoToDidNotFinish_ThrowException()
         {
             var book = GetBook(BookStatus.Finished);
-            Assert.Throws<BookDomainException>(() => book.DecideNotToFinish());
+            Assert.Throws<BookDomainException>(() => book.MarkAsNotFinished());
         }
         
         [Fact]
