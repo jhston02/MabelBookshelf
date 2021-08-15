@@ -35,10 +35,10 @@ namespace MabelBookshelf.Bookshelf.Domain.SeedWork
             }
         }
 
-        private List<INotification> domainEvents = new List<INotification>();
-        public IReadOnlyCollection<INotification> DomainEvents => domainEvents;
+        private List<DomainEvent<T>> domainEvents = new List<DomainEvent<T>>();
+        public IReadOnlyCollection<DomainEvent<T>> DomainEvents => domainEvents;
         
-        protected void AddEvent(INotification @event)
+        protected void AddEvent(DomainEvent<T> @event)
         {
             domainEvents.Add(@event);
         }
