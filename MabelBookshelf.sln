@@ -1,0 +1,40 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MabelBookshelf", "src\Backend\MabelBookshelf\MabelBookshelf.csproj", "{204CD5F8-374C-485F-97AA-AB16FAF4CB5C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MabelBookshelf.Bookshelf.Application", "src\Backend\MabelBookshelf.Bookshelf.Application\MabelBookshelf.Bookshelf.Application.csproj", "{586405DF-B2B4-4C1F-A052-9B014AA6191F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MabelBookshelf.Bookshelf.Domain", "src\Backend\MabelBookshelf.Bookshelf.Domain\MabelBookshelf.Bookshelf.Domain.csproj", "{011CFB3D-A2AF-4171-8F3E-F03B97888387}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MabelBookshelf.Bookshelf.Domain.Tests", "tests\MabelBookshelf.Bookshelf.Domain.Tests\MabelBookshelf.Bookshelf.Domain.Tests.csproj", "{A44E2C57-2932-4C9D-9F03-8D2E75AE0363}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MabelBookshelf.Bookshelf.Application.Tests", "tests\MabelBookshelf.Bookshelf.Application.Tests\MabelBookshelf.Bookshelf.Application.Tests.csproj", "{3F898DD2-449E-4394-B95E-4F98C16B02D5}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{204CD5F8-374C-485F-97AA-AB16FAF4CB5C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{204CD5F8-374C-485F-97AA-AB16FAF4CB5C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{204CD5F8-374C-485F-97AA-AB16FAF4CB5C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{204CD5F8-374C-485F-97AA-AB16FAF4CB5C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{586405DF-B2B4-4C1F-A052-9B014AA6191F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{586405DF-B2B4-4C1F-A052-9B014AA6191F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{586405DF-B2B4-4C1F-A052-9B014AA6191F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{586405DF-B2B4-4C1F-A052-9B014AA6191F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{011CFB3D-A2AF-4171-8F3E-F03B97888387}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{011CFB3D-A2AF-4171-8F3E-F03B97888387}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{011CFB3D-A2AF-4171-8F3E-F03B97888387}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{011CFB3D-A2AF-4171-8F3E-F03B97888387}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A44E2C57-2932-4C9D-9F03-8D2E75AE0363}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A44E2C57-2932-4C9D-9F03-8D2E75AE0363}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A44E2C57-2932-4C9D-9F03-8D2E75AE0363}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A44E2C57-2932-4C9D-9F03-8D2E75AE0363}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3F898DD2-449E-4394-B95E-4F98C16B02D5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3F898DD2-449E-4394-B95E-4F98C16B02D5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3F898DD2-449E-4394-B95E-4F98C16B02D5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3F898DD2-449E-4394-B95E-4F98C16B02D5}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
