@@ -13,16 +13,14 @@ using MediatR;
 
 namespace MabelBookshelf.Bookshelf.Infrastructure.Bookshelf
 {
-    public class EventStoreDBBookshelfRepository : IBookshelfRepository
+    public class EventStoreDbBookshelfRepository : IBookshelfRepository
     {
         private const string PrependStreamName = "bookshelf-";
-        private readonly EventStoreClient _client;
-        private readonly IMediator _mediator;
+        private readonly EventStoreContext _context;
         
-        public EventStoreDBBookshelfRepository(EventStoreClient client, IMediator mediator)
+        public EventStoreDbBookshelfRepository(EventStoreContext context)
         {
-            this._client = client;
-            this._mediator = mediator;
+            this._context = context;
         }
 
         public IUnitOfWork UnitOfWork => new NoOpUnitOfWork();
@@ -30,27 +28,8 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Bookshelf
         {
             try
             {
-                var eventData = new List<EventData>();
-                foreach (var @event in bookshelf.DomainEvents)
-                {
-                    await _mediator.Publish(@event);
-                    var serializedData = JsonSerializer.SerializeToUtf8Bytes(@event);
-                    eventData.Add(
-                        new EventData(
-                            Uuid.FromGuid(@event.EventId),
-                            @event.GetType().Name,
-                            serializedData
-                        ));
-                }
-
-                await _client.AppendToStreamAsync(
-                    PrependStreamName + bookshelf.Id,
-                    StreamState.NoStream,
-                    eventData
-                );
-
-                bookshelf.ClearEvents();
-                return bookshelf;
+                return await _context.WriteToStreamAsync<Domain.Aggregates.BookshelfAggregate.Bookshelf, Guid>(bookshelf,
+                    PrependStreamName + bookshelf.Id);
             }
             catch (WrongExpectedVersionException e)
             {

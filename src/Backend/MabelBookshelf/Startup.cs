@@ -75,11 +75,11 @@ namespace MabelBookshelf
                 return new EventStoreClient(settings);
             });
             
-            services.AddMediatR(typeof(Startup), typeof(CreateBookshelfCommand), typeof(Entity<>), typeof(EventStoreDBBookshelfRepository));
+            services.AddMediatR(typeof(Startup), typeof(CreateBookshelfCommand), typeof(Entity<>), typeof(EventStoreDbBookshelfRepository));
             AssemblyScanner.FindValidatorsInAssembly(typeof(CreateBookshelfCommand).Assembly)
                 .ForEach(item => services.AddScoped(item.InterfaceType, item.ValidatorType));
             services.AddScoped(typeof(IPipelineBehavior<,>), typeof(ValidationPipelineBehavior<,>));
-            services.AddScoped<IBookshelfRepository,EventStoreDBBookshelfRepository>();
+            services.AddScoped<IBookshelfRepository,EventStoreDbBookshelfRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

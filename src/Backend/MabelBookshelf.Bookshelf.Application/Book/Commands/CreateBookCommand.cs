@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using MabelBookshelf.Bookshelf.Application.Bookshelf.Commands;
 using MediatR;
 
-namespace MabelBookshelf.Bookshelf.Application.Book
+namespace MabelBookshelf.Bookshelf.Application.Book.Commands
 {
     public class CreateBookCommand : IRequest<bool>
     {
