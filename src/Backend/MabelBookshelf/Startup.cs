@@ -5,11 +5,15 @@ using MabelBookshelf.Bookshelf.Application.Infrastructure.Behaviors;
 using MabelBookshelf.Bookshelf.Domain.Aggregates.BookshelfAggregate;
 using MabelBookshelf.Bookshelf.Domain.SeedWork;
 using MabelBookshelf.Bookshelf.Infrastructure.Bookshelf;
+using MabelBookshelf.Identity.Infrastructure;
 using MediatR;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Versioning;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -42,10 +46,26 @@ namespace MabelBookshelf
                 c.SwaggerDoc("v1", new OpenApiInfo {Title = "MabelBookshelf", Version = "v1"});
             });
 
-            ConfigureDomainServices(services);
+            ConfigureBookshelfDomainServices(services);
         }
 
-        private void ConfigureDomainServices(IServiceCollection services)
+        private void ConfigureIdentityService(IServiceCollection services)
+        {
+            services.AddDbContext<MabelBookshelfIdentityDbContext>(options =>
+                    options.UseSqlServer(
+                        Configuration.GetConnectionString("MabelBookshelfIdentityDbContextConnection")));
+
+            services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
+                .AddEntityFrameworkStores<MabelBookshelfIdentityDbContext>();
+
+            services.AddIdentityServer()
+                .AddApiAuthorization<ApplicationUser, MabelBookshelfIdentityDbContext>();
+
+            services.AddAuthentication()
+                .AddIdentityServerJwt();
+        }
+
+        private void ConfigureBookshelfDomainServices(IServiceCollection services)
         {
             services.AddSingleton<EventStoreClient>((x) =>
             {

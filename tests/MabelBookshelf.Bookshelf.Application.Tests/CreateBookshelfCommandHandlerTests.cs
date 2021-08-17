@@ -19,7 +19,7 @@ namespace MabelBookshelf.Bookshelf.Application.Tests
         {
             var mockRepo = new MockBookshelfRepository();
             var handler = new CreateBookshelfCommandHandler(mockRepo);
-            handler.Handle(new CreateBookshelfCommand(Guid.NewGuid(), "test", 4), CancellationToken.None);
+            handler.Handle(new CreateBookshelfCommand(Guid.NewGuid(), "test", 4.ToString()), CancellationToken.None);
             var bookshelf = mockRepo.Bookshelfs.FirstOrDefault(x => x.Name == "test");
             Assert.NotNull(bookshelf);
         }

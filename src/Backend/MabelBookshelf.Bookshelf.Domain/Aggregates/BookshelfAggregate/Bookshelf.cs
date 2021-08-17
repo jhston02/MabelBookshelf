@@ -10,9 +10,9 @@ namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookshelfAggregate
         public string Name { get; private set; }
         private List<Guid> _booksIds;
         public IReadOnlyCollection<Guid> Books => _booksIds;
-        public long OwnerId { get; private set; }
+        public string OwnerId { get; private set; }
 
-        public Bookshelf(Guid id, string name, long ownerId)
+        public Bookshelf(Guid id, string name, string ownerId)
         {
             if (name == null) throw new ArgumentNullException(nameof(name));
             var @event = new BookshelfCreatedDomainEvent(id, name, ownerId, Version);

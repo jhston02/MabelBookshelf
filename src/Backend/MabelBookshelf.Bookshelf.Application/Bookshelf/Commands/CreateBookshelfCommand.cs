@@ -11,13 +11,13 @@ namespace MabelBookshelf.Bookshelf.Application.Bookshelf.Commands
         [Required]
         public string Name { get; private set; }
         [Required]
-        public long OwnerId { get; private set; }
+        public string OwnerId { get; private set; }
 
-        public CreateBookshelfCommand(Guid id, string name, long ownerId)
+        public CreateBookshelfCommand(Guid id, string name, string ownerId)
         {
             this.Id = id;
-            this.Name = name;
-            this.OwnerId = ownerId;
+            this.Name = name ?? throw new ArgumentNullException(nameof(name));
+            this.OwnerId = ownerId ?? throw new ArgumentNullException(nameof(ownerId));
         }
     }
 }

@@ -12,7 +12,7 @@ namespace MabelBookshelf.Bookshelf.Domain.Tests
     {
         private Bookshelf GetBookshelf(string name)
         {
-            return new Bookshelf(Guid.NewGuid(),name, 0);
+            return new Bookshelf(Guid.NewGuid(),name, 0.ToString());
         }
 
         [Fact]

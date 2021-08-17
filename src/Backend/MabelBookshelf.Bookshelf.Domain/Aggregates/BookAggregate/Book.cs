@@ -14,10 +14,12 @@ namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookAggregate
         public BookStatus Status { get; private set; }
         public int TotalPages { get; private set; }
         public int CurrentPageNumber { get; private set; }
+        public string OwnerId { get; private set; }
+        public string[] Categories { get; private set; }
 
-        public Book(Guid id, string title, string[] authors, string isbn, string externalId, int totalPages)
+        public Book(Guid id, string title, string[] authors, string isbn, string externalId, int totalPages, string ownerId, string[] categories)
         {
-            var @event = new BookCreatedDomainEvent(id, title, authors, isbn, externalId, totalPages, Version);
+            var @event = new BookCreatedDomainEvent(id, title, authors, isbn, externalId, totalPages, Version, ownerId, categories);
             this.AddEvent(@event);
             this.Apply(@event);
         }
@@ -144,6 +146,8 @@ namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookAggregate
             this.ExternalId = @event.ExternalId;
             this.TotalPages = @event.TotalPages;
             this.Status = BookStatus.Want;
+            this.OwnerId = @event.OwnerId;
+            this.Categories = @event.Categories;
             CurrentPageNumber = 0;
         }
         #endregion
