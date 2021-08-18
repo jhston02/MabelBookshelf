@@ -42,5 +42,23 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Infrastructure
             value.ClearEvents();
             return value;
         }
+
+        public async Task<bool> StreamExists(string streamId)
+        {
+            var result = _client.ReadStreamAsync(
+                Direction.Forwards,
+                "streamId",
+                revision: StreamPosition.Start,
+                maxCount: 1);
+
+            if (await result.ReadState == ReadState.StreamNotFound)
+            {
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+        }
     }
 }

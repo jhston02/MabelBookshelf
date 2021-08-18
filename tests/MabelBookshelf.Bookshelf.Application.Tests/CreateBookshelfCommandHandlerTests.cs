@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using MabelBookshelf.Bookshelf.Domain.Aggregates.BookshelfAggregate;
 using MabelBookshelf.Bookshelf.Domain.SeedWork;
 using MabelBookshelf.Bookshelf.Application.Bookshelf.Commands;
-using Moq;
 using Xunit;
 
 namespace MabelBookshelf.Bookshelf.Application.Tests
@@ -28,7 +27,7 @@ namespace MabelBookshelf.Bookshelf.Application.Tests
         {
             public List<Bookshelf> Bookshelfs = new List<Bookshelf>();
             public IUnitOfWork UnitOfWork => new MockUnitOfWork();
-            public Task<Domain.Aggregates.BookshelfAggregate.Bookshelf> Add(Domain.Aggregates.BookshelfAggregate.Bookshelf bookshelf)
+            public Task<Bookshelf> Add(Bookshelf bookshelf)
             {
                 Bookshelfs.Add(bookshelf);
                 return Task.FromResult(bookshelf);

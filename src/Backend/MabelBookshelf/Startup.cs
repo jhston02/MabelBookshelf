@@ -2,9 +2,14 @@ using EventStore.Client;
 using FluentValidation;
 using MabelBookshelf.Bookshelf.Application.Bookshelf.Commands;
 using MabelBookshelf.Bookshelf.Application.Infrastructure.Behaviors;
+using MabelBookshelf.Bookshelf.Application.Infrastructure.ExternalBookServices;
+using MabelBookshelf.Bookshelf.Application.Interfaces;
+using MabelBookshelf.Bookshelf.Domain.Aggregates.BookAggregate;
 using MabelBookshelf.Bookshelf.Domain.Aggregates.BookshelfAggregate;
 using MabelBookshelf.Bookshelf.Domain.SeedWork;
+using MabelBookshelf.Bookshelf.Infrastructure.Book;
 using MabelBookshelf.Bookshelf.Infrastructure.Bookshelf;
+using MabelBookshelf.Bookshelf.Infrastructure.Infrastructure;
 using MabelBookshelf.Identity.Infrastructure;
 using MediatR;
 using Microsoft.AspNetCore.Authentication;
@@ -80,6 +85,11 @@ namespace MabelBookshelf
                 .ForEach(item => services.AddScoped(item.InterfaceType, item.ValidatorType));
             services.AddScoped(typeof(IPipelineBehavior<,>), typeof(ValidationPipelineBehavior<,>));
             services.AddScoped<IBookshelfRepository,EventStoreDbBookshelfRepository>();
+            services.AddScoped<IExternalBookService, GoogleApiExternalBookService>();
+            services.AddScoped<IBookRepository, EventStoreDBBookRepsitory>();
+            services.AddScoped<EventStoreContext>();
+            services.AddSingleton<ProfanityFilter.ProfanityFilter>();
+            services.AddHttpClient<GoogleApiExternalBookService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

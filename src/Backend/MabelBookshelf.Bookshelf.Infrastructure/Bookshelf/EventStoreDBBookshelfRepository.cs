@@ -5,8 +5,8 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using EventStore.Client;
+using MabelBookshelf.Bookshelf.Domain.Aggregates.BookAggregate;
 using MabelBookshelf.Bookshelf.Domain.Aggregates.BookshelfAggregate;
-using MabelBookshelf.Bookshelf.Domain.Aggregates.BookshelfAggregate.Exceptions;
 using MabelBookshelf.Bookshelf.Domain.SeedWork;
 using MabelBookshelf.Bookshelf.Infrastructure.Infrastructure;
 using MediatR;
@@ -31,9 +31,9 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Bookshelf
                 return await _context.WriteToStreamAsync<Domain.Aggregates.BookshelfAggregate.Bookshelf, Guid>(bookshelf,
                     PrependStreamName + bookshelf.Id);
             }
-            catch (WrongExpectedVersionException e)
+            catch (WrongExpectedVersionException)
             {
-                throw new DuplicateBookshelfException(bookshelf.Id);
+                throw new BookDomainException($"Bookshelf with id:{bookshelf.Id} already exists");
             }
         }
 

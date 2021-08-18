@@ -1,5 +1,5 @@
 ﻿using System.Threading.Tasks;
-using MabelBookshelf.Bookshelf.Application.Bookshelf.Commands;
+using MabelBookshelf.Bookshelf.Application.Book.Commands;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -9,10 +9,10 @@ namespace MabelBookshelf.Controllers
     [Route("api/[controller]")]
     [ApiController]
     [ApiVersion("1.0")]
-    public class BookshelfController : ControllerBase
+    public class BookController : ControllerBase
     {
         private IMediator _mediator;
-        public BookshelfController(IMediator mediator)
+        public BookController(IMediator mediator)
         {
             this._mediator = mediator;
         }
@@ -21,7 +21,7 @@ namespace MabelBookshelf.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails),StatusCodes.Status400BadRequest)]
         [HttpPost]
-        public async Task<ActionResult> CreateBookshelf([FromBody] CreateBookshelfCommand command)
+        public async Task<ActionResult> CreateBook([FromBody] CreateBookCommand command)
         {
             var result = await _mediator.Send(command);
             if (result)

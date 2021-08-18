@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using MabelBookshelf.Bookshelf.Application.Bookshelf.Commands;
 using MabelBookshelf.Bookshelf.Application.Interfaces;
+using MabelBookshelf.Bookshelf.Domain.Aggregates.BookAggregate;
 using MediatR;
 
 namespace MabelBookshelf.Bookshelf.Application.Book.Commands
@@ -11,9 +12,11 @@ namespace MabelBookshelf.Bookshelf.Application.Book.Commands
     public class CreateBookCommandHandler : IRequestHandler<CreateBookCommand, bool>
     {
         private IExternalBookService bookService;
-        public CreateBookCommandHandler(IExternalBookService bookService)
+        private IBookRepository _bookRepository;
+        public CreateBookCommandHandler(IExternalBookService bookService, IBookRepository repository)
         {
             this.bookService = bookService;
+            this._bookRepository = repository;
         }
         
         public async Task<bool> Handle(CreateBookCommand request, CancellationToken cancellationToken)
@@ -22,7 +25,9 @@ namespace MabelBookshelf.Bookshelf.Application.Book.Commands
             var book = new Book(request.Id, externalBook.Title, externalBook.Authors, externalBook.Isbn,
                 externalBook.Id, externalBook.TotalPages, request.OwnerId, externalBook.Categories);
 
-            throw new NotImplementedException();
+            await this._bookRepository.Add(book);
+            await this._bookRepository.UnitOfWork.SaveChangesAsync();
+            return true;
         }
     }
 }
