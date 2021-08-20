@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using MabelBookshelf.Bookshelf.Application.Book.Commands;
+using MabelBookshelf.Models;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -21,8 +22,9 @@ namespace MabelBookshelf.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails),StatusCodes.Status400BadRequest)]
         [HttpPost]
-        public async Task<ActionResult> CreateBook([FromBody] CreateBookCommand command)
+        public async Task<ActionResult> CreateBook([FromBody] CreateNewBookRequest request)
         {
+            var command = new CreateBookCommand(request.Id, request.ExternalId, "test");
             var result = await _mediator.Send(command);
             if (result)
                 return Ok();

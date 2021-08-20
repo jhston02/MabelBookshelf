@@ -5,10 +5,8 @@ namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookAggregate.Events
 {
     public class BookFinishedDomainEvent : DomainEvent<Guid>
     {
-        public Guid BookId { get; private set; }
-        public BookFinishedDomainEvent(Guid bookId, long streamPosition) : base(bookId, streamPosition)
+        public BookFinishedDomainEvent(Guid streamId, long streamPosition) : base(streamId, streamPosition)
         {
-            this.BookId = bookId;
         }
     }
 }

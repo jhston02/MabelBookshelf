@@ -23,6 +23,8 @@ namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookAggregate
             this.AddEvent(@event);
             this.Apply(@event);
         }
+        
+        protected Book(){ }
 
         public void StartReading()
         {
@@ -83,7 +85,7 @@ namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookAggregate
 
         public override void Apply(DomainEvent<Guid> @event)
         {
-            if (@event.StreamPosition == Version && @event.StreamId == Id)
+            if (@event.StreamPosition == Version)
             {
                 if (@event is BookCreatedDomainEvent)
                     Apply(@event as BookCreatedDomainEvent);

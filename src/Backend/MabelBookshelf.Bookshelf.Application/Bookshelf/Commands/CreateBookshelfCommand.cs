@@ -7,14 +7,8 @@ namespace MabelBookshelf.Bookshelf.Application.Bookshelf.Commands
 {
     public class CreateBookshelfCommand : IRequest<bool>
     {
-        [Required]
-        [JsonInclude]
         public Guid Id { get; private set; }
-        [Required]
-        [JsonInclude]
         public string Name { get; private set; }
-        [Required]
-        [JsonInclude]
         public string OwnerId { get; private set; }
 
         public CreateBookshelfCommand(Guid id, string name, string ownerId)

@@ -1,3 +1,4 @@
+using System.Linq;
 using EventStore.Client;
 using FluentValidation;
 using MabelBookshelf.Bookshelf.Application.Bookshelf.Commands;
@@ -5,11 +6,13 @@ using MabelBookshelf.Bookshelf.Application.Infrastructure.Behaviors;
 using MabelBookshelf.Bookshelf.Application.Infrastructure.ExternalBookServices;
 using MabelBookshelf.Bookshelf.Application.Interfaces;
 using MabelBookshelf.Bookshelf.Domain.Aggregates.BookAggregate;
+using MabelBookshelf.Bookshelf.Domain.Aggregates.BookAggregate.Events;
 using MabelBookshelf.Bookshelf.Domain.Aggregates.BookshelfAggregate;
 using MabelBookshelf.Bookshelf.Domain.SeedWork;
 using MabelBookshelf.Bookshelf.Infrastructure.Book;
 using MabelBookshelf.Bookshelf.Infrastructure.Bookshelf;
 using MabelBookshelf.Bookshelf.Infrastructure.Infrastructure;
+using MabelBookshelf.Bookshelf.Infrastructure.Interfaces;
 using MabelBookshelf.Identity.Infrastructure;
 using MediatR;
 using Microsoft.AspNetCore.Authentication;
@@ -90,6 +93,14 @@ namespace MabelBookshelf
             services.AddScoped<EventStoreContext>();
             services.AddSingleton<ProfanityFilter.ProfanityFilter>();
             services.AddHttpClient<GoogleApiExternalBookService>();
+            services.AddSingleton<ITypeCache>(services =>
+            {
+                var types = typeof(BookCreatedDomainEvent).Assembly.GetTypes().Where(x => x.BaseType is
+                {
+                    IsGenericType: true
+                } && x.BaseType.GetGenericTypeDefinition() == typeof(DomainEvent<>));
+                return new DictionaryTypeCache(types.ToDictionary(x => x.Name, x => x));
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

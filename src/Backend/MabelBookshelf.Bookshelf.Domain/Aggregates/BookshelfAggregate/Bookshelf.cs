@@ -20,6 +20,8 @@ namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookshelfAggregate
             this.Apply(@event);
         }
         
+        protected Bookshelf(){ }
+        
         public void AddBook(Guid bookId)
         {
             if (_booksIds.Contains(bookId))
@@ -51,7 +53,7 @@ namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookshelfAggregate
 
         public override void Apply(DomainEvent<Guid> @event)
         {
-            if (@event.StreamPosition == Version && @event.StreamId == Id)
+            if (@event.StreamPosition == Version)
             {
                 if (@event is AddedBookToBookshelfDomainEvent)
                     Apply(@event as AddedBookToBookshelfDomainEvent);
