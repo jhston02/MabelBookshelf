@@ -1,5 +1,4 @@
-﻿using System.Runtime.CompilerServices;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using MabelBookshelf.Bookshelf.Domain.Aggregates.BookshelfAggregate;

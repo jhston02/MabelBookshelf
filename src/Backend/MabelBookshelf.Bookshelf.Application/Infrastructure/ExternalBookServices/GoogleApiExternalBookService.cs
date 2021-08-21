@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using MabelBookshelf.Bookshelf.Application.Interfaces;
 using MabelBookshelf.Bookshelf.Application.Models;
@@ -13,8 +12,8 @@ namespace MabelBookshelf.Bookshelf.Application.Infrastructure.ExternalBookServic
     public class GoogleApiExternalBookService : IExternalBookService
     {
         private Dictionary<string, ExternalBook> externalBooksCache;
-        private const string GOOGLE_BOOKS_BASE_URI = "https://www.googleapis.com/books/v1";
-        private const string ISBN_IDENTIFIER = "ISBN_13";
+        private const string GoogleBooksBaseUri = "https://www.googleapis.com/books/v1";
+        private const string IsbnIdentifier = "ISBN_13";
         private HttpClient _client;
 
         public GoogleApiExternalBookService(HttpClient client)
@@ -32,15 +31,16 @@ namespace MabelBookshelf.Bookshelf.Application.Infrastructure.ExternalBookServic
             else
             {
                 using var responseMessage =
-                    await _client.GetAsync(GOOGLE_BOOKS_BASE_URI + $"/volumes/{externalBookId}");
+                    await _client.GetAsync(GoogleBooksBaseUri + $"/volumes/{externalBookId}");
                 if (responseMessage.IsSuccessStatusCode)
                 {
+                    var options = new JsonSerializerOptions() { PropertyNameCaseInsensitive = true };
                     var googleBook =
-                        JsonSerializer.Deserialize<GoogleApiBookDto>(await responseMessage.Content.ReadAsStringAsync());
-                    var externalBook = new ExternalBook(googleBook.id, googleBook.volumeInfo.title,
-                        googleBook.volumeInfo.authors.ToArray(),
-                        googleBook.volumeInfo.industryIdentifiers.First(x => x.type == ISBN_IDENTIFIER).identifier,
-                        googleBook.volumeInfo.pageCount, googleBook.volumeInfo.categories.ToArray());
+                        JsonSerializer.Deserialize<GoogleApiBookDto>(await responseMessage.Content.ReadAsStringAsync(), options);
+                    var externalBook = new ExternalBook(googleBook.Id, googleBook.VolumeInfo.Title,
+                        googleBook.VolumeInfo.Authors.ToArray(),
+                        googleBook.VolumeInfo.IndustryIdentifiers.First(x => x.Type == IsbnIdentifier).Identifier,
+                        googleBook.VolumeInfo.PageCount, googleBook.VolumeInfo.Categories.ToArray());
                     externalBooksCache[externalBookId] = externalBook;
                     return externalBook;
                 }
@@ -53,138 +53,138 @@ namespace MabelBookshelf.Bookshelf.Application.Infrastructure.ExternalBookServic
 
         private class IndustryIdentifier
         {
-            public string type { get; set; }
-            public string identifier { get; set; }
+            public string Type { get; set; }
+            public string Identifier { get; set; }
         }
 
         private class ReadingModes
         {
-            public bool text { get; set; }
-            public bool image { get; set; }
+            public bool Text { get; set; }
+            public bool Image { get; set; }
         }
 
         private class PanelizationSummary
         {
-            public bool containsEpubBubbles { get; set; }
-            public bool containsImageBubbles { get; set; }
+            public bool ContainsEpubBubbles { get; set; }
+            public bool ContainsImageBubbles { get; set; }
         }
 
         public class ImageLinks
         {
-            public string smallThumbnail { get; set; }
-            public string thumbnail { get; set; }
-            public string small { get; set; }
-            public string medium { get; set; }
-            public string large { get; set; }
-            public string extraLarge { get; set; }
+            public string SmallThumbnail { get; set; }
+            public string Thumbnail { get; set; }
+            public string Small { get; set; }
+            public string Medium { get; set; }
+            public string Large { get; set; }
+            public string ExtraLarge { get; set; }
         }
 
         private class VolumeInfo
         {
-            public string title { get; set; }
-            public List<string> authors { get; set; }
-            public string publisher { get; set; }
-            public string publishedDate { get; set; }
-            public string description { get; set; }
-            public List<IndustryIdentifier> industryIdentifiers { get; set; }
-            public ReadingModes readingModes { get; set; }
-            public int pageCount { get; set; }
-            public int printedPageCount { get; set; }
-            public string printType { get; set; }
-            public List<string> categories { get; set; }
-            public int averageRating { get; set; }
-            public int ratingsCount { get; set; }
-            public string maturityRating { get; set; }
-            public bool allowAnonLogging { get; set; }
-            public string contentVersion { get; set; }
-            public PanelizationSummary panelizationSummary { get; set; }
-            public ImageLinks imageLinks { get; set; }
-            public string language { get; set; }
-            public string previewLink { get; set; }
-            public string infoLink { get; set; }
-            public string canonicalVolumeLink { get; set; }
+            public string Title { get; set; }
+            public List<string> Authors { get; set; }
+            public string Publisher { get; set; }
+            public string PublishedDate { get; set; }
+            public string Description { get; set; }
+            public List<IndustryIdentifier> IndustryIdentifiers { get; set; }
+            public ReadingModes ReadingModes { get; set; }
+            public int PageCount { get; set; }
+            public int PrintedPageCount { get; set; }
+            public string PrintType { get; set; }
+            public List<string> Categories { get; set; }
+            public int AverageRating { get; set; }
+            public int RatingsCount { get; set; }
+            public string MaturityRating { get; set; }
+            public bool AllowAnonLogging { get; set; }
+            public string ContentVersion { get; set; }
+            public PanelizationSummary PanelizationSummary { get; set; }
+            public ImageLinks ImageLinks { get; set; }
+            public string Language { get; set; }
+            public string PreviewLink { get; set; }
+            public string InfoLink { get; set; }
+            public string CanonicalVolumeLink { get; set; }
         }
 
         private class Layer
         {
-            public string layerId { get; set; }
-            public string volumeAnnotationsVersion { get; set; }
+            public string LayerId { get; set; }
+            public string VolumeAnnotationsVersion { get; set; }
         }
 
         private class LayerInfo
         {
-            public List<Layer> layers { get; set; }
+            public List<Layer> Layers { get; set; }
         }
 
         private class ListPrice
         {
-            public double amount { get; set; }
-            public string currencyCode { get; set; }
-            public int amountInMicros { get; set; }
+            public double Amount { get; set; }
+            public string CurrencyCode { get; set; }
+            public int AmountInMicros { get; set; }
         }
 
         private class RetailPrice
         {
-            public double amount { get; set; }
-            public string currencyCode { get; set; }
-            public int amountInMicros { get; set; }
+            public double Amount { get; set; }
+            public string CurrencyCode { get; set; }
+            public int AmountInMicros { get; set; }
         }
 
         private class Offer
         {
-            public int finskyOfferType { get; set; }
-            public ListPrice listPrice { get; set; }
-            public RetailPrice retailPrice { get; set; }
-            public bool giftable { get; set; }
+            public int FinskyOfferType { get; set; }
+            public ListPrice ListPrice { get; set; }
+            public RetailPrice RetailPrice { get; set; }
+            public bool Giftable { get; set; }
         }
 
         private class SaleInfo
         {
-            public string country { get; set; }
-            public string saleability { get; set; }
-            public bool isEbook { get; set; }
-            public ListPrice listPrice { get; set; }
-            public RetailPrice retailPrice { get; set; }
-            public string buyLink { get; set; }
-            public List<Offer> offers { get; set; }
+            public string Country { get; set; }
+            public string Saleability { get; set; }
+            public bool IsEbook { get; set; }
+            public ListPrice ListPrice { get; set; }
+            public RetailPrice RetailPrice { get; set; }
+            public string BuyLink { get; set; }
+            public List<Offer> Offers { get; set; }
         }
 
         private class Epub
         {
-            public bool isAvailable { get; set; }
-            public string acsTokenLink { get; set; }
+            public bool IsAvailable { get; set; }
+            public string AcsTokenLink { get; set; }
         }
 
         private class Pdf
         {
-            public bool isAvailable { get; set; }
-            public string acsTokenLink { get; set; }
+            public bool IsAvailable { get; set; }
+            public string AcsTokenLink { get; set; }
         }
 
         private class AccessInfo
         {
-            public string country { get; set; }
-            public string viewability { get; set; }
-            public bool embeddable { get; set; }
-            public bool publicDomain { get; set; }
-            public string textToSpeechPermission { get; set; }
-            public Epub epub { get; set; }
-            public Pdf pdf { get; set; }
-            public string webReaderLink { get; set; }
-            public string accessViewStatus { get; set; }
-            public bool quoteSharingAllowed { get; set; }
+            public string Country { get; set; }
+            public string Viewability { get; set; }
+            public bool Embeddable { get; set; }
+            public bool PublicDomain { get; set; }
+            public string TextToSpeechPermission { get; set; }
+            public Epub Epub { get; set; }
+            public Pdf Pdf { get; set; }
+            public string WebReaderLink { get; set; }
+            public string AccessViewStatus { get; set; }
+            public bool QuoteSharingAllowed { get; set; }
         }
 
         private class GoogleApiBookDto
         {
-            public string kind { get; set; }
-            public string id { get; set; }
-            public string etag { get; set; }
-            public string selfLink { get; set; }
-            public VolumeInfo volumeInfo { get; set; }
-            public LayerInfo layerInfo { get; set; }
-            public SaleInfo saleInfo { get; set; }
-            public AccessInfo accessInfo { get; set; }
+            public string Kind { get; set; }
+            public string Id { get; set; }
+            public string Etag { get; set; }
+            public string SelfLink { get; set; }
+            public VolumeInfo VolumeInfo { get; set; }
+            public LayerInfo LayerInfo { get; set; }
+            public SaleInfo SaleInfo { get; set; }
+            public AccessInfo AccessInfo { get; set; }
 
         }
     }

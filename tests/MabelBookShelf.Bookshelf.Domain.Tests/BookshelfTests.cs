@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using MabelBookshelf.Bookshelf.Domain.Aggregates.BookshelfAggregate;
 using Xunit;

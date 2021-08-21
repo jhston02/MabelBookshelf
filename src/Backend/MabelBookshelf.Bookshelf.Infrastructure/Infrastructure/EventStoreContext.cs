@@ -23,9 +23,9 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Infrastructure
             this._cache = cache;
         }
 
-        public async Task<T> CreateStreamAsync<T, V>(T value, string streamName) where T : Entity<V>
+        public async Task<T> CreateStreamAsync<T, TV>(T value, string streamName) where T : Entity<TV>
         {
-            var eventData = await GetEventData<T, V>(value);
+            var eventData = await GetEventData<T, TV>(value);
             await _client.AppendToStreamAsync(
                 streamName,
                 StreamState.NoStream,
@@ -36,9 +36,9 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Infrastructure
             return value;
         }
 
-        public async Task<T> WriteToStreamAsync<T, V>(T value, string streamName) where T : Entity<V>
+        public async Task<T> WriteToStreamAsync<T, TV>(T value, string streamName) where T : Entity<TV>
         {
-            var eventData = await GetEventData<T, V>(value);
+            var eventData = await GetEventData<T, TV>(value);
             await _client.AppendToStreamAsync(
                 streamName,
                 new StreamRevision((ulong)(value.Version - eventData.Count - 1)),
@@ -49,7 +49,7 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Infrastructure
             return value;
         }
 
-        private async Task<List<EventData>> GetEventData<T, V>(T value) where T : Entity<V>
+        private async Task<List<EventData>> GetEventData<T, TV>(T value) where T : Entity<TV>
         {
             var eventData = new List<EventData>();
             foreach (var @event in value.DomainEvents)
@@ -67,7 +67,7 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Infrastructure
             return eventData;
         }
 
-        public async Task<T> ReadFromStreamAsync<T,V>(string streamName) where T : Entity<V>
+        public async Task<T> ReadFromStreamAsync<T,TV>(string streamName) where T : Entity<TV>
         {
             var result = _client.ReadStreamAsync(
                 Direction.Forwards,
@@ -84,9 +84,9 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Infrastructure
                 var type = _cache.GetTypeFromString(e.Event.EventType);
                 var data = Encoding.UTF8.GetString(e.Event.Data.Span);
                 var serializedData = JsonSerializer.Deserialize(data, type);
-                if (serializedData is DomainEvent<V>)
+                if (serializedData is DomainEvent<TV>)
                 {
-                    var castedData = serializedData as DomainEvent<V>;
+                    var castedData = serializedData as DomainEvent<TV>;
                     entity.Apply(castedData);
                 }
                 else

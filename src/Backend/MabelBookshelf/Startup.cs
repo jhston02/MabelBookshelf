@@ -75,9 +75,8 @@ namespace MabelBookshelf
 
         private void ConfigureBookshelfDomainServices(IServiceCollection services)
         {
-            services.AddSingleton<EventStoreClient>((x) =>
+            services.AddSingleton((_) =>
             {
-                var cs = Configuration.GetConnectionString("EventStoreDbConnectionString");
                 var settings = EventStoreClientSettings
                     .Create(Configuration.GetConnectionString("EventStoreDbConnectionString"));
                 return new EventStoreClient(settings);
@@ -89,11 +88,11 @@ namespace MabelBookshelf
             services.AddScoped(typeof(IPipelineBehavior<,>), typeof(ValidationPipelineBehavior<,>));
             services.AddScoped<IBookshelfRepository,EventStoreDbBookshelfRepository>();
             services.AddScoped<IExternalBookService, GoogleApiExternalBookService>();
-            services.AddScoped<IBookRepository, EventStoreDBBookRepsitory>();
+            services.AddScoped<IBookRepository, EventStoreDbBookRepository>();
             services.AddScoped<EventStoreContext>();
             services.AddSingleton<ProfanityFilter.ProfanityFilter>();
             services.AddHttpClient<GoogleApiExternalBookService>();
-            services.AddSingleton<ITypeCache>(services =>
+            services.AddSingleton<ITypeCache>(_ =>
             {
                 var types = typeof(BookCreatedDomainEvent).Assembly.GetTypes().Where(x => x.BaseType is
                 {

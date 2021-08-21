@@ -7,11 +7,11 @@ using MabelBookshelf.Bookshelf.Infrastructure.Infrastructure;
 
 namespace MabelBookshelf.Bookshelf.Infrastructure.Book
 {
-    public class EventStoreDBBookRepsitory : IBookRepository
+    public class EventStoreDbBookRepository : IBookRepository
     {
         private const string PrependStreamName = "book-";
         private EventStoreContext _context;
-        public EventStoreDBBookRepsitory(EventStoreContext context)
+        public EventStoreDbBookRepository(EventStoreContext context)
         {
             this._context = context;
         }
