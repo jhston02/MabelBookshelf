@@ -1,6 +1,8 @@
+using System.Collections.Generic;
 using System.Linq;
 using EventStore.Client;
 using FluentValidation;
+using MabelBookshelf.BackgroundWorkers;
 using MabelBookshelf.Bookshelf.Application.Bookshelf.Commands;
 using MabelBookshelf.Bookshelf.Application.Infrastructure.Behaviors;
 using MabelBookshelf.Bookshelf.Application.Infrastructure.ExternalBookServices;
@@ -100,6 +102,15 @@ namespace MabelBookshelf
                 } && x.BaseType.GetGenericTypeDefinition() == typeof(DomainEvent<>));
                 return new DictionaryTypeCache(types.ToDictionary(x => x.Name, x => x));
             });
+            services.AddSingleton(x => new PersistentSubscriptionWatcherConfiguration()
+                { GroupStreams = new List<(string @group, string stream)>() { ("readmodelbook-group", "$ce-book") } });
+            services.AddSingleton((_) =>
+            {
+                var settings = EventStoreClientSettings
+                    .Create(Configuration.GetConnectionString("EventStoreDbConnectionString"));
+                return new EventStorePersistentSubscriptionsClient(settings);
+            });
+            services.AddSingleton<PersistentSubscriptionEventStoreContext>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

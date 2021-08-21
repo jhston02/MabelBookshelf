@@ -1,18 +1,16 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
+        <OutputType>Exe</OutputType>
         <TargetFramework>net5.0</TargetFramework>
     </PropertyGroup>
 
     <ItemGroup>
+      <PackageReference Include="CommandLineParser" Version="2.8.0" />
+      <PackageReference Include="EventStore.Client" Version="21.2.0" />
       <PackageReference Include="EventStore.Client.Grpc.PersistentSubscriptions" Version="21.2.0" />
+      <PackageReference Include="EventStore.Client.Grpc.ProjectionManagement" Version="21.2.0" />
       <PackageReference Include="EventStore.Client.Grpc.Streams" Version="21.2.0" />
-      <PackageReference Include="Grpc.Net.Client" Version="2.38.0" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <ProjectReference Include="..\MabelBookshelf.Bookshelf.Application\MabelBookshelf.Bookshelf.Application.csproj" />
-      <ProjectReference Include="..\MabelBookshelf.Bookshelf.Domain\MabelBookshelf.Bookshelf.Domain.csproj" />
     </ItemGroup>
 
 </Project>

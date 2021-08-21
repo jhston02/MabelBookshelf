@@ -13,13 +13,11 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Infrastructure
     public class EventStoreContext
     {
         private readonly EventStoreClient _client;
-        private readonly IMediator _mediator;
         private readonly ITypeCache _cache;
         
-        public EventStoreContext(EventStoreClient client, IMediator mediator, ITypeCache cache)
+        public EventStoreContext(EventStoreClient client, ITypeCache cache)
         {
             this._client = client;
-            this._mediator = mediator;
             this._cache = cache;
         }
 
@@ -54,7 +52,6 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Infrastructure
             var eventData = new List<EventData>();
             foreach (var @event in value.DomainEvents)
             {
-                await _mediator.Publish(@event);
                 var serializedData = JsonSerializer.SerializeToUtf8Bytes(@event, @event.GetType());
                 eventData.Add(
                     new EventData(
