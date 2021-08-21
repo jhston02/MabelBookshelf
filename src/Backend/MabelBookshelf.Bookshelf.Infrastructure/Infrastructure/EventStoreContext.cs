@@ -23,7 +23,33 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Infrastructure
             this._cache = cache;
         }
 
+        public async Task<T> CreateStreamAsync<T, V>(T value, string streamName) where T : Entity<V>
+        {
+            var eventData = await GetEventData<T, V>(value);
+            await _client.AppendToStreamAsync(
+                streamName,
+                StreamState.NoStream,
+                eventData
+            );
+
+            value.ClearEvents();
+            return value;
+        }
+
         public async Task<T> WriteToStreamAsync<T, V>(T value, string streamName) where T : Entity<V>
+        {
+            var eventData = await GetEventData<T, V>(value);
+            await _client.AppendToStreamAsync(
+                streamName,
+                new StreamRevision((ulong)(value.Version - eventData.Count - 1)),
+                eventData
+            );
+
+            value.ClearEvents();
+            return value;
+        }
+
+        private async Task<List<EventData>> GetEventData<T, V>(T value) where T : Entity<V>
         {
             var eventData = new List<EventData>();
             foreach (var @event in value.DomainEvents)
@@ -38,14 +64,7 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Infrastructure
                     ));
             }
 
-            await _client.AppendToStreamAsync(
-                streamName,
-                StreamState.NoStream,
-                eventData
-            );
-
-            value.ClearEvents();
-            return value;
+            return eventData;
         }
 
         public async Task<T> ReadFromStreamAsync<T,V>(string streamName) where T : Entity<V>
