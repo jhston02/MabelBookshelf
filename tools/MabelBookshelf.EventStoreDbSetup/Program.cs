@@ -23,7 +23,7 @@ namespace MabelBookshelf.EventStoreDbSetup
                     var settings = EventStoreClientSettings
                         .Create(o.ConnectionString);
                     var managementClient = new EventStoreProjectionManagementClient(settings);
-                    managementClient.EnableAsync("$by_category").GetAwaiter().GetResult();
+                    //managementClient.EnableAsync("$by_category").GetAwaiter().GetResult();
                     
                     using var client = new EventStorePersistentSubscriptionsClient(
                         EventStoreClientSettings.Create(o.ConnectionString)
@@ -31,12 +31,12 @@ namespace MabelBookshelf.EventStoreDbSetup
                     var pSettings = new PersistentSubscriptionSettings(namedConsumerStrategy: "Pinned", resolveLinkTos: true);
                     client.CreateAsync(
                         "$ce-book",
-                        "readmodelbook-group",
+                        "bookshelf-app",
                         pSettings).GetAwaiter().GetResult();
                     
                     client.CreateAsync(
                         "$ce-bookshelf",
-                        "readmodelbookshelf-group",
+                        "bookshelf-app",
                         pSettings).GetAwaiter().GetResult();
                 })
                 .WithNotParsed(o => Console.WriteLine("Not valid connections string"));

@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Threading;
@@ -16,16 +17,16 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Infrastructure
     {
         private EventStorePersistentSubscriptionsClient _client;
         private readonly ITypeCache _cache;
-        private ConcurrentDictionary<(string, string), (StreamStatus, PersistentSubscription)> _subCache;
+        private ConcurrentDictionary<string, (StreamStatus, PersistentSubscription)> _subCache;
         
         public PersistentSubscriptionEventStoreContext(EventStorePersistentSubscriptionsClient client, ITypeCache cache)
         {
             this._client = client;
             this._cache = cache;
-            this._subCache = new ConcurrentDictionary<(string, string), (StreamStatus, PersistentSubscription)>();
+            this._subCache = new ConcurrentDictionary<string, (StreamStatus, PersistentSubscription)>();
         }
 
-        public async Task Subscribe<T>(string groupName, string streamName, Func<DomainEvent<T>, Task> action, CancellationToken token)
+        public async Task<string> Subscribe<T>(string groupName, string streamName, Func<DomainEvent<T>, Task> action, CancellationToken token, string oldStreamId = null)
         {
             var subscription = await _client.SubscribeAsync(
                 streamName,
@@ -51,8 +52,8 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Infrastructure
                         // Resubscribe if the client didn't stop the subscription
                         subscription.Dispose();
                         var key = (groupName, streamName);
-                        var valueTuple = _subCache[key];
-                        _subCache[(groupName, streamName)] = (new StreamStatus(
+                        var valueTuple = _subCache[subscription.SubscriptionId];
+                        _subCache[subscription.SubscriptionId] = (new StreamStatus(
                             valueTuple.Item1.Id, 
                             valueTuple.Item1.Group, 
                             valueTuple.Item1.StreamName, 
@@ -61,16 +62,23 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Infrastructure
                     }
                 }, cancellationToken: token);
             var value = (new StreamStatus(subscription.SubscriptionId, groupName, streamName, Status.Ok), subscription);
-            _subCache.AddOrUpdate((groupName, streamName), (x) => value, (x,y) => value);
+            _subCache.AddOrUpdate(subscription.SubscriptionId, (x) => value, (x,y) => value);
+            if (oldStreamId != null)
+                _subCache.Remove(oldStreamId, out var oldValue);
+            return subscription.SubscriptionId;
         }
 
-        public StreamStatus GetStreamStatus(string groupName, string streamName)
+        public StreamStatus GetStreamStatus(string subscriptionId)
         {
-            var tuple = (groupName, streamname: streamName);
-            if (_subCache.ContainsKey(tuple))
-                return _subCache[tuple].Item1;
+            if (_subCache.ContainsKey(subscriptionId))
+                return _subCache[subscriptionId].Item1;
             else
                 return null;
+        }
+
+        public IEnumerable<StreamStatus> GetDroppedStreams()
+        {
+            return _subCache.Values.Where(x => x.Item1.Status == Status.Dropped).Select(x => x.Item1);
         }
 
         public void Dispose()

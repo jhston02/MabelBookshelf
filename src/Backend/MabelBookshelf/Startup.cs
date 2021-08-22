@@ -102,8 +102,12 @@ namespace MabelBookshelf
                 } && x.BaseType.GetGenericTypeDefinition() == typeof(DomainEvent<>));
                 return new DictionaryTypeCache(types.ToDictionary(x => x.Name, x => x));
             });
-            services.AddSingleton(x => new PersistentSubscriptionWatcherConfiguration()
-                { GroupStreams = new List<(string @group, string stream)>() { ("readmodelbook-group", "$ce-book") } });
+            services.AddSingleton(x =>
+            {
+                var settings = new PersistantSubscriptionSettings();
+                Configuration.GetSection("PersistantSubscriptionSettings").Bind(settings);
+                return settings;
+            });
             services.AddSingleton((_) =>
             {
                 var settings = EventStoreClientSettings
