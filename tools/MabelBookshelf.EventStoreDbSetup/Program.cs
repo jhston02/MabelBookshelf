@@ -23,7 +23,7 @@ namespace MabelBookshelf.EventStoreDbSetup
                     var settings = EventStoreClientSettings
                         .Create(o.ConnectionString);
                     var managementClient = new EventStoreProjectionManagementClient(settings);
-                    //managementClient.EnableAsync("$by_category").GetAwaiter().GetResult();
+                    managementClient.EnableAsync("$by_category").GetAwaiter().GetResult();
                     
                     using var client = new EventStorePersistentSubscriptionsClient(
                         EventStoreClientSettings.Create(o.ConnectionString)
