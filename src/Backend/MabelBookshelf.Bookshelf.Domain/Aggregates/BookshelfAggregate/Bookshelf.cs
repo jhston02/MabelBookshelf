@@ -5,7 +5,7 @@ using MabelBookshelf.Bookshelf.Domain.SeedWork;
 
 namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookshelfAggregate
 {
-    public class Bookshelf : Entity<Guid>
+    public class Bookshelf : Entity
     {
         public string Name { get; private set; }
         private List<Guid> _booksIds;
@@ -51,7 +51,7 @@ namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookshelfAggregate
 
         #region Apply Events
 
-        public override void Apply(DomainEvent<Guid> @event)
+        public override void Apply(DomainEvent @event)
         {
             if (@event.StreamPosition == Version)
             {

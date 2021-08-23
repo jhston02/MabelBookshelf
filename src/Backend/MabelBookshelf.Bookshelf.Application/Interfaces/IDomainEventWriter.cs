@@ -4,8 +4,8 @@ using MabelBookshelf.Bookshelf.Domain.SeedWork;
 
 namespace MabelBookshelf.Bookshelf.Application.Interfaces
 {
-    public interface IDomainEventWriter<T,TV> where T : DomainEvent<TV>
+    public interface IDomainEventWriter
     {
-        Task Handle(T domainEvent);
+        Task Write(DomainEvent domainEvent);
     }
 }

@@ -36,7 +36,7 @@ namespace MabelBookshelf.BackgroundWorkers
             {
                 for (int i = 0; i < config.Count; i++)
                 {
-                    await Subscribe(config.GroupName, config.StreamName, stoppingToken);
+                    await Subscribe(config.GroupName, config.StreamName, config.GroupName + config.StreamName + i.ToString(), stoppingToken);
                 }
             }
 
@@ -45,15 +45,15 @@ namespace MabelBookshelf.BackgroundWorkers
                 var droppedStreams = ctx.GetDroppedStreams();
                 foreach (var stream in droppedStreams)
                 {
-                    await Subscribe(stream.Group, stream.StreamName, stoppingToken, stream.Id);
+                    await Subscribe(stream.Group, stream.StreamName, stream.Id, stoppingToken);
                 }
                 await Task.Delay(sleepTimespan, stoppingToken);
             }
         }
 
-        private async Task Subscribe(string groupName, string streamName, CancellationToken stoppingToken, string oldStream = null)
+        private async Task Subscribe(string groupName, string streamName, string subscriptionId, CancellationToken stoppingToken)
         {
-            await ctx.Subscribe<Guid>(groupName, streamName,
+            await ctx.Subscribe<Guid>(groupName, streamName,subscriptionId,
                 async (x) =>
                 {
                     using (var scope = services.CreateScope())
@@ -64,7 +64,7 @@ namespace MabelBookshelf.BackgroundWorkers
                         await mediator.Publish(x, stoppingToken);
                     }
                 },
-                stoppingToken, oldStream);
+                stoppingToken);
         }
     }
 

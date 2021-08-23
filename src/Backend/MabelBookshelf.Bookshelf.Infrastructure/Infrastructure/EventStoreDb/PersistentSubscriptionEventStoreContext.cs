@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
@@ -26,7 +27,7 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Infrastructure
             this._subCache = new ConcurrentDictionary<string, (StreamStatus, PersistentSubscription)>();
         }
 
-        public async Task<string> Subscribe<T>(string groupName, string streamName, Func<DomainEvent<T>, Task> action, CancellationToken token, string oldStreamId = null)
+        public async Task<string> Subscribe<T>(string groupName, string streamName, string subscriptionId, Func<DomainEvent, Task> action, CancellationToken token)
         {
             var subscription = await _client.SubscribeAsync(
                 streamName,
@@ -39,9 +40,9 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Infrastructure
                     var type = _cache.GetTypeFromString(e.Event.EventType);
                     var data = Encoding.UTF8.GetString(e.Event.Data.Span);
                     var serializedData = JsonSerializer.Deserialize(data, type);
-                    if (serializedData is DomainEvent<T>)
+                    if (serializedData is DomainEvent)
                     {
-                        var castedData = serializedData as DomainEvent<T>;
+                        var castedData = serializedData as DomainEvent;
                         await action(castedData);
                     }
                     else
@@ -61,10 +62,8 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Infrastructure
                             valueTuple.Item2);
                     }
                 }, cancellationToken: token);
-            var value = (new StreamStatus(subscription.SubscriptionId, groupName, streamName, Status.Ok), subscription);
-            _subCache.AddOrUpdate(subscription.SubscriptionId, (x) => value, (x,y) => value);
-            if (oldStreamId != null)
-                _subCache.Remove(oldStreamId, out var oldValue);
+            var value = (new StreamStatus(subscriptionId, groupName, streamName, Status.Ok), subscription);
+            _subCache.AddOrUpdate(subscriptionId, (x) => value, (x,y) => value);
             return subscription.SubscriptionId;
         }
 

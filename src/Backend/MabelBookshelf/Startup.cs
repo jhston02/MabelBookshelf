@@ -84,7 +84,7 @@ namespace MabelBookshelf
                 return new EventStoreClient(settings);
             });
             
-            services.AddMediatR(typeof(Startup), typeof(CreateBookshelfCommand), typeof(Entity<>), typeof(EventStoreDbBookshelfRepository));
+            services.AddMediatR(typeof(Startup), typeof(CreateBookshelfCommand), typeof(Entity), typeof(EventStoreDbBookshelfRepository));
             AssemblyScanner.FindValidatorsInAssembly(typeof(CreateBookshelfCommand).Assembly)
                 .ForEach(item => services.AddScoped(item.InterfaceType, item.ValidatorType));
             services.AddScoped(typeof(IPipelineBehavior<,>), typeof(ValidationPipelineBehavior<,>));
@@ -96,10 +96,7 @@ namespace MabelBookshelf
             services.AddHttpClient<GoogleApiExternalBookService>();
             services.AddSingleton<ITypeCache>(_ =>
             {
-                var types = typeof(BookCreatedDomainEvent).Assembly.GetTypes().Where(x => x.BaseType is
-                {
-                    IsGenericType: true
-                } && x.BaseType.GetGenericTypeDefinition() == typeof(DomainEvent<>));
+                var types = typeof(BookCreatedDomainEvent).Assembly.GetTypes().Where(x => x.IsSubclassOf(typeof(DomainEvent)));
                 return new DictionaryTypeCache(types.ToDictionary(x => x.Name, x => x));
             });
             services.AddSingleton(x =>
@@ -115,6 +112,7 @@ namespace MabelBookshelf
                 return new EventStorePersistentSubscriptionsClient(settings);
             });
             services.AddSingleton<PersistentSubscriptionEventStoreContext>();
+            services.AddScoped(typeof(IDomainEventWriter), typeof(SqlDomainEventWriter));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
