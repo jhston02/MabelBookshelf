@@ -23,7 +23,7 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Infrastructure
 
         public async Task<T> CreateStreamAsync<T>(T value, string streamName) where T : Entity
         {
-            var eventData = await GetEventData<T>(value);
+            var eventData = GetEventData<T>(value);
             await _client.AppendToStreamAsync(
                 streamName,
                 StreamState.NoStream,
@@ -36,7 +36,7 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Infrastructure
 
         public async Task<T> WriteToStreamAsync<T>(T value, string streamName) where T : Entity
         {
-            var eventData = await GetEventData<T>(value);
+            var eventData =  GetEventData<T>(value);
             await _client.AppendToStreamAsync(
                 streamName,
                 new StreamRevision((ulong)(value.Version - eventData.Count - 1)),
@@ -47,7 +47,7 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Infrastructure
             return value;
         }
 
-        private async Task<List<EventData>> GetEventData<T>(T value) where T : Entity
+        private  List<EventData> GetEventData<T>(T value) where T : Entity
         {
             var eventData = new List<EventData>();
             foreach (var @event in value.DomainEvents)
