@@ -3,7 +3,7 @@ using MabelBookshelf.Bookshelf.Domain.SeedWork;
 
 namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookshelfAggregate.Events
 {
-    public class RenamedBookshelfDomainEvent : DomainEvent<Guid>
+    public class RenamedBookshelfDomainEvent : DomainEvent
     {
         public string NewName { get; private set; }
         public string OldName { get; private set; }

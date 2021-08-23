@@ -14,6 +14,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MabelBookshelf.Bookshelf.In
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MabelBookshelf.Identity.Infrastructure", "src\Backend\MabelBookshelf.Identity.Infrastructure\MabelBookshelf.Identity.Infrastructure.csproj", "{0CB570F8-B108-4B95-9343-E4EA102CEC8F}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tools", "tools", "{7C252252-1195-4C59-8451-0D528F844775}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MabelBookshelf.EventStoreDbSetup", "tools\MabelBookshelf.EventStoreDbSetup\MabelBookshelf.EventStoreDbSetup.csproj", "{957BE54F-BAB4-4A8A-8CB2-95C8EF27EE16}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -48,5 +52,12 @@ Global
 		{0CB570F8-B108-4B95-9343-E4EA102CEC8F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0CB570F8-B108-4B95-9343-E4EA102CEC8F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0CB570F8-B108-4B95-9343-E4EA102CEC8F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{957BE54F-BAB4-4A8A-8CB2-95C8EF27EE16}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{957BE54F-BAB4-4A8A-8CB2-95C8EF27EE16}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{957BE54F-BAB4-4A8A-8CB2-95C8EF27EE16}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{957BE54F-BAB4-4A8A-8CB2-95C8EF27EE16}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{957BE54F-BAB4-4A8A-8CB2-95C8EF27EE16} = {7C252252-1195-4C59-8451-0D528F844775}
 	EndGlobalSection
 EndGlobal
