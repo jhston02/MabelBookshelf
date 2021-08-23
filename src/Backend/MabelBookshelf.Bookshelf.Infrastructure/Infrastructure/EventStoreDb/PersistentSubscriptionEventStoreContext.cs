@@ -52,9 +52,8 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Infrastructure
                     {
                         // Resubscribe if the client didn't stop the subscription
                         subscription.Dispose();
-                        var key = (groupName, streamName);
-                        var valueTuple = _subCache[subscription.SubscriptionId];
-                        _subCache[subscription.SubscriptionId] = (new StreamStatus(
+                        var valueTuple = _subCache[subscriptionId];
+                        _subCache[subscriptionId] = (new StreamStatus(
                             valueTuple.Item1.Id, 
                             valueTuple.Item1.Group, 
                             valueTuple.Item1.StreamName, 
