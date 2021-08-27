@@ -8,5 +8,6 @@ namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookshelfAggregate
     {
         Task<Bookshelf> Add(Bookshelf bookshelf);
         Task<Bookshelf> Get(Guid id);
+        Task<Bookshelf> Update(Guid id);
     }
 }
