@@ -36,5 +36,10 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Bookshelf
         {
             throw new NotImplementedException();
         }
+
+        public Task<Domain.Aggregates.BookshelfAggregate.Bookshelf> Update(Domain.Aggregates.BookshelfAggregate.Bookshelf bookshelf)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

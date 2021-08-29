@@ -33,6 +33,11 @@ namespace MabelBookshelf.Bookshelf.Application.Tests
                 return Task.FromResult(bookshelf);
             }
 
+            public Task<Bookshelf> Update(Bookshelf bookshelf)
+            {
+                throw new NotImplementedException();
+            }
+
             public Task<Bookshelf> Get(Guid id)
             {
                 throw new NotImplementedException();
