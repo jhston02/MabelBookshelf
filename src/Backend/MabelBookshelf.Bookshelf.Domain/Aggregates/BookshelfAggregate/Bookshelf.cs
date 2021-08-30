@@ -53,7 +53,8 @@ namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookshelfAggregate
 
         public override void Apply(DomainEvent<Guid> @event)
         {
-            if (@event.StreamPosition != Version) return;
+            if (@event.StreamPosition != Version) 
+                throw new ArgumentException("Event is not in order!");
             switch (@event)
             {
                 case AddedBookToBookshelfDomainEvent domainEvent:
