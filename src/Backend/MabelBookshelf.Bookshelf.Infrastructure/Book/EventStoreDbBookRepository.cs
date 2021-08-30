@@ -21,7 +21,7 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Book
         {
             try
             {
-                return await _context.CreateStreamAsync<Domain.Aggregates.BookAggregate.Book, Guid>(book,
+                return await _context.CreateStreamAsync(book,
                     PrependStreamName + book.Id);
             }
             catch (WrongExpectedVersionException)

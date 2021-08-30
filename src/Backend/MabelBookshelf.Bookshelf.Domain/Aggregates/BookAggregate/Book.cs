@@ -5,7 +5,7 @@ using MabelBookshelf.Bookshelf.Domain.SeedWork;
 namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookAggregate
 {
     //TODO: check isbn format
-    public class Book : Entity<Guid>
+    public class Book : Entity
     {
         public string Title { get; private set; }
         public string[] Authors { get; private set; }
@@ -83,7 +83,7 @@ namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookAggregate
 
         #region Apply Events
 
-        public override void Apply(DomainEvent<Guid> @event)
+        public override void Apply(DomainEvent @event)
         {
             if (@event.StreamPosition == Version)
             {

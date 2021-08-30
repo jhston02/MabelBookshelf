@@ -3,7 +3,7 @@ using MabelBookshelf.Bookshelf.Domain.SeedWork;
 
 namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookshelfAggregate.Events
 {
-    public class BookshelfCreatedDomainEvent : DomainEvent<Guid>
+    public class BookshelfCreatedDomainEvent : DomainEvent
     {
         public string Name { get; private set; }
         public string OwnerId { get; private set; }

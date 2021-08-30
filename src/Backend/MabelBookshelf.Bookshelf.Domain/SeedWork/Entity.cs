@@ -1,13 +1,14 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using MediatR;
 
 namespace MabelBookshelf.Bookshelf.Domain.SeedWork
 {
-    public abstract class Entity<T>
+    public abstract class Entity
     {
-        public T Id { get; protected set; }
+        public Guid Id { get; protected set; }
         public long Version { get; protected set; }
-        protected bool Equals(Entity<T> other)
+        protected bool Equals(Entity other)
         {
             if (Id.Equals(other.Id))
                 return true;
@@ -20,12 +21,12 @@ namespace MabelBookshelf.Bookshelf.Domain.SeedWork
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != this.GetType()) return false;
-            return Equals((Entity<T>) obj);
+            return Equals((Entity) obj);
         }
 
         public override int GetHashCode()
         {
-            if (!Id.Equals(default(T)))
+            if (!Id.Equals(default(Guid)))
             {
                 return Id.GetHashCode();
             }
@@ -35,10 +36,10 @@ namespace MabelBookshelf.Bookshelf.Domain.SeedWork
             }
         }
 
-        private List<DomainEvent<T>> domainEvents = new List<DomainEvent<T>>();
-        public IReadOnlyCollection<DomainEvent<T>> DomainEvents => domainEvents;
+        private List<DomainEvent> domainEvents = new List<DomainEvent>();
+        public IReadOnlyCollection<DomainEvent> DomainEvents => domainEvents;
         
-        protected void AddEvent(DomainEvent<T> @event)
+        protected void AddEvent(DomainEvent @event)
         {
             domainEvents.Add(@event);
         }
@@ -48,6 +49,6 @@ namespace MabelBookshelf.Bookshelf.Domain.SeedWork
             domainEvents.Clear();
         }
 
-        public virtual void Apply(DomainEvent<T> @event) { }
+        public virtual void Apply(DomainEvent @event) { }
     }
 }
