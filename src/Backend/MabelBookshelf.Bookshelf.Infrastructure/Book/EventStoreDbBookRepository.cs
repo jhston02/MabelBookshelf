@@ -35,9 +35,9 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Book
             throw new NotImplementedException();
         }
 
-        public Task<bool> Exists(Guid bookId)
+        public async Task<bool> Exists(Guid bookId)
         {
-            throw new NotImplementedException();
+           return await  _context.StreamExists(PrependStreamName + bookId);
         }
     }
 }

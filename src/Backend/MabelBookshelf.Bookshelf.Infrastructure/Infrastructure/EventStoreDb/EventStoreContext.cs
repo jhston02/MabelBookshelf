@@ -97,7 +97,7 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Infrastructure
         {
             var result = _client.ReadStreamAsync(
                 Direction.Forwards,
-                "streamId",
+                streamId,
                 revision: StreamPosition.Start,
                 maxCount: 1);
 

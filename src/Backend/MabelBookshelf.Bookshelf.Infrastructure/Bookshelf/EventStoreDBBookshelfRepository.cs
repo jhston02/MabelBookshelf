@@ -28,18 +28,26 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Bookshelf
             }
             catch (WrongExpectedVersionException)
             {
-                throw new BookDomainException($"Bookshelf with id:{bookshelf.Id} already exists");
+                throw new BookshelfDomainException($"Bookshelf with id:{bookshelf.Id} already exists");
             }
         }
 
-        public Task<Domain.Aggregates.BookshelfAggregate.Bookshelf> Get(Guid id)
+        public async Task<Domain.Aggregates.BookshelfAggregate.Bookshelf> Get(Guid id)
         {
-            throw new NotImplementedException();
+            return await _context.ReadFromStreamAsync<Domain.Aggregates.BookshelfAggregate.Bookshelf>(
+                    PrependStreamName + id);
         }
 
-        public Task<Domain.Aggregates.BookshelfAggregate.Bookshelf> Update(Domain.Aggregates.BookshelfAggregate.Bookshelf bookshelf)
+        public async Task<Domain.Aggregates.BookshelfAggregate.Bookshelf> Update(Domain.Aggregates.BookshelfAggregate.Bookshelf bookshelf)
         {
-            throw new NotImplementedException();
+            try
+            {
+                return await _context.WriteToStreamAsync(bookshelf, PrependStreamName + bookshelf.Id);
+            }
+            catch (WrongExpectedVersionException)
+            {
+                throw new BookshelfDomainException($"Bookshelf was modified multiple times");
+            }
         }
     }
 }
