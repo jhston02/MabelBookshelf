@@ -80,6 +80,15 @@ namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookAggregate
             if (this.CurrentPageNumber == TotalPages)
                 this.FinishReading();
         }
+        
+        public override void Delete()
+        {
+            if (IsDeleted)
+                throw new ArgumentException($"Book {Title} is already deleted");
+            var @event = new BookDeletedDomainEvent(this.Id, this.Version);
+            this.AddEvent(@event);
+            this.Apply(@event);
+        }
 
         #region Apply Events
 
@@ -87,6 +96,7 @@ namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookAggregate
         {
             if (@event.StreamPosition == Version)
             {
+                Version++;
                 if (@event is BookCreatedDomainEvent)
                     Apply(@event as BookCreatedDomainEvent);
                 else if(@event is BookFinishedDomainEvent)
@@ -99,6 +109,8 @@ namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookAggregate
                     Apply(@event as MarkedBookAsWantedDomainEvent);
                 else if(@event is ReadToPageDomainEvent)
                     Apply(@event as ReadToPageDomainEvent);
+                else if(@event is BookDeletedDomainEvent)
+                    Apply(@event as BookDeletedDomainEvent);
             }
             else
             {
@@ -108,31 +120,26 @@ namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookAggregate
 
         private void Apply(NotFinishDomainEvent @event)
         {
-            Version++;
             Status = BookStatus.Dnf;
         }
 
         private void Apply(BookFinishedDomainEvent @event)
         {
-            Version++;
             Status = BookStatus.Finished;
         }
         
         private void Apply(BookStartedDomainEvent @event)
         {
-            Version++;
             Status = BookStatus.Reading;
         }
 
         private void Apply(MarkedBookAsWantedDomainEvent @event)
         {
-            Version++;
             Status = BookStatus.Want;
         }
 
         private void Apply(ReadToPageDomainEvent @event)
         {
-            Version++;
             CurrentPageNumber = @event.NewPageNumber;
         }
 
@@ -140,7 +147,6 @@ namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookAggregate
         {
             if (@event.StreamPosition != 0)
                 throw new ArgumentException("Cannot create book twice");
-            Version++;
             this.Id = @event.StreamId;
             this.Title = @event.Title;
             this.Authors = @event.Authors;
@@ -150,7 +156,13 @@ namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookAggregate
             this.Status = BookStatus.Want;
             this.OwnerId = @event.OwnerId;
             this.Categories = @event.Categories;
+            this.IsDeleted = false;
             CurrentPageNumber = 0;
+        }
+        
+        private void Apply(BookDeletedDomainEvent @event)
+        {
+            this.IsDeleted = true;
         }
         #endregion
     }

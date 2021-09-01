@@ -6,7 +6,7 @@ namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookAggregate
 {
     public interface IBookRepository : IRepository<Book>
     {
-        Task<Book> Add(Book book);
-        Task<Book> Get(Guid bookId);
+        Task<Book> AddAsync(Book book);
+        Task<Book> GetAsync(Guid bookId);
     }
 }

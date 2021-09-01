@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using MediatR;
+using Microsoft.VisualBasic.FileIO;
 
 namespace MabelBookshelf.Bookshelf.Domain.SeedWork
 {
@@ -8,6 +9,7 @@ namespace MabelBookshelf.Bookshelf.Domain.SeedWork
     {
         public Guid Id { get; protected set; }
         public long Version { get; protected set; }
+        public bool IsDeleted { get; protected set; }
         protected bool Equals(Entity other)
         {
             if (Id.Equals(other.Id))
@@ -50,5 +52,7 @@ namespace MabelBookshelf.Bookshelf.Domain.SeedWork
         }
 
         public virtual void Apply(DomainEvent @event) { }
+
+        public abstract void Delete();
     }
 }

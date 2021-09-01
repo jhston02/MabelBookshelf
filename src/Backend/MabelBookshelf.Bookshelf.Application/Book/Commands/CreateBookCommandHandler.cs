@@ -23,7 +23,7 @@ namespace MabelBookshelf.Bookshelf.Application.Book.Commands
             var book = new Book(request.Id, externalBook.Title, externalBook.Authors, externalBook.Isbn,
                 externalBook.Id, externalBook.TotalPages, request.OwnerId, externalBook.Categories);
 
-            await this._bookRepository.Add(book);
+            await this._bookRepository.AddAsync(book);
             await this._bookRepository.UnitOfWork.SaveChangesAsync();
             return true;
         }

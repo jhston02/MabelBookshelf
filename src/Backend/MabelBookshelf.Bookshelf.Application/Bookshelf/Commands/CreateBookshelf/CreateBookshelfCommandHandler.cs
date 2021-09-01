@@ -18,7 +18,7 @@ namespace MabelBookshelf.Bookshelf.Application.Bookshelf.Commands
         public async Task<bool> Handle(CreateBookshelfCommand request, CancellationToken cancellationToken)
         {
             var bookshelf = new Bookshelf(request.Id, request.Name, request.OwnerId);
-            await _repository.Add(bookshelf);
+            await _repository.AddAsync(bookshelf);
             await _repository.UnitOfWork.SaveChangesAsync();
             return true;
         }

@@ -27,13 +27,18 @@ namespace MabelBookshelf.Bookshelf.Application.Tests
         {
             public List<Bookshelf> Bookshelfs = new List<Bookshelf>();
             public IUnitOfWork UnitOfWork => new MockUnitOfWork();
-            public Task<Bookshelf> Add(Bookshelf bookshelf)
+            public Task<Bookshelf> AddAsync(Bookshelf bookshelf)
             {
                 Bookshelfs.Add(bookshelf);
                 return Task.FromResult(bookshelf);
             }
 
-            public Task<Bookshelf> Get(Guid id)
+            public Task<Bookshelf> GetAsync(Guid id, bool includeSoftDeletes)
+            {
+                throw new NotImplementedException();
+            }
+
+            public Task<Bookshelf> UpdateAsync(Bookshelf bookshelf)
             {
                 throw new NotImplementedException();
             }

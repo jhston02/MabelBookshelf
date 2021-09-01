@@ -19,12 +19,12 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Bookshelf
         }
 
         public IUnitOfWork UnitOfWork => new NoOpUnitOfWork();
-        public async Task<Domain.Aggregates.BookshelfAggregate.Bookshelf> Add(Domain.Aggregates.BookshelfAggregate.Bookshelf bookshelf)
+        public async Task<Domain.Aggregates.BookshelfAggregate.Bookshelf> AddAsync(Domain.Aggregates.BookshelfAggregate.Bookshelf bookshelf)
         {
             try
             {
                 return await _context.CreateStreamAsync(bookshelf,
-                    PrependStreamName + bookshelf.Id);
+                    GetKey(bookshelf.Id));
             }
             catch (WrongExpectedVersionException)
             {
@@ -32,9 +32,30 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Bookshelf
             }
         }
 
-        public Task<Domain.Aggregates.BookshelfAggregate.Bookshelf> Get(Guid id)
+        public async Task<Domain.Aggregates.BookshelfAggregate.Bookshelf> GetAsync(Guid id, bool includeSoftDeletes = false)
         {
-            throw new NotImplementedException();
+            var bookshelf = await _context.ReadFromStreamAsync<Domain.Aggregates.BookshelfAggregate.Bookshelf>(
+                GetKey(id));
+            if(!includeSoftDeletes) 
+                bookshelf = bookshelf.IsDeleted ? null : bookshelf;
+            return bookshelf;
+        }
+
+        public async Task<Domain.Aggregates.BookshelfAggregate.Bookshelf> UpdateAsync(Domain.Aggregates.BookshelfAggregate.Bookshelf bookshelf)
+        {
+            try
+            {
+                return await _context.WriteToStreamAsync(bookshelf, PrependStreamName + bookshelf.Id);
+            }
+            catch (WrongExpectedVersionException)
+            {
+                throw new BookshelfDomainException($"Bookshelf was modified multiple times");
+            }
+        }
+
+        private string GetKey(Guid bookshelfId)
+        {
+            return PrependStreamName + bookshelfId;
         }
     }
 }

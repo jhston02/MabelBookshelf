@@ -49,12 +49,22 @@ namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookshelfAggregate
             this.Apply(@event);
         }
 
+        public override void Delete()
+        {
+            if (IsDeleted)
+                throw new ArgumentException($"Bookshelf {Name} is already deleted");
+            var @event = new BookshelfDeletedDomainEvent(this.Id, this.Version);
+            this.AddEvent(@event);
+            this.Apply(@event);
+        }
+
         #region Apply Events
 
         public override void Apply(DomainEvent @event)
         {
             if (@event.StreamPosition == Version)
             {
+                Version++;
                 if (@event is AddedBookToBookshelfDomainEvent)
                     Apply(@event as AddedBookToBookshelfDomainEvent);
                 else if(@event is BookshelfCreatedDomainEvent)
@@ -63,6 +73,8 @@ namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookshelfAggregate
                     Apply(@event as RemovedBookFromBookshelfDomainEvent);
                 else if(@event is RenamedBookshelfDomainEvent)
                     Apply(@event as RenamedBookshelfDomainEvent);
+                else if(@event is BookshelfDeletedDomainEvent)
+                    Apply(@event as BookshelfDeletedDomainEvent);
             }
             else
             {
@@ -70,33 +82,36 @@ namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookshelfAggregate
             }
         }
 
-        public void Apply(AddedBookToBookshelfDomainEvent @event)
+        private void Apply(AddedBookToBookshelfDomainEvent @event)
         {
-            Version++;
             this._booksIds.Add(@event.BookId);
         }
         
-        public void Apply(RemovedBookFromBookshelfDomainEvent @event)
+        private void Apply(RemovedBookFromBookshelfDomainEvent @event)
         {
-            Version++;
             this._booksIds.Remove(@event.BookId);
         }
         
-        public void Apply(RenamedBookshelfDomainEvent @event)
+        private void Apply(RenamedBookshelfDomainEvent @event)
         {
-            Version++;
             this.Name = @event.NewName;
         }
 
-        public void Apply(BookshelfCreatedDomainEvent @event)
+        private void Apply(BookshelfCreatedDomainEvent @event)
         {
             if (@event.StreamPosition != 0)
                 throw new ArgumentException("Cannot create bookshelf twice");
-            Version++;
+            
             Id = @event.StreamId;
             _booksIds = new List<Guid>();
             OwnerId = @event.OwnerId;
             Name = @event.Name;
+            IsDeleted = false;
+        }
+
+        private void Apply(BookshelfDeletedDomainEvent @event)
+        {
+            this.IsDeleted = true;
         }
         #endregion
     }

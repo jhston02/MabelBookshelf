@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text;
 using System.Text.Json;
@@ -10,11 +11,11 @@ using MediatR;
 
 namespace MabelBookshelf.Bookshelf.Infrastructure.Infrastructure
 {
-    public class EventStoreContext
+    public class EventStoreContext : IEventStoreContext
     {
         private readonly EventStoreClient _client;
         private readonly ITypeCache _cache;
-        
+
         public EventStoreContext(EventStoreClient client, ITypeCache cache)
         {
             this._client = client;
@@ -97,7 +98,7 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Infrastructure
         {
             var result = _client.ReadStreamAsync(
                 Direction.Forwards,
-                "streamId",
+                streamId,
                 revision: StreamPosition.Start,
                 maxCount: 1);
 
