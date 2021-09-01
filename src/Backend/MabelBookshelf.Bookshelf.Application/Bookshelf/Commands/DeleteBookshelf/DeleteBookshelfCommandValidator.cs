@@ -11,8 +11,10 @@ namespace MabelBookshelf.Bookshelf.Application.Bookshelf.Commands
             RuleFor(x => x.OwnerId).CustomAsync(async (x, context, token) =>
             {
                 var bookshelf = await bookshelfRepository.GetAsync(context.InstanceToValidate.BookshelfId);
-                if(x != bookshelf.OwnerId)
-                    context.AddFailure("Unauthorized");
+                if (bookshelf == null)
+                    context.AddFailure(nameof(DeleteBookshelfCommand.BookshelfId),"Bookshelf does not exist");
+                if (x != bookshelf.OwnerId)
+                    context.AddFailure(nameof(DeleteBookshelfCommand.OwnerId),"Unauthorized");
             });
         }
     }
