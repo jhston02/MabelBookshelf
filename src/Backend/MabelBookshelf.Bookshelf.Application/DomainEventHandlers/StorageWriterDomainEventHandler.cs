@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 using MabelBookshelf.Bookshelf.Application.Interfaces;
 using MabelBookshelf.Bookshelf.Domain.SeedWork;

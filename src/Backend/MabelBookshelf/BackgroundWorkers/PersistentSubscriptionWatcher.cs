@@ -1,12 +1,7 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using EventStore.Client;
-using IdentityServer4.Events;
 using MabelBookshelf.Bookshelf.Infrastructure.Infrastructure;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
@@ -53,7 +48,7 @@ namespace MabelBookshelf.BackgroundWorkers
 
         private async Task Subscribe(string groupName, string streamName, string subscriptionId, CancellationToken stoppingToken)
         {
-            await ctx.Subscribe<Guid>(groupName, streamName,subscriptionId,
+            await ctx.Subscribe(groupName, streamName,subscriptionId,
                 async (x) =>
                 {
                     using (var scope = services.CreateScope())

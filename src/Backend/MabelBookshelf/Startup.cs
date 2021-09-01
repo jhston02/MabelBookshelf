@@ -1,7 +1,5 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http;
 using EventStore.Client;
 using FluentValidation;
 using Hellang.Middleware.ProblemDetails;
@@ -19,16 +17,11 @@ using MabelBookshelf.Bookshelf.Infrastructure.Book;
 using MabelBookshelf.Bookshelf.Infrastructure.Bookshelf;
 using MabelBookshelf.Bookshelf.Infrastructure.Infrastructure;
 using MabelBookshelf.Bookshelf.Infrastructure.Interfaces;
-using MabelBookshelf.Identity.Infrastructure;
 using MediatR;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Versioning;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -91,7 +84,7 @@ namespace MabelBookshelf
                 var types = typeof(BookCreatedDomainEvent).Assembly.GetTypes().Where(x => x.IsSubclassOf(typeof(DomainEvent)));
                 return new DictionaryTypeCache(types.ToDictionary(x => x.Name, x => x));
             });
-            services.AddSingleton(x =>
+            services.AddSingleton(_ =>
             {
                 var settings = new PersistantSubscriptionSettings();
                 Configuration.GetSection("PersistantSubscriptionSettings").Bind(settings);
@@ -110,21 +103,22 @@ namespace MabelBookshelf
         private void ConfigureProblemDetails(ProblemDetailsOptions options)
         {
             // Custom mapping function for FluentValidation's ValidationException.
-            options.MapFluentValidationException();
+            options.Map<ValidationException>((ctx, ex) =>
+            {
+                var factory = ctx.RequestServices.GetRequiredService<ProblemDetailsFactory>();
 
-            // You can configure the middleware to re-throw certain types of exceptions, all exceptions or based on a predicate.
-            // This is useful if you have upstream middleware that needs to do additional handling of exceptions.
-            options.Rethrow<NotSupportedException>();
+                var errors = ex.Errors
+                    .GroupBy(x => x.PropertyName)
+                    .ToDictionary(
+                        x => x.Key,
+                        x => x.Select(validationFailure => validationFailure.ErrorMessage).ToArray());
 
-            // This will map NotImplementedException to the 501 Not Implemented status code.
-            options.MapToStatusCode<NotImplementedException>(StatusCodes.Status501NotImplemented);
+                return factory.CreateValidationProblemDetails(ctx, errors);
+            });
 
-            // This will map HttpRequestException to the 503 Service Unavailable status code.
-            options.MapToStatusCode<HttpRequestException>(StatusCodes.Status503ServiceUnavailable);
-
-            // Because exceptions are handled polymorphically, this will act as a "catch all" mapping, which is why it's added last.
-            // If an exception other than NotImplementedException and HttpRequestException is thrown, this will handle it.
-            options.MapToStatusCode<Exception>(StatusCodes.Status500InternalServerError);
+            options.MapToStatusCode<ArgumentException>(400);
+            options.MapToStatusCode<BookshelfDomainException>(400);
+            options.MapToStatusCode<BookDomainException>(400);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

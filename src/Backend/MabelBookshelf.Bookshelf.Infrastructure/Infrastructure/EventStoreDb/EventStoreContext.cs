@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text;
 using System.Text.Json;
@@ -7,7 +6,6 @@ using System.Threading.Tasks;
 using EventStore.Client;
 using MabelBookshelf.Bookshelf.Domain.SeedWork;
 using MabelBookshelf.Bookshelf.Infrastructure.Interfaces;
-using MediatR;
 
 namespace MabelBookshelf.Bookshelf.Infrastructure.Infrastructure
 {
@@ -24,7 +22,7 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Infrastructure
 
         public async Task<T> CreateStreamAsync<T>(T value, string streamName) where T : Entity
         {
-            var eventData = GetEventData<T>(value);
+            var eventData = GetEventData(value);
             await _client.AppendToStreamAsync(
                 streamName,
                 StreamState.NoStream,
@@ -37,7 +35,7 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Infrastructure
 
         public async Task<T> WriteToStreamAsync<T>(T value, string streamName) where T : Entity
         {
-            var eventData =  GetEventData<T>(value);
+            var eventData =  GetEventData(value);
             await _client.AppendToStreamAsync(
                 streamName,
                 new StreamRevision((ulong)(value.Version - eventData.Count - 1)),
@@ -82,10 +80,9 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Infrastructure
                 var type = _cache.GetTypeFromString(e.Event.EventType);
                 var data = Encoding.UTF8.GetString(e.Event.Data.Span);
                 var serializedData = JsonSerializer.Deserialize(data, type);
-                if (serializedData is DomainEvent)
+                if (serializedData is DomainEvent castedData)
                 {
-                    var castedData = serializedData as DomainEvent;
-                    entity.Apply(castedData);
+                    if (entity != null) entity.Apply(castedData);
                 }
                 else
                     throw new Exception("Invalid event type");

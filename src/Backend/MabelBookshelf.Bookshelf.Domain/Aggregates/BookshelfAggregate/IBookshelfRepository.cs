@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Threading.Tasks;
-using MabelBookshelf.Bookshelf.Domain.Aggregates.BookAggregate.Events;
 using MabelBookshelf.Bookshelf.Domain.SeedWork;
 
 namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookshelfAggregate

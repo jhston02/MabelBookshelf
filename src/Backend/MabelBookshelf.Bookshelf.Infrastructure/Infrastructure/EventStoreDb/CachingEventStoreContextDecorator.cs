@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using MabelBookshelf.Bookshelf.Domain.SeedWork;
@@ -9,10 +8,10 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Infrastructure
 {
     public class CachingEventStoreContextDecorator : IEventStoreContext
     {
-        private ConcurrentDictionary<string, Entity> _cache;
+        private readonly ConcurrentDictionary<string, Entity> _cache;
         //Probably inefficient to store the existence here but don't want to deal with marker values
         //etc.
-        private HashSet<string> _existenceCache;
+        private readonly HashSet<string> _existenceCache;
         private readonly IEventStoreContext _context;
         public CachingEventStoreContextDecorator(IEventStoreContext context)
         {
@@ -31,7 +30,7 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Infrastructure
         public async Task<T> WriteToStreamAsync<T>(T value, string streamName) where T : Entity
         {
             var result = await this._context.WriteToStreamAsync(value, streamName);
-            _cache.AddOrUpdate(streamName, (x) => result, (x,y) => result);
+            _cache.AddOrUpdate(streamName, (_) => result, (_,_) => result);
             return result;
         }
 
@@ -57,7 +56,7 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Infrastructure
             else
             {
                 var result = await _context.StreamExists(streamId);
-                if (result == true)
+                if (result)
                     _existenceCache.Add(streamId);
                 return result;
             }
