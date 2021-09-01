@@ -43,7 +43,7 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Infrastructure
             }
             else
             {
-                var result = await ReadFromStreamAsync<T>(streamName);
+                var result = await _context.ReadFromStreamAsync<T>(streamName);
                 _cache.TryAdd(streamName, result);
                 return result;
             }

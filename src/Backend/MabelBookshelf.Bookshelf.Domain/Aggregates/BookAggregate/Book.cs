@@ -96,7 +96,6 @@ namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookAggregate
         {
             if (@event.StreamPosition == Version)
             {
-                Version++;
                 if (@event is BookCreatedDomainEvent)
                     Apply(@event as BookCreatedDomainEvent);
                 else if(@event is BookFinishedDomainEvent)
@@ -120,26 +119,31 @@ namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookAggregate
 
         private void Apply(NotFinishDomainEvent @event)
         {
+            Version++;
             Status = BookStatus.Dnf;
         }
 
         private void Apply(BookFinishedDomainEvent @event)
         {
+            Version++;
             Status = BookStatus.Finished;
         }
         
         private void Apply(BookStartedDomainEvent @event)
         {
+            Version++;
             Status = BookStatus.Reading;
         }
 
         private void Apply(MarkedBookAsWantedDomainEvent @event)
         {
+            Version++;
             Status = BookStatus.Want;
         }
 
         private void Apply(ReadToPageDomainEvent @event)
         {
+            Version++;
             CurrentPageNumber = @event.NewPageNumber;
         }
 
@@ -147,6 +151,7 @@ namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookAggregate
         {
             if (@event.StreamPosition != 0)
                 throw new ArgumentException("Cannot create book twice");
+            Version++;
             this.Id = @event.StreamId;
             this.Title = @event.Title;
             this.Authors = @event.Authors;

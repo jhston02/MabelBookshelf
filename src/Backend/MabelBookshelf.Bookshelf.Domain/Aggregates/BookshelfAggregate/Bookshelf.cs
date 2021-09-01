@@ -64,7 +64,6 @@ namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookshelfAggregate
         {
             if (@event.StreamPosition == Version)
             {
-                Version++;
                 if (@event is AddedBookToBookshelfDomainEvent)
                     Apply(@event as AddedBookToBookshelfDomainEvent);
                 else if(@event is BookshelfCreatedDomainEvent)
@@ -84,16 +83,19 @@ namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookshelfAggregate
 
         private void Apply(AddedBookToBookshelfDomainEvent @event)
         {
+            Version++;
             this._booksIds.Add(@event.BookId);
         }
         
         private void Apply(RemovedBookFromBookshelfDomainEvent @event)
         {
+            Version++;
             this._booksIds.Remove(@event.BookId);
         }
         
         private void Apply(RenamedBookshelfDomainEvent @event)
         {
+            Version++;
             this.Name = @event.NewName;
         }
 
@@ -102,6 +104,7 @@ namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookshelfAggregate
             if (@event.StreamPosition != 0)
                 throw new ArgumentException("Cannot create bookshelf twice");
             
+            Version++;
             Id = @event.StreamId;
             _booksIds = new List<Guid>();
             OwnerId = @event.OwnerId;
@@ -111,6 +114,7 @@ namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookshelfAggregate
 
         private void Apply(BookshelfDeletedDomainEvent @event)
         {
+            Version++;
             this.IsDeleted = true;
         }
         #endregion

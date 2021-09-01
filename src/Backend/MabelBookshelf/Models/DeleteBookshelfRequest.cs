@@ -6,6 +6,6 @@ namespace MabelBookshelf.Models
     public class DeleteBookshelfRequest
     {
         [Required]
-        public Guid BookshelfId { get; set; }
+        public Guid Id { get; set; }
     }
 }

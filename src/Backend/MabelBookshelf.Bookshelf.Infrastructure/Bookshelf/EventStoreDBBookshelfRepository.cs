@@ -5,15 +5,16 @@ using MabelBookshelf.Bookshelf.Domain.Aggregates.BookAggregate;
 using MabelBookshelf.Bookshelf.Domain.Aggregates.BookshelfAggregate;
 using MabelBookshelf.Bookshelf.Domain.SeedWork;
 using MabelBookshelf.Bookshelf.Infrastructure.Infrastructure;
+using MabelBookshelf.Bookshelf.Infrastructure.Interfaces;
 
 namespace MabelBookshelf.Bookshelf.Infrastructure.Bookshelf
 {
     public class EventStoreDbBookshelfRepository : IBookshelfRepository
     {
         private const string PrependStreamName = "bookshelf-";
-        private readonly EventStoreContext _context;
+        private readonly IEventStoreContext _context;
         
-        public EventStoreDbBookshelfRepository(EventStoreContext context)
+        public EventStoreDbBookshelfRepository(IEventStoreContext context)
         {
             this._context = context;
         }
