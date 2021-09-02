@@ -1,28 +1,28 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using EventStore.Client;
 using MabelBookshelf.Bookshelf.Domain.Aggregates.BookAggregate;
 using MabelBookshelf.Bookshelf.Domain.SeedWork;
 using MabelBookshelf.Bookshelf.Infrastructure.Infrastructure;
+using MabelBookshelf.Bookshelf.Infrastructure.Interfaces;
 
 namespace MabelBookshelf.Bookshelf.Infrastructure.Book
 {
     public class EventStoreDbBookRepository : IBookRepository
     {
         private const string PrependStreamName = "book-";
-        private EventStoreContext _context;
-        public EventStoreDbBookRepository(EventStoreContext context)
+        private readonly IEventStoreContext _context;
+        public EventStoreDbBookRepository(IEventStoreContext context)
         {
             this._context = context;
         }
         
         public IUnitOfWork UnitOfWork => new NoOpUnitOfWork();
-        public async Task<Domain.Aggregates.BookAggregate.Book> Add(Domain.Aggregates.BookAggregate.Book book)
+        public async Task<Domain.Aggregates.BookAggregate.Book> AddAsync(Domain.Aggregates.BookAggregate.Book book)
         {
             try
             {
                 return await _context.CreateStreamAsync(book,
-                    PrependStreamName + book.Id);
+                    GetKey(book.Id));
             }
             catch (WrongExpectedVersionException)
             {
@@ -30,9 +30,15 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Book
             }
         }
 
-        public Task<Domain.Aggregates.BookAggregate.Book> Get(Guid bookId)
+        public async Task<Domain.Aggregates.BookAggregate.Book> GetAsync(string bookId)
         {
-            throw new NotImplementedException();
+            return await _context.ReadFromStreamAsync<Domain.Aggregates.BookAggregate.Book>(
+                GetKey(bookId));
+        }
+
+        private string GetKey(string bookId)
+        {
+            return PrependStreamName + bookId;
         }
     }
 }

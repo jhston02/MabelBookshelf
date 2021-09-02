@@ -6,15 +6,14 @@ using System.Threading.Tasks;
 using EventStore.Client;
 using MabelBookshelf.Bookshelf.Domain.SeedWork;
 using MabelBookshelf.Bookshelf.Infrastructure.Interfaces;
-using MediatR;
 
 namespace MabelBookshelf.Bookshelf.Infrastructure.Infrastructure
 {
-    public class EventStoreContext
+    public class EventStoreContext : IEventStoreContext
     {
         private readonly EventStoreClient _client;
         private readonly ITypeCache _cache;
-        
+
         public EventStoreContext(EventStoreClient client, ITypeCache cache)
         {
             this._client = client;
@@ -23,7 +22,7 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Infrastructure
 
         public async Task<T> CreateStreamAsync<T>(T value, string streamName) where T : Entity
         {
-            var eventData = GetEventData<T>(value);
+            var eventData = GetEventData(value);
             await _client.AppendToStreamAsync(
                 streamName,
                 StreamState.NoStream,
@@ -36,7 +35,7 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Infrastructure
 
         public async Task<T> WriteToStreamAsync<T>(T value, string streamName) where T : Entity
         {
-            var eventData =  GetEventData<T>(value);
+            var eventData =  GetEventData(value);
             await _client.AppendToStreamAsync(
                 streamName,
                 new StreamRevision((ulong)(value.Version - eventData.Count - 1)),
@@ -81,10 +80,9 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Infrastructure
                 var type = _cache.GetTypeFromString(e.Event.EventType);
                 var data = Encoding.UTF8.GetString(e.Event.Data.Span);
                 var serializedData = JsonSerializer.Deserialize(data, type);
-                if (serializedData is DomainEvent)
+                if (serializedData is DomainEvent castedData)
                 {
-                    var castedData = serializedData as DomainEvent;
-                    entity.Apply(castedData);
+                    if (entity != null) entity.Apply(castedData);
                 }
                 else
                     throw new Exception("Invalid event type");
@@ -97,7 +95,7 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Infrastructure
         {
             var result = _client.ReadStreamAsync(
                 Direction.Forwards,
-                "streamId",
+                streamId,
                 revision: StreamPosition.Start,
                 maxCount: 1);
 

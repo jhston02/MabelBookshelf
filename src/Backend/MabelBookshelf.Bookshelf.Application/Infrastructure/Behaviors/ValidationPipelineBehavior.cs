@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using FluentValidation;
@@ -18,14 +16,9 @@ namespace MabelBookshelf.Bookshelf.Application.Infrastructure.Behaviors
         
         public async Task<TResponse> Handle(TRequest request, CancellationToken cancellationToken, RequestHandlerDelegate<TResponse> next)
         {
-            var validationFailures = _validators.Select(async x => await x.ValidateAsync(request, cancellationToken))
-                .SelectMany(x => x.Result.Errors)
-                .Where(x => x != null)
-                .ToList();
-
-            if (validationFailures.Any())
+            foreach (var validator in _validators)
             {
-                throw new ArgumentException(string.Join("\r\n", validationFailures));
+                await validator.ValidateAndThrowAsync(request, cancellationToken);
             }
 
             return await next();

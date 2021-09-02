@@ -1,13 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using MediatR;
+﻿using System.Collections.Generic;
 
 namespace MabelBookshelf.Bookshelf.Domain.SeedWork
 {
     public abstract class Entity
     {
-        public Guid Id { get; protected set; }
+        public string Id { get; protected set; }
         public long Version { get; protected set; }
+        public bool IsDeleted { get; protected set; }
+        // ReSharper disable once MemberCanBePrivate.Global
         protected bool Equals(Entity other)
         {
             if (Id.Equals(other.Id))
@@ -26,29 +26,24 @@ namespace MabelBookshelf.Bookshelf.Domain.SeedWork
 
         public override int GetHashCode()
         {
-            if (!Id.Equals(default(Guid)))
-            {
-                return Id.GetHashCode();
-            }
-            else
-            {
-                return base.GetHashCode();
-            }
+            return Id.GetHashCode();
         }
 
-        private List<DomainEvent> domainEvents = new List<DomainEvent>();
-        public IReadOnlyCollection<DomainEvent> DomainEvents => domainEvents;
+        private readonly List<DomainEvent> _domainEvents = new List<DomainEvent>();
+        public IReadOnlyCollection<DomainEvent> DomainEvents => _domainEvents;
         
         protected void AddEvent(DomainEvent @event)
         {
-            domainEvents.Add(@event);
+            _domainEvents.Add(@event);
         }
 
         public void ClearEvents()
         {
-            domainEvents.Clear();
+            _domainEvents.Clear();
         }
 
         public virtual void Apply(DomainEvent @event) { }
+
+        public abstract void Delete();
     }
 }

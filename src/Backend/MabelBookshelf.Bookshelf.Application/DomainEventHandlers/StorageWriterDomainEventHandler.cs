@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 using MabelBookshelf.Bookshelf.Application.Interfaces;
 using MabelBookshelf.Bookshelf.Domain.SeedWork;
@@ -7,7 +6,7 @@ using MediatR;
 
 namespace MabelBookshelf.Bookshelf.Application.DomainEventHandlers
 {
-    public class StorageWriterDomainEventHandler<T> : INotificationHandler<DomainEvent>
+    public class StorageWriterDomainEventHandler : INotificationHandler<DomainEvent>
     {
         private IDomainEventWriter writer;
         public StorageWriterDomainEventHandler(IDomainEventWriter writer)

@@ -1,7 +1,6 @@
 ﻿using System;
 using CommandLine;
 using EventStore.Client;
-using EventStore.ClientAPI;
 using PersistentSubscriptionSettings = EventStore.Client.PersistentSubscriptionSettings;
 
 namespace MabelBookshelf.EventStoreDbSetup
@@ -17,7 +16,7 @@ namespace MabelBookshelf.EventStoreDbSetup
         static void Main(string[] args)
         {
             Parser.Default.ParseArguments<Options>(args)
-                .WithParsed<Options>(o =>
+                .WithParsed(o =>
                 {
                     //TODO: Creds when we need real deployments
                     var settings = EventStoreClientSettings
@@ -39,7 +38,7 @@ namespace MabelBookshelf.EventStoreDbSetup
                         "bookshelf-app",
                         pSettings).GetAwaiter().GetResult();
                 })
-                .WithNotParsed(o => Console.WriteLine("Not valid connections string"));
+                .WithNotParsed(_ => Console.WriteLine("Not valid connections string"));
         }
     }
 }

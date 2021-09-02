@@ -8,7 +8,7 @@ namespace MabelBookshelf.Bookshelf.Domain.Tests
     {
         private Book GetBook(BookStatus status)
         {
-            var book =  new Book(Guid.NewGuid(), "blah", new[] {"test"}, "blah", "blah", 500, "0", new []{"test"});
+            var book =  new Book(Guid.NewGuid().ToString(), "blah", new[] {"test"}, "blah", "blah", 500, "0", new []{"test"});
             if(status == BookStatus.Reading)
                 book.ReadToPage(1);
             else if(status == BookStatus.Dnf)

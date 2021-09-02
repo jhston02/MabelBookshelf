@@ -17,7 +17,7 @@ namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookAggregate
         public string OwnerId { get; private set; }
         public string[] Categories { get; private set; }
 
-        public Book(Guid id, string title, string[] authors, string isbn, string externalId, int totalPages, string ownerId, string[] categories)
+        public Book(string id, string title, string[] authors, string isbn, string externalId, int totalPages, string ownerId, string[] categories)
         {
             var @event = new BookCreatedDomainEvent(id, title, authors, isbn, externalId, totalPages, Version, ownerId, categories);
             this.AddEvent(@event);
@@ -80,6 +80,15 @@ namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookAggregate
             if (this.CurrentPageNumber == TotalPages)
                 this.FinishReading();
         }
+        
+        public override void Delete()
+        {
+            if (IsDeleted)
+                throw new ArgumentException($"Book {Title} is already deleted");
+            var @event = new BookDeletedDomainEvent(this.Id, this.Version);
+            this.AddEvent(@event);
+            this.Apply(@event);
+        }
 
         #region Apply Events
 
@@ -99,6 +108,8 @@ namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookAggregate
                     Apply(@event as MarkedBookAsWantedDomainEvent);
                 else if(@event is ReadToPageDomainEvent)
                     Apply(@event as ReadToPageDomainEvent);
+                else if(@event is BookDeletedDomainEvent)
+                    Apply(@event as BookDeletedDomainEvent);
             }
             else
             {
@@ -150,7 +161,13 @@ namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookAggregate
             this.Status = BookStatus.Want;
             this.OwnerId = @event.OwnerId;
             this.Categories = @event.Categories;
+            this.IsDeleted = false;
             CurrentPageNumber = 0;
+        }
+        
+        private void Apply(BookDeletedDomainEvent @event)
+        {
+            this.IsDeleted = true;
         }
         #endregion
     }

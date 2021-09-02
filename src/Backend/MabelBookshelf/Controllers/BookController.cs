@@ -24,7 +24,7 @@ namespace MabelBookshelf.Controllers
         [HttpPost]
         public async Task<ActionResult> CreateBook([FromBody] CreateNewBookRequest request)
         {
-            var command = new CreateBookCommand(request.Id, request.ExternalId, "test");
+            var command = new CreateBookCommand(request.ExternalId, "test");
             var result = await _mediator.Send(command);
             if (result)
                 return Ok();
@@ -35,5 +35,7 @@ namespace MabelBookshelf.Controllers
                     StatusCode = 400,
                 };
         }
+        
+        
     }
 }

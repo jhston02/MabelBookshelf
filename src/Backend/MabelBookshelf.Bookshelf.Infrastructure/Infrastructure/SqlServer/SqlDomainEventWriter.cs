@@ -1,7 +1,5 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using MabelBookshelf.Bookshelf.Application.Interfaces;
-using MabelBookshelf.Bookshelf.Domain.Aggregates.BookAggregate.Events;
 using MabelBookshelf.Bookshelf.Domain.SeedWork;
 
 namespace MabelBookshelf.Bookshelf.Infrastructure.Infrastructure
@@ -11,7 +9,6 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Infrastructure
         private string connectionString;
         public SqlDomainEventWriter()
         {
-            this.connectionString = connectionString;
         }
 
 
