@@ -11,7 +11,7 @@ namespace MabelBookshelf.Bookshelf.Domain.Tests
     {
         private Bookshelf GetBookshelf(string name)
         {
-            return new Bookshelf(Guid.NewGuid(),name, 0.ToString());
+            return new Bookshelf(Guid.NewGuid().ToString(),name, 0.ToString());
         }
 
         [Fact]
@@ -25,7 +25,7 @@ namespace MabelBookshelf.Bookshelf.Domain.Tests
         [Fact]
         public void Bookshelf_AddBook_BookshelfHasBook()
         {
-            var bookGuid = Guid.NewGuid();
+            var bookGuid = Guid.NewGuid().ToString();
             var bookshelf = GetBookshelf("test");
             bookshelf.AddBook(bookGuid);
             Assert.Equal(bookGuid, bookshelf.Books.First());
@@ -34,7 +34,7 @@ namespace MabelBookshelf.Bookshelf.Domain.Tests
         [Fact]
         public void BookshelfHasBook_RemoveBook_BookshelfDoesNotHaveBook()
         {
-            var bookGuid = Guid.NewGuid();
+            var bookGuid = Guid.NewGuid().ToString();
             var bookshelf = GetBookshelf("test");
             bookshelf.AddBook(bookGuid);
             bookshelf.RemoveBook(bookGuid);
@@ -45,13 +45,13 @@ namespace MabelBookshelf.Bookshelf.Domain.Tests
         public void BookshelfDoesNotHaveBook_RemoveBook_ThrowsException()
         {
             var bookshelf = GetBookshelf("test");
-            Assert.Throws<BookshelfDomainException>(() => bookshelf.RemoveBook(Guid.NewGuid()));
+            Assert.Throws<BookshelfDomainException>(() => bookshelf.RemoveBook(Guid.NewGuid().ToString()));
         }
         
         [Fact]
         public void BookshelfHasBook_AddKnownBook_ThrowsException()
         {
-            var bookGuid = Guid.NewGuid();
+            var bookGuid = Guid.NewGuid().ToString();
             var bookshelf = GetBookshelf("test");
             bookshelf.AddBook(bookGuid);
             Assert.Throws<BookshelfDomainException>(() => bookshelf.AddBook(bookGuid));

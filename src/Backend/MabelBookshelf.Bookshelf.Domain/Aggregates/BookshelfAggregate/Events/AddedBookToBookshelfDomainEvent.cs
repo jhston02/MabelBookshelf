@@ -1,5 +1,4 @@
-﻿using System;
-using MabelBookshelf.Bookshelf.Domain.SeedWork;
+﻿using MabelBookshelf.Bookshelf.Domain.SeedWork;
 
 namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookshelfAggregate.Events
 {

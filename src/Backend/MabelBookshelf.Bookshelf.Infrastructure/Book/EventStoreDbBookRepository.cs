@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using EventStore.Client;
 using MabelBookshelf.Bookshelf.Domain.Aggregates.BookAggregate;
 using MabelBookshelf.Bookshelf.Domain.SeedWork;

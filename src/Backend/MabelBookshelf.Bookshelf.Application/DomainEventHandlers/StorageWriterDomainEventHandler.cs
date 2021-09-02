@@ -6,7 +6,7 @@ using MediatR;
 
 namespace MabelBookshelf.Bookshelf.Application.DomainEventHandlers
 {
-    public class StorageWriterDomainEventHandler<T> : INotificationHandler<DomainEvent>
+    public class StorageWriterDomainEventHandler : INotificationHandler<DomainEvent>
     {
         private IDomainEventWriter writer;
         public StorageWriterDomainEventHandler(IDomainEventWriter writer)
