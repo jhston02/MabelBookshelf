@@ -33,7 +33,7 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Bookshelf
             }
         }
 
-        public async Task<Domain.Aggregates.BookshelfAggregate.Bookshelf> GetAsync(Guid id, bool includeSoftDeletes = false)
+        public async Task<Domain.Aggregates.BookshelfAggregate.Bookshelf> GetAsync(string id, bool includeSoftDeletes = false)
         {
             var bookshelf = await _context.ReadFromStreamAsync<Domain.Aggregates.BookshelfAggregate.Bookshelf>(
                 GetKey(id));
@@ -46,7 +46,7 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Bookshelf
         {
             try
             {
-                return await _context.WriteToStreamAsync(bookshelf, PrependStreamName + bookshelf.Id);
+                return await _context.WriteToStreamAsync(bookshelf, GetKey(bookshelf.Id));
             }
             catch (WrongExpectedVersionException)
             {
@@ -54,7 +54,7 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Bookshelf
             }
         }
 
-        private string GetKey(Guid bookshelfId)
+        private string GetKey(string bookshelfId)
         {
             return PrependStreamName + bookshelfId;
         }

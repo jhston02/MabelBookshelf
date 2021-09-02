@@ -5,7 +5,7 @@ namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookshelfAggregate.Events
 {
     public class BookshelfDeletedDomainEvent : DomainEvent
     {
-        public BookshelfDeletedDomainEvent(Guid streamId, long streamPosition) : base(streamId, streamPosition)
+        public BookshelfDeletedDomainEvent(string streamId, long streamPosition) : base(streamId, streamPosition)
         {
         }
     }

@@ -31,13 +31,13 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Book
             }
         }
 
-        public async Task<Domain.Aggregates.BookAggregate.Book> GetAsync(Guid bookId)
+        public async Task<Domain.Aggregates.BookAggregate.Book> GetAsync(string bookId)
         {
             return await _context.ReadFromStreamAsync<Domain.Aggregates.BookAggregate.Book>(
                 GetKey(bookId));
         }
 
-        private string GetKey(Guid bookId)
+        private string GetKey(string bookId)
         {
             return PrependStreamName + bookId;
         }

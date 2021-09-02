@@ -8,11 +8,11 @@ namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookshelfAggregate
     public class Bookshelf : Entity
     {
         public string Name { get; private set; }
-        private List<Guid> _booksIds;
-        public IReadOnlyCollection<Guid> Books => _booksIds;
+        private List<string> _booksIds;
+        public IReadOnlyCollection<string> Books => _booksIds;
         public string OwnerId { get; private set; }
 
-        public Bookshelf(Guid id, string name, string ownerId)
+        public Bookshelf(string id, string name, string ownerId)
         {
             if (name == null) throw new ArgumentNullException(nameof(name));
             var @event = new BookshelfCreatedDomainEvent(id, name, ownerId, Version);
@@ -22,7 +22,7 @@ namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookshelfAggregate
         
         protected Bookshelf(){ }
         
-        public void AddBook(Guid bookId)
+        public void AddBook(string bookId)
         {
             if (_booksIds.Contains(bookId))
                 throw new BookshelfDomainException("Book already in bookshelf");
@@ -32,7 +32,7 @@ namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookshelfAggregate
             this.Apply(@event);
         }
 
-        public void RemoveBook(Guid bookId)
+        public void RemoveBook(string bookId)
         {
             if (!_booksIds.Contains(bookId))
                 throw new BookshelfDomainException("Book not in bookshelf");
@@ -106,7 +106,7 @@ namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookshelfAggregate
             
             Version++;
             Id = @event.StreamId;
-            _booksIds = new List<Guid>();
+            _booksIds = new List<string>();
             OwnerId = @event.OwnerId;
             Name = @event.Name;
             IsDeleted = false;

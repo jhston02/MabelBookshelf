@@ -5,8 +5,8 @@ namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookshelfAggregate.Events
 {
     public class AddedBookToBookshelfDomainEvent : DomainEvent
     {
-        public Guid BookId { get; private set; }
-        public AddedBookToBookshelfDomainEvent(Guid streamId, Guid bookId, long streamPosition) : base(streamId, streamPosition)
+        public string BookId { get; private set; }
+        public AddedBookToBookshelfDomainEvent(string streamId, string bookId, long streamPosition) : base(streamId, streamPosition)
         {
             this.BookId = bookId;
         }

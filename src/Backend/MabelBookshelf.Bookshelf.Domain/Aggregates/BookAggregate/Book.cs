@@ -17,7 +17,7 @@ namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookAggregate
         public string OwnerId { get; private set; }
         public string[] Categories { get; private set; }
 
-        public Book(Guid id, string title, string[] authors, string isbn, string externalId, int totalPages, string ownerId, string[] categories)
+        public Book(string id, string title, string[] authors, string isbn, string externalId, int totalPages, string ownerId, string[] categories)
         {
             var @event = new BookCreatedDomainEvent(id, title, authors, isbn, externalId, totalPages, Version, ownerId, categories);
             this.AddEvent(@event);

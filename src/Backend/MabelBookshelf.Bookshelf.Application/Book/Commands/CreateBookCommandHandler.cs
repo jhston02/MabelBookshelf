@@ -20,7 +20,7 @@ namespace MabelBookshelf.Bookshelf.Application.Book.Commands
         public async Task<bool> Handle(CreateBookCommand request, CancellationToken cancellationToken)
         {
             var externalBook = await bookService.GetBook(request.ExternalId);
-            var book = new Book(request.Id, externalBook.Title, externalBook.Authors, externalBook.Isbn,
+            var book = new Book($"{request.OwnerId}-{externalBook.Isbn}", externalBook.Title, externalBook.Authors, externalBook.Isbn,
                 externalBook.Id, externalBook.TotalPages, request.OwnerId, externalBook.Categories);
 
             await this._bookRepository.AddAsync(book);

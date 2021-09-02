@@ -5,7 +5,7 @@ namespace MabelBookshelf.Bookshelf.Domain.SeedWork
 {
     public abstract class Entity
     {
-        public Guid Id { get; protected set; }
+        public string Id { get; protected set; }
         public long Version { get; protected set; }
         public bool IsDeleted { get; protected set; }
         // ReSharper disable once MemberCanBePrivate.Global
@@ -27,17 +27,7 @@ namespace MabelBookshelf.Bookshelf.Domain.SeedWork
 
         public override int GetHashCode()
         {
-            // ReSharper disable once NonReadonlyMemberInGetHashCode
-            if (!Id.Equals(default(Guid)))
-            {
-                // ReSharper disable once NonReadonlyMemberInGetHashCode
-                return Id.GetHashCode();
-            }
-            else
-            {
-                // ReSharper disable once BaseObjectGetHashCodeCallInGetHashCode
-                return base.GetHashCode();
-            }
+            return Id.GetHashCode();
         }
 
         private readonly List<DomainEvent> _domainEvents = new List<DomainEvent>();

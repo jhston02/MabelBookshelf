@@ -18,7 +18,7 @@ namespace MabelBookshelf.Bookshelf.Application.Tests
         {
             var mockRepo = new MockBookshelfRepository();
             var handler = new CreateBookshelfCommandHandler(mockRepo);
-            handler.Handle(new CreateBookshelfCommand(Guid.NewGuid(), "test", 4.ToString()), CancellationToken.None);
+            handler.Handle(new CreateBookshelfCommand(Guid.NewGuid().ToString(), "test", 4.ToString()), CancellationToken.None);
             var bookshelf = mockRepo.Bookshelfs.FirstOrDefault(x => x.Name == "test");
             Assert.NotNull(bookshelf);
         }
@@ -33,7 +33,7 @@ namespace MabelBookshelf.Bookshelf.Application.Tests
                 return Task.FromResult(bookshelf);
             }
 
-            public Task<Bookshelf> GetAsync(Guid id, bool includeSoftDeletes)
+            public Task<Bookshelf> GetAsync(string id, bool includeSoftDeletes)
             {
                 throw new NotImplementedException();
             }
