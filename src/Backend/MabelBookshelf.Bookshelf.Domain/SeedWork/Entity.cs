@@ -1,7 +1,16 @@
-﻿namespace MabelBookshelf.Bookshelf.Domain.SeedWork
+﻿using System;
+
+namespace MabelBookshelf.Bookshelf.Domain.SeedWork
 {
     public abstract class Entity<T>
     {
+        private readonly Action<DomainEvent> whenAction;
+
+        protected Entity(Action<DomainEvent> whenAction)
+        {
+            this.whenAction = whenAction;
+        }
+
         public T Id { get; protected set; }
 
         // ReSharper disable once MemberCanBePrivate.Global
@@ -25,10 +34,12 @@
             return Id.GetHashCode();
         }
 
-        public virtual void Apply(DomainEvent @event)
+        protected void When(DomainEvent @event)
         {
+            Apply(@event);
+            whenAction(@event);
         }
-        
-        
+
+        public abstract void Apply(DomainEvent @event);
     }
 }

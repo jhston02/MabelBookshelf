@@ -13,8 +13,7 @@ namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookshelfAggregate
         {
             if (name == null) throw new ArgumentNullException(nameof(name));
             var @event = new BookshelfCreatedDomainEvent(id, name, ownerId);
-            AddEvent(@event);
-            Apply(@event);
+            When(@event);
         }
 
         protected Bookshelf()
@@ -31,8 +30,7 @@ namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookshelfAggregate
                 throw new BookshelfDomainException("Book already in bookshelf");
 
             var @event = new AddedBookToBookshelfDomainEvent(Id, bookId);
-            AddEvent(@event);
-            Apply(@event);
+            When(@event);
         }
 
         public void RemoveBook(string bookId)
@@ -41,15 +39,13 @@ namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookshelfAggregate
                 throw new BookshelfDomainException("Book not in bookshelf");
 
             var @event = new RemovedBookFromBookshelfDomainEvent(Id, bookId);
-            AddEvent(@event);
-            Apply(@event);
+            When(@event);
         }
 
         public void Rename(string newName)
         {
             var @event = new RenamedBookshelfDomainEvent(Id, newName, Name);
-            AddEvent(@event);
-            Apply(@event);
+            When(@event);
         }
 
         public override void Delete()
@@ -57,15 +53,13 @@ namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookshelfAggregate
             if (IsDeleted)
                 throw new ArgumentException($"Bookshelf {Name} is already deleted");
             var @event = new BookshelfDeletedDomainEvent(Id);
-            AddEvent(@event);
-            Apply(@event);
+            When(@event);
         }
 
-        #region Apply Events
+        #region Apply Event
 
         public override void Apply(DomainEvent @event)
         {
-
             switch (@event)
             {
                 case AddedBookToBookshelfDomainEvent domainEvent:
@@ -83,31 +77,31 @@ namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookshelfAggregate
                 case BookshelfDeletedDomainEvent domainEvent:
                     Apply(domainEvent);
                     break;
+                default:
+                    throw new ArgumentException("Invalid event type");
+                    break;
             }
 
+            Version++;
         }
 
         private void Apply(AddedBookToBookshelfDomainEvent @event)
         {
-            Version++;
             _booksIds.Add(@event.BookId);
         }
 
         private void Apply(RemovedBookFromBookshelfDomainEvent @event)
         {
-            Version++;
             _booksIds.Remove(@event.BookId);
         }
 
         private void Apply(RenamedBookshelfDomainEvent @event)
         {
-            Version++;
             Name = @event.NewName;
         }
 
         private void Apply(BookshelfCreatedDomainEvent @event)
         {
-            Version++;
             Id = @event.BookshelfId;
             _booksIds = new List<string>();
             OwnerId = @event.OwnerId;
@@ -117,7 +111,6 @@ namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookshelfAggregate
 
         private void Apply(BookshelfDeletedDomainEvent @event)
         {
-            Version++;
             IsDeleted = true;
         }
 

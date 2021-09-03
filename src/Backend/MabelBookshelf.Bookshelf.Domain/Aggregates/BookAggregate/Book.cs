@@ -12,8 +12,7 @@ namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookAggregate
         {
             var @event = new BookCreatedDomainEvent(id, title, authors, isbn, externalId, totalPages, ownerId,
                 categories);
-            AddEvent(@event);
-            Apply(@event);
+            When(@event);
         }
 
         protected Book()
@@ -36,8 +35,7 @@ namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookAggregate
                 throw new BookDomainException("Already reading this book");
 
             var @event = new BookStartedDomainEvent(Id);
-            AddEvent(@event);
-            Apply(@event);
+            When(@event);
         }
 
         public void FinishReading()
@@ -49,8 +47,7 @@ namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookAggregate
                 throw new BookDomainException("This book was not finished");
 
             var @event = new BookFinishedDomainEvent(Id);
-            AddEvent(@event);
-            Apply(@event);
+            When(@event);
         }
 
         public void MarkAsNotFinished()
@@ -58,15 +55,13 @@ namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookAggregate
             if (Status == BookStatus.Finished)
                 throw new BookDomainException("Already finished this book");
             var @event = new NotFinishDomainEvent(Id);
-            AddEvent(@event);
-            Apply(@event);
+            When(@event);
         }
 
         public void MarkBookAsWanted()
         {
             var @event = new MarkedBookAsWantedDomainEvent(Id);
-            AddEvent(@event);
-            Apply(@event);
+            When(@event);
         }
 
         public void ReadToPage(int pageNumber)
@@ -78,8 +73,7 @@ namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookAggregate
                 StartReading();
 
             var @event = new ReadToPageDomainEvent(Id, CurrentPageNumber, pageNumber);
-            AddEvent(@event);
-            Apply(@event);
+            When(@event);
 
             if (CurrentPageNumber == TotalPages)
                 FinishReading();
@@ -90,11 +84,10 @@ namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookAggregate
             if (IsDeleted)
                 throw new ArgumentException($"Book {Title} is already deleted");
             var @event = new BookDeletedDomainEvent(Id);
-            AddEvent(@event);
-            Apply(@event);
+            When(@event);
         }
 
-        #region Apply Events
+        #region Apply Event
 
         public override void Apply(DomainEvent @event)
         {
@@ -121,44 +114,40 @@ namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookAggregate
                 case BookDeletedDomainEvent domainEvent:
                     Apply(domainEvent);
                     break;
+                default:
+                    throw new ArgumentException("Invalid event type");
             }
+
+            Version++;
         }
 
         private void Apply(NotFinishDomainEvent @event)
         {
-            Version++;
             Status = BookStatus.Dnf;
         }
 
         private void Apply(BookFinishedDomainEvent @event)
         {
-            Version++;
             Status = BookStatus.Finished;
         }
 
         private void Apply(BookStartedDomainEvent @event)
         {
-            Version++;
             Status = BookStatus.Reading;
         }
 
         private void Apply(MarkedBookAsWantedDomainEvent @event)
         {
-            Version++;
             Status = BookStatus.Want;
         }
 
         private void Apply(ReadToPageDomainEvent @event)
         {
-            Version++;
             CurrentPageNumber = @event.NewPageNumber;
         }
 
         private void Apply(BookCreatedDomainEvent @event)
         {
-            if (@event.StreamPosition != 0)
-                throw new ArgumentException("Cannot create book twice");
-            Version++;
             Id = @event.BookId;
             Title = @event.Title;
             Authors = @event.Authors;
@@ -174,7 +163,6 @@ namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookAggregate
 
         private void Apply(BookDeletedDomainEvent @event)
         {
-            Version++;
             IsDeleted = true;
         }
 
