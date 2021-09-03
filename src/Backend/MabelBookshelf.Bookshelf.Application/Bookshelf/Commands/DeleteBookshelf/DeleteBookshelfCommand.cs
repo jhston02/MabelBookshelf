@@ -1,16 +1,17 @@
-﻿using MediatR;
+﻿using System;
+using MediatR;
 
 namespace MabelBookshelf.Bookshelf.Application.Bookshelf.Commands
 {
     public class DeleteBookshelfCommand : IRequest<bool>
     {
-        public string Id { get; private set; }
-        public string OwnerId { get; private set; }
-
-        public DeleteBookshelfCommand(string id, string ownerId)
+        public DeleteBookshelfCommand(Guid id, string ownerId)
         {
-            this.Id = id;
-            this.OwnerId = ownerId;
+            Id = id;
+            OwnerId = ownerId;
         }
+
+        public Guid Id { get; }
+        public string OwnerId { get; }
     }
 }

@@ -8,10 +8,7 @@ namespace MabelBookshelf.Bookshelf.Application.Bookshelf.Commands
         {
             RuleFor(x => x.Name).Custom((x, context) =>
             {
-                if (filter.IsProfanity(x))
-                {
-                    context.AddFailure("Name must not contain profanity");
-                }
+                if (filter.IsProfanity(x)) context.AddFailure("Name must not contain profanity");
             });
         }
     }

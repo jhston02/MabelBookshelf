@@ -1,13 +1,15 @@
-﻿using MabelBookshelf.Bookshelf.Domain.SeedWork;
+﻿using System;
 
 namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookshelfAggregate.Events
 {
-    public class AddedBookToBookshelfDomainEvent : DomainEvent
+    public class AddedBookToBookshelfDomainEvent : BookshelfDomainEvent
     {
-        public string BookId { get; private set; }
-        public AddedBookToBookshelfDomainEvent(string streamId, string bookId, long streamPosition) : base(streamId, streamPosition)
+        public AddedBookToBookshelfDomainEvent(Guid bookshelfId, string bookId, long streamPosition) : base(bookshelfId,
+            streamPosition)
         {
-            this.BookId = bookId;
+            BookId = bookId;
         }
+
+        public string BookId { get; }
     }
 }

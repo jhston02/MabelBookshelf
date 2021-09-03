@@ -1,10 +1,8 @@
-﻿using MabelBookshelf.Bookshelf.Domain.SeedWork;
-
-namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookAggregate.Events
+﻿namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookAggregate.Events
 {
-    public class NotFinishDomainEvent : DomainEvent
+    public class NotFinishDomainEvent : BookDomainEvent
     {
-        public NotFinishDomainEvent(string streamId, long streamPosition) : base(streamId, streamPosition)
+        public NotFinishDomainEvent(string bookId, long streamPosition) : base(bookId, streamPosition)
         {
         }
     }

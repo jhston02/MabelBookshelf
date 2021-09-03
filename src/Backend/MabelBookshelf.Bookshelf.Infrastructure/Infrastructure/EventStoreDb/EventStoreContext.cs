@@ -11,18 +11,18 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Infrastructure
 {
     public class EventStoreContext : IEventStoreContext
     {
-        private readonly EventStoreClient _client;
         private readonly ITypeCache _cache;
+        private readonly EventStoreClient _client;
 
         public EventStoreContext(EventStoreClient client, ITypeCache cache)
         {
-            this._client = client;
-            this._cache = cache;
+            _client = client;
+            _cache = cache;
         }
 
-        public async Task<T> CreateStreamAsync<T>(T value, string streamName) where T : Entity
+        public async Task<T> CreateStreamAsync<T, TV>(T value, string streamName) where T : AggregateRoot<TV>
         {
-            var eventData = GetEventData(value);
+            var eventData = GetEventData<T, TV>(value);
             await _client.AppendToStreamAsync(
                 streamName,
                 StreamState.NoStream,
@@ -33,9 +33,9 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Infrastructure
             return value;
         }
 
-        public async Task<T> WriteToStreamAsync<T>(T value, string streamName) where T : Entity
+        public async Task<T> WriteToStreamAsync<T, TV>(T value, string streamName) where T : AggregateRoot<TV>
         {
-            var eventData =  GetEventData(value);
+            var eventData = GetEventData<T, TV>(value);
             await _client.AppendToStreamAsync(
                 streamName,
                 new StreamRevision((ulong)(value.Version - eventData.Count - 1)),
@@ -46,7 +46,48 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Infrastructure
             return value;
         }
 
-        private  List<EventData> GetEventData<T>(T value) where T : Entity
+        public async Task<T> ReadFromStreamAsync<T, TV>(string streamName) where T : AggregateRoot<TV>
+        {
+            var result = _client.ReadStreamAsync(
+                Direction.Forwards,
+                streamName,
+                StreamPosition.Start);
+
+            if (await result.ReadState == ReadState.StreamNotFound) return null;
+
+            var entity = Activator.CreateInstance(typeof(T), true) as T;
+            await foreach (var e in result)
+            {
+                var type = _cache.GetTypeFromString(e.Event.EventType);
+                var data = Encoding.UTF8.GetString(e.Event.Data.Span);
+                var serializedData = JsonSerializer.Deserialize(data, type);
+                if (serializedData is DomainEvent castedData)
+                {
+                    if (entity != null) entity.Apply(castedData);
+                }
+                else
+                {
+                    throw new Exception("Invalid event type");
+                }
+            }
+
+            return entity;
+        }
+
+        public async Task<bool> StreamExists(string streamId)
+        {
+            var result = _client.ReadStreamAsync(
+                Direction.Forwards,
+                streamId,
+                StreamPosition.Start,
+                1);
+
+            if (await result.ReadState == ReadState.StreamNotFound)
+                return false;
+            return true;
+        }
+
+        private List<EventData> GetEventData<T, TV>(T value) where T : AggregateRoot<TV>
         {
             var eventData = new List<EventData>();
             foreach (var @event in value.DomainEvents)
@@ -61,52 +102,6 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Infrastructure
             }
 
             return eventData;
-        }
-
-        public async Task<T> ReadFromStreamAsync<T>(string streamName) where T : Entity
-        {
-            var result = _client.ReadStreamAsync(
-                Direction.Forwards,
-                streamName,
-                StreamPosition.Start);
-
-            if (await result.ReadState == ReadState.StreamNotFound) {
-                return null;
-            }
-
-            var entity = Activator.CreateInstance(typeof(T), true) as T;
-            await foreach (var e in result)
-            {
-                var type = _cache.GetTypeFromString(e.Event.EventType);
-                var data = Encoding.UTF8.GetString(e.Event.Data.Span);
-                var serializedData = JsonSerializer.Deserialize(data, type);
-                if (serializedData is DomainEvent castedData)
-                {
-                    if (entity != null) entity.Apply(castedData);
-                }
-                else
-                    throw new Exception("Invalid event type");
-            }
-
-            return entity;
-        }
-
-        public async Task<bool> StreamExists(string streamId)
-        {
-            var result = _client.ReadStreamAsync(
-                Direction.Forwards,
-                streamId,
-                revision: StreamPosition.Start,
-                maxCount: 1);
-
-            if (await result.ReadState == ReadState.StreamNotFound)
-            {
-                return false;
-            }
-            else
-            {
-                return true;
-            }
         }
     }
 }

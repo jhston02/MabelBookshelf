@@ -3,14 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using MabelBookshelf.Bookshelf.Application.Bookshelf.Commands;
 using MabelBookshelf.Bookshelf.Domain.Aggregates.BookshelfAggregate;
 using MabelBookshelf.Bookshelf.Domain.SeedWork;
-using MabelBookshelf.Bookshelf.Application.Bookshelf.Commands;
 using Xunit;
 
 namespace MabelBookshelf.Bookshelf.Application.Tests
 {
-    using Bookshelf=Domain.Aggregates.BookshelfAggregate.Bookshelf;
     public class CreateBookshelfCommandHandlerTests
     {
         [Fact]
@@ -18,33 +17,36 @@ namespace MabelBookshelf.Bookshelf.Application.Tests
         {
             var mockRepo = new MockBookshelfRepository();
             var handler = new CreateBookshelfCommandHandler(mockRepo);
-            handler.Handle(new CreateBookshelfCommand(Guid.NewGuid().ToString(), "test", 4.ToString()), CancellationToken.None);
+            handler.Handle(new CreateBookshelfCommand(Guid.NewGuid(), "test", 4.ToString()), CancellationToken.None);
             var bookshelf = mockRepo.Bookshelfs.FirstOrDefault(x => x.Name == "test");
             Assert.NotNull(bookshelf);
         }
 
         private class MockBookshelfRepository : IBookshelfRepository
         {
-            public List<Bookshelf> Bookshelfs = new List<Bookshelf>();
+            public readonly List<Domain.Aggregates.BookshelfAggregate.Bookshelf> Bookshelfs = new();
             public IUnitOfWork UnitOfWork => new MockUnitOfWork();
-            public Task<Bookshelf> AddAsync(Bookshelf bookshelf)
+
+            public Task<Domain.Aggregates.BookshelfAggregate.Bookshelf> AddAsync(
+                Domain.Aggregates.BookshelfAggregate.Bookshelf bookshelf)
             {
                 Bookshelfs.Add(bookshelf);
                 return Task.FromResult(bookshelf);
             }
 
-            public Task<Bookshelf> GetAsync(string id, bool includeSoftDeletes)
+            public Task<Domain.Aggregates.BookshelfAggregate.Bookshelf> GetAsync(Guid id, bool includeSoftDeletes)
             {
                 throw new NotImplementedException();
             }
 
-            public Task<Bookshelf> UpdateAsync(Bookshelf bookshelf)
+            public Task<Domain.Aggregates.BookshelfAggregate.Bookshelf> UpdateAsync(
+                Domain.Aggregates.BookshelfAggregate.Bookshelf bookshelf)
             {
                 throw new NotImplementedException();
             }
         }
-        
-        private  class MockUnitOfWork : IUnitOfWork
+
+        private class MockUnitOfWork : IUnitOfWork
         {
             public Task SaveChangesAsync()
             {

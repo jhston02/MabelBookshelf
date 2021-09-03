@@ -7,9 +7,6 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Infrastructure
     public class SqlDomainEventWriter : IDomainEventWriter
     {
         private string connectionString;
-        public SqlDomainEventWriter()
-        {
-        }
 
 
         public Task Write(DomainEvent domainEvent)

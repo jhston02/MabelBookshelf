@@ -8,12 +8,13 @@ namespace MabelBookshelf.Bookshelf.Application.DomainEventHandlers
 {
     public class StorageWriterDomainEventHandler : INotificationHandler<DomainEvent>
     {
-        private IDomainEventWriter writer;
+        private readonly IDomainEventWriter writer;
+
         public StorageWriterDomainEventHandler(IDomainEventWriter writer)
         {
             this.writer = writer;
         }
-        
+
         public async Task Handle(DomainEvent notification, CancellationToken cancellationToken)
         {
             await writer.Write(notification);

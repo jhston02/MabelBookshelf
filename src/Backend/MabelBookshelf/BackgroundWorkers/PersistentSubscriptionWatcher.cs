@@ -11,9 +11,9 @@ namespace MabelBookshelf.BackgroundWorkers
 {
     public class PersistentSubscriptionWatcher : BackgroundService
     {
-        private PersistantSubscriptionSettings configuration;
-        private PersistentSubscriptionEventStoreContext ctx;
-        private IServiceProvider services;
+        private readonly PersistantSubscriptionSettings configuration;
+        private readonly PersistentSubscriptionEventStoreContext ctx;
+        private readonly IServiceProvider services;
 
         public PersistentSubscriptionWatcher(IServiceProvider services,
             PersistantSubscriptionSettings configuration, PersistentSubscriptionEventStoreContext ctx)
@@ -28,28 +28,24 @@ namespace MabelBookshelf.BackgroundWorkers
             var sleepTimespan = new TimeSpan(0, 0, 10);
 
             foreach (var config in configuration.Connections)
-            {
-                for (int i = 0; i < config.Count; i++)
-                {
-                    await Subscribe(config.GroupName, config.StreamName, config.GroupName + config.StreamName + i.ToString(), stoppingToken);
-                }
-            }
+                for (var i = 0; i < config.Count; i++)
+                    await Subscribe(config.GroupName, config.StreamName, config.GroupName + config.StreamName + i,
+                        stoppingToken);
 
             while (!stoppingToken.IsCancellationRequested)
             {
                 var droppedStreams = ctx.GetDroppedStreams();
                 foreach (var stream in droppedStreams)
-                {
                     await Subscribe(stream.Group, stream.StreamName, stream.Id, stoppingToken);
-                }
                 await Task.Delay(sleepTimespan, stoppingToken);
             }
         }
 
-        private async Task Subscribe(string groupName, string streamName, string subscriptionId, CancellationToken stoppingToken)
+        private async Task Subscribe(string groupName, string streamName, string subscriptionId,
+            CancellationToken stoppingToken)
         {
-            await ctx.Subscribe(groupName, streamName,subscriptionId,
-                async (x) =>
+            await ctx.Subscribe(groupName, streamName, subscriptionId,
+                async x =>
                 {
                     using (var scope = services.CreateScope())
                     {

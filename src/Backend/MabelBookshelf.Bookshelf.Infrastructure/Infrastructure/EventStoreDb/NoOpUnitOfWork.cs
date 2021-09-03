@@ -7,7 +7,7 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Infrastructure
     {
         public Task SaveChangesAsync()
         {
-            return  Task.CompletedTask;
+            return Task.CompletedTask;
         }
     }
 }

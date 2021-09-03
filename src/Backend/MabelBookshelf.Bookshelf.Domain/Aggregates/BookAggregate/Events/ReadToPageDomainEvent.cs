@@ -1,16 +1,15 @@
-﻿using MabelBookshelf.Bookshelf.Domain.SeedWork;
-
-namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookAggregate.Events
+﻿namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookAggregate.Events
 {
-    public class ReadToPageDomainEvent : DomainEvent
+    public class ReadToPageDomainEvent : BookDomainEvent
     {
-        public int OldPageNumber { get; private set; }
-        public int NewPageNumber { get; private set; }
-        
-        public ReadToPageDomainEvent(string streamId, int oldPageNumber, int newPageNumber, long streamPosition) : base(streamId, streamPosition)
+        public ReadToPageDomainEvent(string bookId, int oldPageNumber, int newPageNumber, long streamPosition) : base(
+            bookId, streamPosition)
         {
-            this.OldPageNumber = oldPageNumber;
-            this.NewPageNumber = newPageNumber;
+            OldPageNumber = oldPageNumber;
+            NewPageNumber = newPageNumber;
         }
+
+        public int OldPageNumber { get; }
+        public int NewPageNumber { get; }
     }
 }

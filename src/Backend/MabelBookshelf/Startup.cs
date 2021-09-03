@@ -53,7 +53,7 @@ namespace MabelBookshelf
             });
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo {Title = "MabelBookshelf", Version = "v1"});
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "MabelBookshelf", Version = "v1" });
             });
 
             ConfigureBookshelfDomainServices(services);
@@ -61,18 +61,19 @@ namespace MabelBookshelf
 
         private void ConfigureBookshelfDomainServices(IServiceCollection services)
         {
-            services.AddSingleton((_) =>
+            services.AddSingleton(_ =>
             {
                 var settings = EventStoreClientSettings
                     .Create(Configuration.GetConnectionString("EventStoreDbConnectionString"));
                 return new EventStoreClient(settings);
             });
-            
-            services.AddMediatR(typeof(Startup), typeof(CreateBookshelfCommand), typeof(Entity), typeof(EventStoreDbBookshelfRepository));
+
+            services.AddMediatR(typeof(Startup), typeof(CreateBookshelfCommand), typeof(Entity<>),
+                typeof(EventStoreDbBookshelfRepository));
             AssemblyScanner.FindValidatorsInAssembly(typeof(CreateBookshelfCommand).Assembly)
                 .ForEach(item => services.AddScoped(item.InterfaceType, item.ValidatorType));
             services.AddScoped(typeof(IPipelineBehavior<,>), typeof(ValidationPipelineBehavior<,>));
-            services.AddScoped<IBookshelfRepository,EventStoreDbBookshelfRepository>();
+            services.AddScoped<IBookshelfRepository, EventStoreDbBookshelfRepository>();
             services.AddScoped<IExternalBookService, GoogleApiExternalBookService>();
             services.AddScoped<IBookRepository, EventStoreDbBookRepository>();
             services.AddScoped<IEventStoreContext, EventStoreContext>();
@@ -81,7 +82,8 @@ namespace MabelBookshelf
             services.AddHttpClient<GoogleApiExternalBookService>();
             services.AddSingleton<ITypeCache>(_ =>
             {
-                var types = typeof(BookCreatedDomainEvent).Assembly.GetTypes().Where(x => x.IsSubclassOf(typeof(DomainEvent)));
+                var types = typeof(BookCreatedDomainEvent).Assembly.GetTypes()
+                    .Where(x => x.IsSubclassOf(typeof(DomainEvent)));
                 return new DictionaryTypeCache(types.ToDictionary(x => x.Name, x => x));
             });
             services.AddSingleton(_ =>
@@ -90,7 +92,7 @@ namespace MabelBookshelf
                 Configuration.GetSection("PersistantSubscriptionSettings").Bind(settings);
                 return settings;
             });
-            services.AddSingleton((_) =>
+            services.AddSingleton(_ =>
             {
                 var settings = EventStoreClientSettings
                     .Create(Configuration.GetConnectionString("EventStoreDbConnectionString"));
@@ -99,7 +101,7 @@ namespace MabelBookshelf
             services.AddSingleton<PersistentSubscriptionEventStoreContext>();
             services.AddScoped(typeof(IDomainEventWriter), typeof(SqlDomainEventWriter));
         }
-        
+
         private void ConfigureProblemDetails(ProblemDetailsOptions options)
         {
             // Custom mapping function for FluentValidation's ValidationException.

@@ -1,10 +1,8 @@
-﻿using MabelBookshelf.Bookshelf.Domain.SeedWork;
-
-namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookAggregate.Events
+﻿namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookAggregate.Events
 {
-    public class MarkedBookAsWantedDomainEvent : DomainEvent
+    public class MarkedBookAsWantedDomainEvent : BookDomainEvent
     {
-        public MarkedBookAsWantedDomainEvent(string streamId, long streamPosition) : base(streamId, streamPosition)
+        public MarkedBookAsWantedDomainEvent(string bookId, long streamPosition) : base(bookId, streamPosition)
         {
         }
     }

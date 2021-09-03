@@ -1,27 +1,27 @@
 ﻿using System;
-using MabelBookshelf.Bookshelf.Domain.SeedWork;
 
 namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookAggregate.Events
 {
-    public class BookCreatedDomainEvent : DomainEvent
+    public class BookCreatedDomainEvent : BookDomainEvent
     {
-        public string Title { get; private set; }
-        public string[] Authors { get; private set; }
-        public string Isbn { get; private set; }
-        public string ExternalId { get; private set; }
-        public int TotalPages { get; private set; }
-        public string OwnerId { get; private set; }
-        public string[] Categories { get; private set; }
-
-        public BookCreatedDomainEvent(string streamId, string title, string[] authors, string isbn, string externalId, int totalPages, long streamPosition, string ownerId, string[] categories) : base(streamId, streamPosition)
+        public BookCreatedDomainEvent(string bookId, string title, string[] authors, string isbn, string externalId,
+            int totalPages, long streamPosition, string ownerId, string[] categories) : base(bookId, streamPosition)
         {
-            this.Title = title ?? throw new ArgumentNullException(nameof(title));
-            this.Authors = authors ?? throw new ArgumentNullException(nameof(authors));
-            this.Isbn = isbn ?? throw new ArgumentNullException(nameof(isbn));
-            this.ExternalId = externalId ?? throw new ArgumentNullException(nameof(externalId));
-            this.TotalPages = totalPages;
-            this.OwnerId = ownerId ?? throw new ArgumentNullException(nameof(ownerId));
-            this.Categories = categories ?? throw new ArgumentNullException(nameof(categories));
+            Title = title ?? throw new ArgumentNullException(nameof(title));
+            Authors = authors ?? throw new ArgumentNullException(nameof(authors));
+            Isbn = isbn ?? throw new ArgumentNullException(nameof(isbn));
+            ExternalId = externalId ?? throw new ArgumentNullException(nameof(externalId));
+            TotalPages = totalPages;
+            OwnerId = ownerId ?? throw new ArgumentNullException(nameof(ownerId));
+            Categories = categories ?? throw new ArgumentNullException(nameof(categories));
         }
+
+        public string Title { get; }
+        public string[] Authors { get; }
+        public string Isbn { get; }
+        public string ExternalId { get; }
+        public int TotalPages { get; }
+        public string OwnerId { get; }
+        public string[] Categories { get; }
     }
 }

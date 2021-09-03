@@ -2,18 +2,18 @@
 {
     public class StreamStatus
     {
-        public string Id { get; private set; }
-        public string Group { get; private set; }
-        public string StreamName { get; private set; }
-        public Status Status { get; private set; }
-
-        public StreamStatus(string id, string @group, string streamName, Status status)
+        public StreamStatus(string id, string group, string streamName, Status status)
         {
             Id = id;
-            Group = @group;
+            Group = group;
             StreamName = streamName;
             Status = status;
         }
+
+        public string Id { get; }
+        public string Group { get; }
+        public string StreamName { get; }
+        public Status Status { get; }
     }
 
     public enum Status

@@ -1,10 +1,8 @@
-﻿using MabelBookshelf.Bookshelf.Domain.SeedWork;
-
-namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookAggregate.Events
+﻿namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookAggregate.Events
 {
-    public class BookDeletedDomainEvent : DomainEvent
+    public class BookDeletedDomainEvent : BookDomainEvent
     {
-        public BookDeletedDomainEvent(string streamId, long streamPosition) : base(streamId, streamPosition)
+        public BookDeletedDomainEvent(string bookId, long streamPosition) : base(bookId, streamPosition)
         {
         }
     }

@@ -1,10 +1,10 @@
-﻿using MabelBookshelf.Bookshelf.Domain.SeedWork;
+﻿using System;
 
 namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookshelfAggregate.Events
 {
-    public class BookshelfDeletedDomainEvent : DomainEvent
+    public class BookshelfDeletedDomainEvent : BookshelfDomainEvent
     {
-        public BookshelfDeletedDomainEvent(string streamId, long streamPosition) : base(streamId, streamPosition)
+        public BookshelfDeletedDomainEvent(Guid bookshelfId, long streamPosition) : base(bookshelfId, streamPosition)
         {
         }
     }

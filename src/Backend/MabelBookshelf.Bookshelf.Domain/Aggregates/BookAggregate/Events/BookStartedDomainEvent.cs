@@ -1,10 +1,8 @@
-﻿using MabelBookshelf.Bookshelf.Domain.SeedWork;
-
-namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookAggregate.Events
+﻿namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookAggregate.Events
 {
-    public class BookStartedDomainEvent : DomainEvent
+    public class BookStartedDomainEvent : BookDomainEvent
     {
-        public BookStartedDomainEvent(string streamId, long streamPosition) : base(streamId, streamPosition)
+        public BookStartedDomainEvent(string bookId, long streamPosition) : base(bookId, streamPosition)
         {
         }
     }

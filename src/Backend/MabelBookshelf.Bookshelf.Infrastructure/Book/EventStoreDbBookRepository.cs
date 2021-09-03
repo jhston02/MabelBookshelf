@@ -11,17 +11,19 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Book
     {
         private const string PrependStreamName = "book-";
         private readonly IEventStoreContext _context;
+
         public EventStoreDbBookRepository(IEventStoreContext context)
         {
-            this._context = context;
+            _context = context;
         }
-        
+
         public IUnitOfWork UnitOfWork => new NoOpUnitOfWork();
+
         public async Task<Domain.Aggregates.BookAggregate.Book> AddAsync(Domain.Aggregates.BookAggregate.Book book)
         {
             try
             {
-                return await _context.CreateStreamAsync(book,
+                return await _context.CreateStreamAsync<Domain.Aggregates.BookAggregate.Book, string>(book,
                     GetKey(book.Id));
             }
             catch (WrongExpectedVersionException)
@@ -32,7 +34,7 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Book
 
         public async Task<Domain.Aggregates.BookAggregate.Book> GetAsync(string bookId)
         {
-            return await _context.ReadFromStreamAsync<Domain.Aggregates.BookAggregate.Book>(
+            return await _context.ReadFromStreamAsync<Domain.Aggregates.BookAggregate.Book, string>(
                 GetKey(bookId));
         }
 

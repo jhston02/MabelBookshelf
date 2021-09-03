@@ -8,58 +8,56 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Infrastructure
 {
     public class CachingEventStoreContextDecorator : IEventStoreContext
     {
-        private readonly ConcurrentDictionary<string, Entity> _cache;
+        private readonly ConcurrentDictionary<string, object> _cache;
+
+        private readonly IEventStoreContext _context;
+
         //Probably inefficient to store the existence here but don't want to deal with marker values
         //etc.
         private readonly HashSet<string> _existenceCache;
-        private readonly IEventStoreContext _context;
+
         public CachingEventStoreContextDecorator(IEventStoreContext context)
         {
-            this._context = context;
-            this._cache = new ConcurrentDictionary<string, Entity>();
+            _context = context;
+            _cache = new ConcurrentDictionary<string, object>();
             _existenceCache = new HashSet<string>();
         }
-        
-        public async Task<T> CreateStreamAsync<T>(T value, string streamName) where T : Entity
+
+        public async Task<T> CreateStreamAsync<T, TV>(T value, string streamName) where T : AggregateRoot<TV>
         {
-            var result = await this._context.CreateStreamAsync(value, streamName);
+            var result = await _context.CreateStreamAsync<T, TV>(value, streamName);
             _cache.TryAdd(streamName, result);
             return result;
         }
 
-        public async Task<T> WriteToStreamAsync<T>(T value, string streamName) where T : Entity
+        public async Task<T> WriteToStreamAsync<T, TV>(T value, string streamName) where T : AggregateRoot<TV>
         {
-            var result = await this._context.WriteToStreamAsync(value, streamName);
-            _cache.AddOrUpdate(streamName, (_) => result, (_,_) => result);
+            var result = await _context.WriteToStreamAsync<T, TV>(value, streamName);
+            _cache.AddOrUpdate(streamName, _ => result, (_, _) => result);
             return result;
         }
 
-        public async Task<T> ReadFromStreamAsync<T>(string streamName) where T : Entity
+        public async Task<T> ReadFromStreamAsync<T, TV>(string streamName) where T : AggregateRoot<TV>
         {
             if (_cache.ContainsKey(streamName))
             {
                 var entity = _cache[streamName];
                 return (T)entity;
             }
-            else
-            {
-                var result = await _context.ReadFromStreamAsync<T>(streamName);
-                _cache.TryAdd(streamName, result);
-                return result;
-            }
+
+            var result = await _context.ReadFromStreamAsync<T, TV>(streamName);
+            _cache.TryAdd(streamName, result);
+            return result;
         }
 
         public async Task<bool> StreamExists(string streamId)
         {
-            if (_existenceCache.Contains(streamId) || _cache.ContainsKey(streamId))
-                return true;
-            else
-            {
-                var result = await _context.StreamExists(streamId);
-                if (result)
-                    _existenceCache.Add(streamId);
-                return result;
-            }
+            if (_existenceCache.Contains(streamId) || _cache.ContainsKey(streamId)) return true;
+
+            var result = await _context.StreamExists(streamId);
+            if (result)
+                _existenceCache.Add(streamId);
+            return result;
         }
     }
 }
