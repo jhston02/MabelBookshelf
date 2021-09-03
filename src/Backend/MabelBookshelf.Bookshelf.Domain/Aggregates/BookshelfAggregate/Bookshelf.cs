@@ -12,7 +12,7 @@ namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookshelfAggregate
         public Bookshelf(Guid id, string name, string ownerId)
         {
             if (name == null) throw new ArgumentNullException(nameof(name));
-            var @event = new BookshelfCreatedDomainEvent(id, name, ownerId, Version);
+            var @event = new BookshelfCreatedDomainEvent(id, name, ownerId);
             AddEvent(@event);
             Apply(@event);
         }
@@ -30,7 +30,7 @@ namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookshelfAggregate
             if (_booksIds.Contains(bookId))
                 throw new BookshelfDomainException("Book already in bookshelf");
 
-            var @event = new AddedBookToBookshelfDomainEvent(Id, bookId, Version);
+            var @event = new AddedBookToBookshelfDomainEvent(Id, bookId);
             AddEvent(@event);
             Apply(@event);
         }
@@ -40,14 +40,14 @@ namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookshelfAggregate
             if (!_booksIds.Contains(bookId))
                 throw new BookshelfDomainException("Book not in bookshelf");
 
-            var @event = new RemovedBookFromBookshelfDomainEvent(Id, bookId, Version);
+            var @event = new RemovedBookFromBookshelfDomainEvent(Id, bookId);
             AddEvent(@event);
             Apply(@event);
         }
 
         public void Rename(string newName)
         {
-            var @event = new RenamedBookshelfDomainEvent(Id, newName, Name, Version);
+            var @event = new RenamedBookshelfDomainEvent(Id, newName, Name);
             AddEvent(@event);
             Apply(@event);
         }
@@ -56,7 +56,7 @@ namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookshelfAggregate
         {
             if (IsDeleted)
                 throw new ArgumentException($"Bookshelf {Name} is already deleted");
-            var @event = new BookshelfDeletedDomainEvent(Id, Version);
+            var @event = new BookshelfDeletedDomainEvent(Id);
             AddEvent(@event);
             Apply(@event);
         }
@@ -65,23 +65,26 @@ namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookshelfAggregate
 
         public override void Apply(DomainEvent @event)
         {
-            if (@event.StreamPosition == Version)
+
+            switch (@event)
             {
-                if (@event is AddedBookToBookshelfDomainEvent)
-                    Apply(@event as AddedBookToBookshelfDomainEvent);
-                else if (@event is BookshelfCreatedDomainEvent)
-                    Apply(@event as BookshelfCreatedDomainEvent);
-                else if (@event is RemovedBookFromBookshelfDomainEvent)
-                    Apply(@event as RemovedBookFromBookshelfDomainEvent);
-                else if (@event is RenamedBookshelfDomainEvent)
-                    Apply(@event as RenamedBookshelfDomainEvent);
-                else if (@event is BookshelfDeletedDomainEvent)
-                    Apply(@event as BookshelfDeletedDomainEvent);
+                case AddedBookToBookshelfDomainEvent domainEvent:
+                    Apply(domainEvent);
+                    break;
+                case BookshelfCreatedDomainEvent domainEvent:
+                    Apply(domainEvent);
+                    break;
+                case RemovedBookFromBookshelfDomainEvent domainEvent:
+                    Apply(domainEvent);
+                    break;
+                case RenamedBookshelfDomainEvent domainEvent:
+                    Apply(domainEvent);
+                    break;
+                case BookshelfDeletedDomainEvent domainEvent:
+                    Apply(domainEvent);
+                    break;
             }
-            else
-            {
-                throw new ArgumentException("Event is not in order!");
-            }
+
         }
 
         private void Apply(AddedBookToBookshelfDomainEvent @event)
@@ -104,9 +107,6 @@ namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookshelfAggregate
 
         private void Apply(BookshelfCreatedDomainEvent @event)
         {
-            if (@event.StreamPosition != 0)
-                throw new ArgumentException("Cannot create bookshelf twice");
-
             Version++;
             Id = @event.BookshelfId;
             _booksIds = new List<string>();

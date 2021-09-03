@@ -38,7 +38,7 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Infrastructure
             var eventData = GetEventData<T, TV>(value);
             await _client.AppendToStreamAsync(
                 streamName,
-                new StreamRevision((ulong)(value.Version - eventData.Count - 1)),
+                new StreamRevision((ulong)(value.Version - eventData.Count)),
                 eventData
             );
 

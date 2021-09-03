@@ -2,7 +2,7 @@
 {
     public class MarkedBookAsWantedDomainEvent : BookDomainEvent
     {
-        public MarkedBookAsWantedDomainEvent(string bookId, long streamPosition) : base(bookId, streamPosition)
+        public MarkedBookAsWantedDomainEvent(string bookId) : base(bookId)
         {
         }
     }

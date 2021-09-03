@@ -2,7 +2,7 @@
 {
     public class NotFinishDomainEvent : BookDomainEvent
     {
-        public NotFinishDomainEvent(string bookId, long streamPosition) : base(bookId, streamPosition)
+        public NotFinishDomainEvent(string bookId) : base(bookId)
         {
         }
     }

@@ -10,7 +10,7 @@ namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookAggregate
         public Book(string id, string title, string[] authors, string isbn, string externalId, int totalPages,
             string ownerId, string[] categories)
         {
-            var @event = new BookCreatedDomainEvent(id, title, authors, isbn, externalId, totalPages, Version, ownerId,
+            var @event = new BookCreatedDomainEvent(id, title, authors, isbn, externalId, totalPages, ownerId,
                 categories);
             AddEvent(@event);
             Apply(@event);
@@ -35,7 +35,7 @@ namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookAggregate
             if (Status == BookStatus.Reading)
                 throw new BookDomainException("Already reading this book");
 
-            var @event = new BookStartedDomainEvent(Id, Version);
+            var @event = new BookStartedDomainEvent(Id);
             AddEvent(@event);
             Apply(@event);
         }
@@ -48,7 +48,7 @@ namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookAggregate
             if (Status == BookStatus.Dnf)
                 throw new BookDomainException("This book was not finished");
 
-            var @event = new BookFinishedDomainEvent(Id, Version);
+            var @event = new BookFinishedDomainEvent(Id);
             AddEvent(@event);
             Apply(@event);
         }
@@ -57,14 +57,14 @@ namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookAggregate
         {
             if (Status == BookStatus.Finished)
                 throw new BookDomainException("Already finished this book");
-            var @event = new NotFinishDomainEvent(Id, Version);
+            var @event = new NotFinishDomainEvent(Id);
             AddEvent(@event);
             Apply(@event);
         }
 
         public void MarkBookAsWanted()
         {
-            var @event = new MarkedBookAsWantedDomainEvent(Id, Version);
+            var @event = new MarkedBookAsWantedDomainEvent(Id);
             AddEvent(@event);
             Apply(@event);
         }
@@ -77,7 +77,7 @@ namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookAggregate
             if (Status != BookStatus.Reading)
                 StartReading();
 
-            var @event = new ReadToPageDomainEvent(Id, CurrentPageNumber, pageNumber, Version);
+            var @event = new ReadToPageDomainEvent(Id, CurrentPageNumber, pageNumber);
             AddEvent(@event);
             Apply(@event);
 
@@ -89,7 +89,7 @@ namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookAggregate
         {
             if (IsDeleted)
                 throw new ArgumentException($"Book {Title} is already deleted");
-            var @event = new BookDeletedDomainEvent(Id, Version);
+            var @event = new BookDeletedDomainEvent(Id);
             AddEvent(@event);
             Apply(@event);
         }
@@ -98,26 +98,29 @@ namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookAggregate
 
         public override void Apply(DomainEvent @event)
         {
-            if (@event.StreamPosition == Version)
+            switch (@event)
             {
-                if (@event is BookCreatedDomainEvent)
-                    Apply(@event as BookCreatedDomainEvent);
-                else if (@event is BookFinishedDomainEvent)
-                    Apply(@event as BookFinishedDomainEvent);
-                else if (@event is BookStartedDomainEvent)
-                    Apply(@event as BookStartedDomainEvent);
-                else if (@event is NotFinishDomainEvent)
-                    Apply(@event as NotFinishDomainEvent);
-                else if (@event is MarkedBookAsWantedDomainEvent)
-                    Apply(@event as MarkedBookAsWantedDomainEvent);
-                else if (@event is ReadToPageDomainEvent)
-                    Apply(@event as ReadToPageDomainEvent);
-                else if (@event is BookDeletedDomainEvent)
-                    Apply(@event as BookDeletedDomainEvent);
-            }
-            else
-            {
-                throw new ArgumentException("Event is not in order!");
+                case BookCreatedDomainEvent domainEvent:
+                    Apply(domainEvent);
+                    break;
+                case BookFinishedDomainEvent domainEvent:
+                    Apply(domainEvent);
+                    break;
+                case BookStartedDomainEvent domainEvent:
+                    Apply(domainEvent);
+                    break;
+                case NotFinishDomainEvent domainEvent:
+                    Apply(domainEvent);
+                    break;
+                case MarkedBookAsWantedDomainEvent domainEvent:
+                    Apply(domainEvent);
+                    break;
+                case ReadToPageDomainEvent domainEvent:
+                    Apply(domainEvent);
+                    break;
+                case BookDeletedDomainEvent domainEvent:
+                    Apply(domainEvent);
+                    break;
             }
         }
 

@@ -5,9 +5,8 @@ namespace MabelBookshelf.Bookshelf.Domain.SeedWork
 {
     public abstract class DomainEvent : INotification
     {
-        protected DomainEvent(long streamPosition)
+        protected DomainEvent()
         {
-            StreamPosition = streamPosition;
             Timestamp = DateTimeOffset.UtcNow;
             EventId = Guid.NewGuid();
         }

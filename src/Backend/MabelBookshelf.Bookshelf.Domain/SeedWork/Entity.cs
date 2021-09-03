@@ -2,9 +2,7 @@
 {
     public abstract class Entity<T>
     {
-        public long Version { get; protected set; }
         public T Id { get; protected set; }
-        public bool IsDeleted { get; protected set; }
 
         // ReSharper disable once MemberCanBePrivate.Global
         protected bool Equals(Entity<T> other)
@@ -30,7 +28,7 @@
         public virtual void Apply(DomainEvent @event)
         {
         }
-
-        public abstract void Delete();
+        
+        
     }
 }

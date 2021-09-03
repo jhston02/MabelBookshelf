@@ -2,8 +2,8 @@
 {
     public class ReadToPageDomainEvent : BookDomainEvent
     {
-        public ReadToPageDomainEvent(string bookId, int oldPageNumber, int newPageNumber, long streamPosition) : base(
-            bookId, streamPosition)
+        public ReadToPageDomainEvent(string bookId, int oldPageNumber, int newPageNumber) : base(
+            bookId)
         {
             OldPageNumber = oldPageNumber;
             NewPageNumber = newPageNumber;

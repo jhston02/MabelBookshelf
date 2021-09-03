@@ -4,8 +4,7 @@ namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookshelfAggregate.Events
 {
     public class AddedBookToBookshelfDomainEvent : BookshelfDomainEvent
     {
-        public AddedBookToBookshelfDomainEvent(Guid bookshelfId, string bookId, long streamPosition) : base(bookshelfId,
-            streamPosition)
+        public AddedBookToBookshelfDomainEvent(Guid bookshelfId, string bookId) : base(bookshelfId)
         {
             BookId = bookId;
         }

@@ -5,7 +5,7 @@ namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookAggregate.Events
     public class BookCreatedDomainEvent : BookDomainEvent
     {
         public BookCreatedDomainEvent(string bookId, string title, string[] authors, string isbn, string externalId,
-            int totalPages, long streamPosition, string ownerId, string[] categories) : base(bookId, streamPosition)
+            int totalPages, string ownerId, string[] categories) : base(bookId)
         {
             Title = title ?? throw new ArgumentNullException(nameof(title));
             Authors = authors ?? throw new ArgumentNullException(nameof(authors));
