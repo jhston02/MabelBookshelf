@@ -99,7 +99,7 @@ namespace MabelBookshelf
                 return new EventStorePersistentSubscriptionsClient(settings);
             });
             services.AddSingleton<PersistentSubscriptionEventStoreContext>();
-            services.AddScoped(typeof(IDomainEventWriter), typeof(SqlDomainEventWriter));
+            services.AddSingleton<CatchUpSubscriptionEventStoreContext>();
         }
 
         private void ConfigureProblemDetails(ProblemDetailsOptions options)

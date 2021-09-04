@@ -79,7 +79,6 @@ namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookshelfAggregate
                     break;
                 default:
                     throw new ArgumentException("Invalid event type");
-                    break;
             }
 
             Version++;
