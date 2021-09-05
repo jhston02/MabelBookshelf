@@ -61,6 +61,7 @@ namespace MabelBookshelf
 
         private void ConfigureBookshelfDomainServices(IServiceCollection services)
         {
+            services.AddMemoryCache();
             services.AddSingleton(_ =>
             {
                 var settings = EventStoreClientSettings
@@ -74,10 +75,11 @@ namespace MabelBookshelf
                 .ForEach(item => services.AddScoped(item.InterfaceType, item.ValidatorType));
             services.AddScoped(typeof(IPipelineBehavior<,>), typeof(ValidationPipelineBehavior<,>));
             services.AddScoped<IBookshelfRepository, EventStoreDbBookshelfRepository>();
-            services.AddScoped<IExternalBookService, GoogleApiExternalBookService>();
+            services.AddSingleton<IExternalBookService, GoogleApiExternalBookService>();
             services.AddScoped<IBookRepository, EventStoreDbBookRepository>();
             services.AddScoped<IEventStoreContext, EventStoreContext>();
             services.Decorate<IEventStoreContext, CachingEventStoreContextDecorator>();
+            services.Decorate<IExternalBookService, CachingExternalBookServiceDecorator>();
             services.AddSingleton<ProfanityFilter.ProfanityFilter>();
             services.AddHttpClient<GoogleApiExternalBookService>();
             services.AddSingleton<ITypeCache>(_ =>

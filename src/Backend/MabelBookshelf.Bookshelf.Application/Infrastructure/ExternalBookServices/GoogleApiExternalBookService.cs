@@ -14,18 +14,14 @@ namespace MabelBookshelf.Bookshelf.Application.Infrastructure.ExternalBookServic
         private const string GoogleBooksBaseUri = "https://www.googleapis.com/books/v1";
         private const string IsbnIdentifier = "ISBN_13";
         private readonly HttpClient _client;
-        private readonly Dictionary<string, ExternalBook> externalBooksCache;
 
         public GoogleApiExternalBookService(HttpClient client)
         {
             _client = client;
-            externalBooksCache = new Dictionary<string, ExternalBook>();
         }
 
         public async Task<ExternalBook> GetBook(string externalBookId)
         {
-            if (externalBooksCache.ContainsKey(externalBookId)) return externalBooksCache[externalBookId];
-
             using var responseMessage =
                 await _client.GetAsync(GoogleBooksBaseUri + $"/volumes/{externalBookId}");
             if (responseMessage.IsSuccessStatusCode)
@@ -38,7 +34,6 @@ namespace MabelBookshelf.Bookshelf.Application.Infrastructure.ExternalBookServic
                     googleBook.VolumeInfo.Authors.ToArray(),
                     googleBook.VolumeInfo.IndustryIdentifiers.First(x => x.Type == IsbnIdentifier).Identifier,
                     googleBook.VolumeInfo.PageCount, googleBook.VolumeInfo.Categories.ToArray());
-                externalBooksCache[externalBookId] = externalBook;
                 return externalBook;
             }
 

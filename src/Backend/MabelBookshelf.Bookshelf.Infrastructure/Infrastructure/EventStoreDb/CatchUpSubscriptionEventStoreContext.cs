@@ -26,10 +26,15 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Infrastructure
         public async Task<Action> Subscribe(Func<StreamEntry, Task> handleEvent, Func<Task<ProjectionPosition>> getPosition, Func<ProjectionPosition, Task> checkpoint, uint checkpointInterval = 32)
         {
             var streamId = Guid.NewGuid();
-            return await SubscribeImpl(streamId, handleEvent, getPosition, checkpoint, checkpointInterval);
+            await SubscribeImpl(streamId, handleEvent, getPosition, checkpoint, checkpointInterval);
+            return () =>
+            {
+                _subscriptionsByName.TryRemove(streamId, out StreamSubscription sub);
+                sub?.Dispose();
+            };
         }
 
-        private async Task<Action> SubscribeImpl(Guid streamId, Func<StreamEntry, Task> handleEvent, Func<Task<ProjectionPosition>> getPosition, Func<ProjectionPosition, Task> checkpoint, uint checkpointInterval)
+        private async Task SubscribeImpl(Guid streamId, Func<StreamEntry, Task> handleEvent, Func<Task<ProjectionPosition>> getPosition, Func<ProjectionPosition, Task> checkpoint, uint checkpointInterval)
         {
             var position = await getPosition();
             var eventStorePosition = new Position(position.CommitPosition, position.PreparePosition);
@@ -63,11 +68,6 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Infrastructure
                     })
             );
             _subscriptionsByName.AddOrUpdate(streamId, (x) => subscription, (x, y) => subscription);
-            return () =>
-            {
-                _subscriptionsByName.TryRemove(streamId, out StreamSubscription sub);
-                sub?.Dispose();
-            };
         }
 
         private void Resubscribe(Guid streamId, Func<StreamEntry, Task> handleEvent, Func<Task<ProjectionPosition>> getPosition, Func<ProjectionPosition, Task> checkpoint, uint checkpointInterval)
