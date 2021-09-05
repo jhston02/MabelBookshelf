@@ -1,7 +1,9 @@
-using System.Collections.Generic;
+using System;
 using System.Linq;
 using EventStore.Client;
 using FluentValidation;
+using Hellang.Middleware.ProblemDetails;
+using Hellang.Middleware.ProblemDetails.Mvc;
 using MabelBookshelf.BackgroundWorkers;
 using MabelBookshelf.Bookshelf.Application.Bookshelf.Commands;
 using MabelBookshelf.Bookshelf.Application.Infrastructure.Behaviors;
@@ -15,15 +17,11 @@ using MabelBookshelf.Bookshelf.Infrastructure.Book;
 using MabelBookshelf.Bookshelf.Infrastructure.Bookshelf;
 using MabelBookshelf.Bookshelf.Infrastructure.Infrastructure;
 using MabelBookshelf.Bookshelf.Infrastructure.Interfaces;
-using MabelBookshelf.Identity.Infrastructure;
 using MediatR;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Versioning;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -43,7 +41,9 @@ namespace MabelBookshelf
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers();
+            services.AddProblemDetails(ConfigureProblemDetails)
+                .AddControllers()
+                .AddProblemDetailsConventions();
             services.AddApiVersioning(config =>
             {
                 config.DefaultApiVersion = new ApiVersion(1, 0);
@@ -53,59 +53,46 @@ namespace MabelBookshelf
             });
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo {Title = "MabelBookshelf", Version = "v1"});
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "MabelBookshelf", Version = "v1" });
             });
 
             ConfigureBookshelfDomainServices(services);
         }
 
-        private void ConfigureIdentityService(IServiceCollection services)
-        {
-            services.AddDbContext<MabelBookshelfIdentityDbContext>(options =>
-                    options.UseSqlServer(
-                        Configuration.GetConnectionString("MabelBookshelfIdentityDbContextConnection")));
-
-            services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
-                .AddEntityFrameworkStores<MabelBookshelfIdentityDbContext>();
-
-            services.AddIdentityServer()
-                .AddApiAuthorization<ApplicationUser, MabelBookshelfIdentityDbContext>();
-
-            services.AddAuthentication()
-                .AddIdentityServerJwt();
-        }
-
         private void ConfigureBookshelfDomainServices(IServiceCollection services)
         {
-            services.AddSingleton((_) =>
+            services.AddSingleton(_ =>
             {
                 var settings = EventStoreClientSettings
                     .Create(Configuration.GetConnectionString("EventStoreDbConnectionString"));
                 return new EventStoreClient(settings);
             });
-            
-            services.AddMediatR(typeof(Startup), typeof(CreateBookshelfCommand), typeof(Entity), typeof(EventStoreDbBookshelfRepository));
+
+            services.AddMediatR(typeof(Startup), typeof(CreateBookshelfCommand), typeof(Entity<>),
+                typeof(EventStoreDbBookshelfRepository));
             AssemblyScanner.FindValidatorsInAssembly(typeof(CreateBookshelfCommand).Assembly)
                 .ForEach(item => services.AddScoped(item.InterfaceType, item.ValidatorType));
             services.AddScoped(typeof(IPipelineBehavior<,>), typeof(ValidationPipelineBehavior<,>));
-            services.AddScoped<IBookshelfRepository,EventStoreDbBookshelfRepository>();
+            services.AddScoped<IBookshelfRepository, EventStoreDbBookshelfRepository>();
             services.AddScoped<IExternalBookService, GoogleApiExternalBookService>();
             services.AddScoped<IBookRepository, EventStoreDbBookRepository>();
-            services.AddScoped<EventStoreContext>();
+            services.AddScoped<IEventStoreContext, EventStoreContext>();
+            services.Decorate<IEventStoreContext, CachingEventStoreContextDecorator>();
             services.AddSingleton<ProfanityFilter.ProfanityFilter>();
             services.AddHttpClient<GoogleApiExternalBookService>();
             services.AddSingleton<ITypeCache>(_ =>
             {
-                var types = typeof(BookCreatedDomainEvent).Assembly.GetTypes().Where(x => x.IsSubclassOf(typeof(DomainEvent)));
+                var types = typeof(BookCreatedDomainEvent).Assembly.GetTypes()
+                    .Where(x => x.IsSubclassOf(typeof(DomainEvent)));
                 return new DictionaryTypeCache(types.ToDictionary(x => x.Name, x => x));
             });
-            services.AddSingleton(x =>
+            services.AddSingleton(_ =>
             {
                 var settings = new PersistantSubscriptionSettings();
                 Configuration.GetSection("PersistantSubscriptionSettings").Bind(settings);
                 return settings;
             });
-            services.AddSingleton((_) =>
+            services.AddSingleton(_ =>
             {
                 var settings = EventStoreClientSettings
                     .Create(Configuration.GetConnectionString("EventStoreDbConnectionString"));
@@ -113,6 +100,27 @@ namespace MabelBookshelf
             });
             services.AddSingleton<PersistentSubscriptionEventStoreContext>();
             services.AddScoped(typeof(IDomainEventWriter), typeof(SqlDomainEventWriter));
+        }
+
+        private void ConfigureProblemDetails(ProblemDetailsOptions options)
+        {
+            // Custom mapping function for FluentValidation's ValidationException.
+            options.Map<ValidationException>((ctx, ex) =>
+            {
+                var factory = ctx.RequestServices.GetRequiredService<ProblemDetailsFactory>();
+
+                var errors = ex.Errors
+                    .GroupBy(x => x.PropertyName)
+                    .ToDictionary(
+                        x => x.Key,
+                        x => x.Select(validationFailure => validationFailure.ErrorMessage).ToArray());
+
+                return factory.CreateValidationProblemDetails(ctx, errors);
+            });
+
+            options.MapToStatusCode<ArgumentException>(400);
+            options.MapToStatusCode<BookshelfDomainException>(400);
+            options.MapToStatusCode<BookDomainException>(400);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

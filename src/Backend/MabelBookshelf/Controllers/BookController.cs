@@ -12,28 +12,28 @@ namespace MabelBookshelf.Controllers
     [ApiVersion("1.0")]
     public class BookController : ControllerBase
     {
-        private IMediator _mediator;
+        private readonly IMediator _mediator;
+
         public BookController(IMediator mediator)
         {
-            this._mediator = mediator;
+            _mediator = mediator;
         }
-        
+
         [Route("create")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ProblemDetails),StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         [HttpPost]
         public async Task<ActionResult> CreateBook([FromBody] CreateNewBookRequest request)
         {
-            var command = new CreateBookCommand(request.Id, request.ExternalId, "test");
+            var command = new CreateBookCommand(request.ExternalId, "test");
             var result = await _mediator.Send(command);
             if (result)
                 return Ok();
-            else
-                return new ObjectResult(ProblemDetailsFactory.CreateProblemDetails(this.HttpContext, statusCode: 400))
-                {
-                    ContentTypes = { "application/problem+json" },
-                    StatusCode = 400,
-                };
+            return new ObjectResult(ProblemDetailsFactory.CreateProblemDetails(HttpContext, 400))
+            {
+                ContentTypes = { "application/problem+json" },
+                StatusCode = 400
+            };
         }
     }
 }

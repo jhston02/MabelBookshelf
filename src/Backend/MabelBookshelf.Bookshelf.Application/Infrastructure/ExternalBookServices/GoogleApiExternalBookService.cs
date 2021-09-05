@@ -11,44 +11,38 @@ namespace MabelBookshelf.Bookshelf.Application.Infrastructure.ExternalBookServic
 {
     public class GoogleApiExternalBookService : IExternalBookService
     {
-        private Dictionary<string, ExternalBook> externalBooksCache;
         private const string GoogleBooksBaseUri = "https://www.googleapis.com/books/v1";
         private const string IsbnIdentifier = "ISBN_13";
-        private HttpClient _client;
+        private readonly HttpClient _client;
+        private readonly Dictionary<string, ExternalBook> externalBooksCache;
 
         public GoogleApiExternalBookService(HttpClient client)
         {
-            this._client = client;
+            _client = client;
             externalBooksCache = new Dictionary<string, ExternalBook>();
         }
 
         public async Task<ExternalBook> GetBook(string externalBookId)
         {
-            if (externalBooksCache.ContainsKey(externalBookId))
+            if (externalBooksCache.ContainsKey(externalBookId)) return externalBooksCache[externalBookId];
+
+            using var responseMessage =
+                await _client.GetAsync(GoogleBooksBaseUri + $"/volumes/{externalBookId}");
+            if (responseMessage.IsSuccessStatusCode)
             {
-                return externalBooksCache[externalBookId];
+                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                var googleBook =
+                    JsonSerializer.Deserialize<GoogleApiBookDto>(await responseMessage.Content.ReadAsStringAsync(),
+                        options);
+                var externalBook = new ExternalBook(googleBook.Id, googleBook.VolumeInfo.Title,
+                    googleBook.VolumeInfo.Authors.ToArray(),
+                    googleBook.VolumeInfo.IndustryIdentifiers.First(x => x.Type == IsbnIdentifier).Identifier,
+                    googleBook.VolumeInfo.PageCount, googleBook.VolumeInfo.Categories.ToArray());
+                externalBooksCache[externalBookId] = externalBook;
+                return externalBook;
             }
-            else
-            {
-                using var responseMessage =
-                    await _client.GetAsync(GoogleBooksBaseUri + $"/volumes/{externalBookId}");
-                if (responseMessage.IsSuccessStatusCode)
-                {
-                    var options = new JsonSerializerOptions() { PropertyNameCaseInsensitive = true };
-                    var googleBook =
-                        JsonSerializer.Deserialize<GoogleApiBookDto>(await responseMessage.Content.ReadAsStringAsync(), options);
-                    var externalBook = new ExternalBook(googleBook.Id, googleBook.VolumeInfo.Title,
-                        googleBook.VolumeInfo.Authors.ToArray(),
-                        googleBook.VolumeInfo.IndustryIdentifiers.First(x => x.Type == IsbnIdentifier).Identifier,
-                        googleBook.VolumeInfo.PageCount, googleBook.VolumeInfo.Categories.ToArray());
-                    externalBooksCache[externalBookId] = externalBook;
-                    return externalBook;
-                }
-                else
-                {
-                    throw new ArgumentException("Invalid book id");
-                }
-            }
+
+            throw new ArgumentException("Invalid book id");
         }
 
         private class IndustryIdentifier
@@ -185,7 +179,6 @@ namespace MabelBookshelf.Bookshelf.Application.Infrastructure.ExternalBookServic
             public LayerInfo LayerInfo { get; set; }
             public SaleInfo SaleInfo { get; set; }
             public AccessInfo AccessInfo { get; set; }
-
         }
     }
 }

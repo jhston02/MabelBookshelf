@@ -5,49 +5,63 @@ using MabelBookshelf.Bookshelf.Domain.Aggregates.BookAggregate;
 using MabelBookshelf.Bookshelf.Domain.Aggregates.BookshelfAggregate;
 using MabelBookshelf.Bookshelf.Domain.SeedWork;
 using MabelBookshelf.Bookshelf.Infrastructure.Infrastructure;
+using MabelBookshelf.Bookshelf.Infrastructure.Interfaces;
 
 namespace MabelBookshelf.Bookshelf.Infrastructure.Bookshelf
 {
     public class EventStoreDbBookshelfRepository : IBookshelfRepository
     {
         private const string PrependStreamName = "bookshelf-";
-        private readonly EventStoreContext _context;
-        
-        public EventStoreDbBookshelfRepository(EventStoreContext context)
+        private readonly IEventStoreContext _context;
+
+        public EventStoreDbBookshelfRepository(IEventStoreContext context)
         {
-            this._context = context;
+            _context = context;
         }
 
         public IUnitOfWork UnitOfWork => new NoOpUnitOfWork();
-        public async Task<Domain.Aggregates.BookshelfAggregate.Bookshelf> Add(Domain.Aggregates.BookshelfAggregate.Bookshelf bookshelf)
+
+        public async Task<Domain.Aggregates.BookshelfAggregate.Bookshelf> AddAsync(
+            Domain.Aggregates.BookshelfAggregate.Bookshelf bookshelf)
         {
             try
             {
-                return await _context.CreateStreamAsync(bookshelf,
-                    PrependStreamName + bookshelf.Id);
+                return await _context.CreateStreamAsync<Domain.Aggregates.BookshelfAggregate.Bookshelf, Guid>(bookshelf,
+                    GetKey(bookshelf.Id));
             }
             catch (WrongExpectedVersionException)
             {
-                throw new BookshelfDomainException($"Bookshelf with id:{bookshelf.Id} already exists");
+                throw new BookDomainException($"Bookshelf with id:{bookshelf.Id} already exists");
             }
         }
 
-        public async Task<Domain.Aggregates.BookshelfAggregate.Bookshelf> Get(Guid id)
+        public async Task<Domain.Aggregates.BookshelfAggregate.Bookshelf> GetAsync(Guid id,
+            bool includeSoftDeletes = false)
         {
-            return await _context.ReadFromStreamAsync<Domain.Aggregates.BookshelfAggregate.Bookshelf>(
-                    PrependStreamName + id);
+            var bookshelf = await _context.ReadFromStreamAsync<Domain.Aggregates.BookshelfAggregate.Bookshelf, Guid>(
+                GetKey(id));
+            if (!includeSoftDeletes)
+                bookshelf = bookshelf.IsDeleted ? null : bookshelf;
+            return bookshelf;
         }
 
-        public async Task<Domain.Aggregates.BookshelfAggregate.Bookshelf> Update(Domain.Aggregates.BookshelfAggregate.Bookshelf bookshelf)
+        public async Task<Domain.Aggregates.BookshelfAggregate.Bookshelf> UpdateAsync(
+            Domain.Aggregates.BookshelfAggregate.Bookshelf bookshelf)
         {
             try
             {
-                return await _context.WriteToStreamAsync(bookshelf, PrependStreamName + bookshelf.Id);
+                return await _context.WriteToStreamAsync<Domain.Aggregates.BookshelfAggregate.Bookshelf, Guid>(
+                    bookshelf, GetKey(bookshelf.Id));
             }
             catch (WrongExpectedVersionException)
             {
-                throw new BookshelfDomainException($"Bookshelf was modified multiple times");
+                throw new BookshelfDomainException("Bookshelf was modified multiple times");
             }
+        }
+
+        private string GetKey(Guid bookshelfId)
+        {
+            return PrependStreamName + bookshelfId;
         }
     }
 }

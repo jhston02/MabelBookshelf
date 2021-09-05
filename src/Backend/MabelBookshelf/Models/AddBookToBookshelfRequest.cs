@@ -6,7 +6,7 @@ namespace MabelBookshelf.Models
     public class AddBookToBookshelfRequest
     {
         [Required]
-        public Guid BookId { get; set; }
+        public string BookId { get; set; }
         [Required]
         public Guid BookShelfId { get; set; }  
     }

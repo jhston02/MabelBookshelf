@@ -1,16 +1,17 @@
 ﻿using System;
-using MabelBookshelf.Bookshelf.Domain.SeedWork;
 
 namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookshelfAggregate.Events
 {
-    public class RenamedBookshelfDomainEvent : DomainEvent
+    public class RenamedBookshelfDomainEvent : BookshelfDomainEvent
     {
-        public string NewName { get; private set; }
-        public string OldName { get; private set; }
-        public RenamedBookshelfDomainEvent(Guid streamId, string newName, string oldName, long streamPosition) : base(streamId, streamPosition)
+        public RenamedBookshelfDomainEvent(Guid bookshelfId, string newName, string oldName) :
+            base(bookshelfId)
         {
-            this.NewName = newName;
-            this.OldName = oldName;
+            NewName = newName;
+            OldName = oldName;
         }
+
+        public string NewName { get; }
+        public string OldName { get; }
     }
 }

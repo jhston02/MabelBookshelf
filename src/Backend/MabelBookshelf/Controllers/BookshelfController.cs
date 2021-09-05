@@ -12,15 +12,16 @@ namespace MabelBookshelf.Controllers
     [ApiVersion("1.0")]
     public class BookshelfController : ControllerBase
     {
-        private IMediator _mediator;
+        private readonly IMediator _mediator;
+
         public BookshelfController(IMediator mediator)
         {
-            this._mediator = mediator;
+            _mediator = mediator;
         }
-        
+
         [Route("create")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ProblemDetails),StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         [HttpPost]
         public async Task<ActionResult> CreateBookshelf([FromBody] CreateNewBookshelfRequest request)
         {
@@ -28,12 +29,28 @@ namespace MabelBookshelf.Controllers
             var result = await _mediator.Send(command);
             if (result)
                 return Ok();
-            else
-                return new ObjectResult(ProblemDetailsFactory.CreateProblemDetails(this.HttpContext, statusCode: 400))
-                {
-                    ContentTypes = { "application/problem+json" },
-                    StatusCode = 400,
-                };
+            return new ObjectResult(ProblemDetailsFactory.CreateProblemDetails(HttpContext, 400))
+            {
+                ContentTypes = { "application/problem+json" },
+                StatusCode = 400
+            };
+        }
+
+        [Route("delete")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+        [HttpPost]
+        public async Task<ActionResult> DeleteBookshelf([FromBody] DeleteBookshelfRequest request)
+        {
+            var command = new DeleteBookshelfCommand(request.Id, "temp");
+            var result = await _mediator.Send(command);
+            if (result)
+                return Ok();
+            return new ObjectResult(ProblemDetailsFactory.CreateProblemDetails(HttpContext, 400))
+            {
+                ContentTypes = { "application/problem+json" },
+                StatusCode = 400
+            };
         }
 
         [Route("add")]

@@ -9,9 +9,9 @@ namespace MabelBookshelf.Bookshelf.Application.Bookshelf.Commands
 {
     public class AddBookToBookshelfCommand : IRequest<bool>
     {
-        public Guid BookId { get; private set; }
+        public string BookId { get; private set; }
         public Guid ShelfId { get; private set; }
-        public AddBookToBookshelfCommand(Guid bookId, Guid shelfId)
+        public AddBookToBookshelfCommand(string bookId, Guid shelfId)
         {
             this.BookId = bookId;
             this.ShelfId = shelfId;

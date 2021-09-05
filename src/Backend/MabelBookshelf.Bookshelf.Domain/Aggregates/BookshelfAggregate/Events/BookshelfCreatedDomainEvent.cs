@@ -1,17 +1,17 @@
 ﻿using System;
-using MabelBookshelf.Bookshelf.Domain.SeedWork;
 
 namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookshelfAggregate.Events
 {
-    public class BookshelfCreatedDomainEvent : DomainEvent
+    public class BookshelfCreatedDomainEvent : BookshelfDomainEvent
     {
-        public string Name { get; private set; }
-        public string OwnerId { get; private set; }
-        
-        public BookshelfCreatedDomainEvent(Guid streamId, string name, string ownerId, long streamPosition) : base(streamId, streamPosition)
+        public BookshelfCreatedDomainEvent(Guid bookshelfId, string name, string ownerId) : base(
+            bookshelfId)
         {
-            this.Name = name;
-            this.OwnerId = ownerId;
+            Name = name;
+            OwnerId = ownerId;
         }
+
+        public string Name { get; }
+        public string OwnerId { get; }
     }
 }

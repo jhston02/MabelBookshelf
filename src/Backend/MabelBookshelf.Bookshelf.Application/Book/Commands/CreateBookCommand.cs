@@ -5,15 +5,13 @@ namespace MabelBookshelf.Bookshelf.Application.Book.Commands
 {
     public class CreateBookCommand : IRequest<bool>
     {
-        public Guid Id { get; private set; }
-        public string ExternalId { get; private set; }
-        public string OwnerId { get; private set; }
-
-        public CreateBookCommand(Guid id, string externalId, string ownerId)
+        public CreateBookCommand(string externalId, string ownerId)
         {
-            this.Id = id;
-            this.ExternalId = externalId ?? throw new ArgumentNullException(nameof(externalId));
-            this.OwnerId = ownerId ?? throw new ArgumentNullException(nameof(ownerId));
+            ExternalId = externalId ?? throw new ArgumentNullException(nameof(externalId));
+            OwnerId = ownerId ?? throw new ArgumentNullException(nameof(ownerId));
         }
+
+        public string ExternalId { get; }
+        public string OwnerId { get; }
     }
 }

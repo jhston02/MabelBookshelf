@@ -5,17 +5,13 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="FluentValidation" Version="10.3.0" />
-      <PackageReference Include="MediatR" Version="9.0.0" />
-      <PackageReference Include="Profanity.Detector" Version="0.1.8" />
+        <PackageReference Include="FluentValidation" Version="10.3.0"/>
+        <PackageReference Include="MediatR" Version="9.0.0"/>
+        <PackageReference Include="Profanity.Detector" Version="0.1.8"/>
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\MabelBookshelf.Bookshelf.Domain\MabelBookshelf.Bookshelf.Domain.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="Book\Events" />
+        <ProjectReference Include="..\MabelBookshelf.Bookshelf.Domain\MabelBookshelf.Bookshelf.Domain.csproj"/>
     </ItemGroup>
 
 </Project>
