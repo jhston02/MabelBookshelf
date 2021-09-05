@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using MabelBookshelf.Bookshelf.Application.Interfaces;
 using MabelBookshelf.Bookshelf.Application.Models;
@@ -19,12 +20,13 @@ namespace MabelBookshelf.Bookshelf.Application.Infrastructure.ExternalBookServic
             _cache = cache;
             _inner = inner;
         }
-        public async Task<ExternalBook> GetBook(string externalBookId)
+        public async Task<ExternalBook> GetBookAsync(string externalBookId, CancellationToken token = default)
         {
+            token.ThrowIfCancellationRequested();
             return await _cache.GetOrCreateAsync(externalBookId, async entry =>
             {
                 entry.SlidingExpiration = TimeSpan.FromMinutes(10);
-                return await _inner.GetBook(externalBookId);
+                return await _inner.GetBookAsync(externalBookId, token);
             });
         }
     }

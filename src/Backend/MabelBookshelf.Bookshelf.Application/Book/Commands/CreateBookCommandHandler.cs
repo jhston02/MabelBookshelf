@@ -19,12 +19,12 @@ namespace MabelBookshelf.Bookshelf.Application.Book.Commands
 
         public async Task<bool> Handle(CreateBookCommand request, CancellationToken cancellationToken)
         {
-            var externalBook = await bookService.GetBook(request.ExternalId);
+            var externalBook = await bookService.GetBookAsync(request.ExternalId, cancellationToken);
             var book = new Domain.Aggregates.BookAggregate.Book($"{request.OwnerId}-{externalBook.Isbn}",
                 externalBook.Title, externalBook.Authors, externalBook.Isbn,
                 externalBook.Id, externalBook.TotalPages, request.OwnerId, externalBook.Categories);
 
-            await _bookRepository.AddAsync(book);
+            await _bookRepository.AddAsync(book, cancellationToken);
             await _bookRepository.UnitOfWork.SaveChangesAsync();
             return true;
         }

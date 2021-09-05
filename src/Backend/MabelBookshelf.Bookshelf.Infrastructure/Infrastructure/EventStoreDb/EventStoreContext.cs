@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 using EventStore.Client;
 using MabelBookshelf.Bookshelf.Domain.SeedWork;
@@ -20,7 +21,7 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Infrastructure
             _cache = cache;
         }
 
-        public async Task<T> CreateStreamAsync<T, TV>(T value, string streamName) where T : AggregateRoot<TV>
+        public async Task<T> CreateStreamAsync<T, TV>(T value, string streamName, CancellationToken token = default) where T : AggregateRoot<TV>
         {
             var eventData = GetEventData<T, TV>(value);
             await _client.AppendToStreamAsync(
@@ -33,7 +34,7 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Infrastructure
             return value;
         }
 
-        public async Task<T> WriteToStreamAsync<T, TV>(T value, string streamName) where T : AggregateRoot<TV>
+        public async Task<T> WriteToStreamAsync<T, TV>(T value, string streamName, CancellationToken token = default) where T : AggregateRoot<TV>
         {
             var eventData = GetEventData<T, TV>(value);
             await _client.AppendToStreamAsync(
@@ -46,7 +47,7 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Infrastructure
             return value;
         }
 
-        public async Task<T> ReadFromStreamAsync<T, TV>(string streamName) where T : AggregateRoot<TV>
+        public async Task<T> ReadFromStreamAsync<T, TV>(string streamName, CancellationToken token = default) where T : AggregateRoot<TV>
         {
             var result = _client.ReadStreamAsync(
                 Direction.Forwards,
@@ -74,7 +75,7 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Infrastructure
             return entity;
         }
 
-        public async Task<bool> StreamExists(string streamId)
+        public async Task<bool> StreamExists(string streamId, CancellationToken token = default)
         {
             var result = _client.ReadStreamAsync(
                 Direction.Forwards,

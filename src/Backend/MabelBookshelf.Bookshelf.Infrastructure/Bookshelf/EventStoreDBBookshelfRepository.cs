@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using EventStore.Client;
 using MabelBookshelf.Bookshelf.Domain.Aggregates.BookAggregate;
@@ -22,12 +23,12 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Bookshelf
         public IUnitOfWork UnitOfWork => new NoOpUnitOfWork();
 
         public async Task<Domain.Aggregates.BookshelfAggregate.Bookshelf> AddAsync(
-            Domain.Aggregates.BookshelfAggregate.Bookshelf bookshelf)
+            Domain.Aggregates.BookshelfAggregate.Bookshelf bookshelf, CancellationToken token = default)
         {
             try
             {
                 return await _context.CreateStreamAsync<Domain.Aggregates.BookshelfAggregate.Bookshelf, Guid>(bookshelf,
-                    GetKey(bookshelf.Id));
+                    GetKey(bookshelf.Id), token);
             }
             catch (WrongExpectedVersionException)
             {
@@ -36,26 +37,26 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Bookshelf
         }
 
         public async Task<Domain.Aggregates.BookshelfAggregate.Bookshelf> GetAsync(Guid id,
-            bool includeSoftDeletes = false)
+            bool includeSoftDeletes = false, CancellationToken token = default)
         {
             var bookshelf = await _context.ReadFromStreamAsync<Domain.Aggregates.BookshelfAggregate.Bookshelf, Guid>(
-                GetKey(id));
+                GetKey(id), token);
             if (!includeSoftDeletes)
                 bookshelf = bookshelf.IsDeleted ? null : bookshelf;
             return bookshelf;
         }
 
         public async Task<Domain.Aggregates.BookshelfAggregate.Bookshelf> UpdateAsync(
-            Domain.Aggregates.BookshelfAggregate.Bookshelf bookshelf)
+            Domain.Aggregates.BookshelfAggregate.Bookshelf bookshelf, CancellationToken token = default)
         {
             try
             {
                 return await _context.WriteToStreamAsync<Domain.Aggregates.BookshelfAggregate.Bookshelf, Guid>(
-                    bookshelf, GetKey(bookshelf.Id));
+                    bookshelf, GetKey(bookshelf.Id), token);
             }
             catch (WrongExpectedVersionException)
             {
-                throw new BookshelfDomainException("Bookshelf was modified multiple times");
+                throw new ("Bookshelf was modified multiple times");
             }
         }
 

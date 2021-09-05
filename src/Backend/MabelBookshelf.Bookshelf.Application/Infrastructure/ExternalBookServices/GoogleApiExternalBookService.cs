@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 using MabelBookshelf.Bookshelf.Application.Interfaces;
 using MabelBookshelf.Bookshelf.Application.Models;
@@ -20,8 +21,9 @@ namespace MabelBookshelf.Bookshelf.Application.Infrastructure.ExternalBookServic
             _client = client;
         }
 
-        public async Task<ExternalBook> GetBook(string externalBookId)
+        public async Task<ExternalBook> GetBookAsync(string externalBookId, CancellationToken token = default)
         {
+            token.ThrowIfCancellationRequested();
             using var responseMessage =
                 await _client.GetAsync(GoogleBooksBaseUri + $"/volumes/{externalBookId}");
             if (responseMessage.IsSuccessStatusCode)

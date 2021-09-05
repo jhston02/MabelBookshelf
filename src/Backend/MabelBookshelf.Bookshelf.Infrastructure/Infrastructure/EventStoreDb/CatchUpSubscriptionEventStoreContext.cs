@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Text;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 using EventStore.Client;
 using MabelBookshelf.Bookshelf.Application.Models;
@@ -23,23 +24,30 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Infrastructure
             _subscriptionsByName = new ConcurrentDictionary<Guid, StreamSubscription>();
         }
 
-        public async Task<Action> Subscribe(Func<StreamEntry, Task> handleEvent, Func<Task<ProjectionPosition>> getPosition, Func<ProjectionPosition, Task> checkpoint, uint checkpointInterval = 32)
+        public async Task<Action> Subscribe(Func<StreamEntry, CancellationToken, Task> handleEvent, Func<CancellationToken,Task<ProjectionPosition>> getPosition, Func<ProjectionPosition, CancellationToken, Task> checkpoint, uint checkpointInterval = 32, CancellationToken token= default)
         {
             var streamId = Guid.NewGuid();
-            await SubscribeImpl(streamId, handleEvent, getPosition, checkpoint, checkpointInterval);
+            await SubscribeImpl(streamId, handleEvent, getPosition, checkpoint, checkpointInterval, token);
             return () =>
             {
-                _subscriptionsByName.TryRemove(streamId, out StreamSubscription sub);
-                sub?.Dispose();
+                try
+                {
+                    _subscriptionsByName.TryRemove(streamId, out StreamSubscription sub);
+                    sub?.Dispose();
+                }
+                catch (Exception)
+                {
+                    //swallow exception, oh well
+                }
             };
         }
 
-        private async Task SubscribeImpl(Guid streamId, Func<StreamEntry, Task> handleEvent, Func<Task<ProjectionPosition>> getPosition, Func<ProjectionPosition, Task> checkpoint, uint checkpointInterval)
+        private async Task SubscribeImpl(Guid streamId, Func<StreamEntry, CancellationToken, Task> handleEvent, Func<CancellationToken,Task<ProjectionPosition>> getPosition, Func<ProjectionPosition, CancellationToken, Task> checkpoint, uint checkpointInterval, CancellationToken token)
         {
-            var position = await getPosition();
+            var position = await getPosition(token);
             var eventStorePosition = new Position(position.CommitPosition, position.PreparePosition);
             var subscription = await _client.SubscribeToAllAsync(eventStorePosition,
-                async (subscription, evnt, cancellationToken) =>
+                async (_, evnt, cancellationToken) =>
                 {
                     var type = _cache.GetTypeFromString(evnt.Event.EventType);
                     var data = Encoding.UTF8.GetString(evnt.Event.Data.Span);
@@ -47,7 +55,7 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Infrastructure
                     if (serializedData is DomainEvent castedData)
                     {
                         var entry = new StreamEntry(evnt.Event.Position.CommitPosition,castedData);
-                        await handleEvent(entry);
+                        await handleEvent(entry, cancellationToken);
                     }
                 },
                 subscriptionDropped: ((subscription, reason, exception) =>
@@ -56,23 +64,22 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Infrastructure
                     if (reason != SubscriptionDroppedReason.Disposed)
                     {
                         subscription.Dispose();
-                        Resubscribe(streamId,handleEvent, getPosition, checkpoint, checkpointInterval);
+                        Resubscribe(streamId,handleEvent, getPosition, checkpoint, checkpointInterval, token);
                     }
                 }),
                 filterOptions: new SubscriptionFilterOptions(
                     EventTypeFilter.ExcludeSystemEvents(),
                     checkpointInterval,
-                    checkpointReached:async (subscriptionDroppedReason, streamPosition, token) =>
+                    checkpointReached:async (subscriptionDroppedReason, streamPosition, cancellationToken) =>
                     {
-                        await checkpoint(new ProjectionPosition(streamPosition.CommitPosition, streamPosition.PreparePosition));
-                    })
-            );
+                        await checkpoint(new ProjectionPosition(streamPosition.CommitPosition, streamPosition.PreparePosition), cancellationToken);
+                    }), cancellationToken: token);
             _subscriptionsByName.AddOrUpdate(streamId, (x) => subscription, (x, y) => subscription);
         }
 
-        private void Resubscribe(Guid streamId, Func<StreamEntry, Task> handleEvent, Func<Task<ProjectionPosition>> getPosition, Func<ProjectionPosition, Task> checkpoint, uint checkpointInterval)
+        private void Resubscribe(Guid streamId, Func<StreamEntry, CancellationToken, Task> handleEvent, Func<CancellationToken,Task<ProjectionPosition>> getPosition, Func<ProjectionPosition, CancellationToken, Task> checkpoint, uint checkpointInterval, CancellationToken token)
         {
-            Task.Run(() => SubscribeImpl(streamId, handleEvent, getPosition, checkpoint, checkpointInterval)).Wait();
+            Task.Run(() => SubscribeImpl(streamId, handleEvent, getPosition, checkpoint, checkpointInterval, token), token).Wait(token);
         }
     }
 }
