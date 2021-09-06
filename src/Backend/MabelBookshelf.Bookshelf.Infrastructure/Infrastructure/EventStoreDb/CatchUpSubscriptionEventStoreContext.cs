@@ -45,7 +45,7 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Infrastructure
         private async Task SubscribeImpl(Guid streamId, Func<StreamEntry, CancellationToken, Task> handleEvent, Func<CancellationToken,Task<ProjectionPosition>> getPosition, Func<ProjectionPosition, CancellationToken, Task> checkpoint, uint checkpointInterval, CancellationToken token)
         {
             var position = await getPosition(token);
-            var eventStorePosition = new Position(position.CommitPosition, position.PreparePosition);
+            var eventStorePosition = position == null ? Position.Start : new Position(position.CommitPosition, position.PreparePosition);
             var subscription = await _client.SubscribeToAllAsync(eventStorePosition,
                 async (_, evnt, cancellationToken) =>
                 {

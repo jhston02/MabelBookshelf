@@ -2,7 +2,7 @@
 {
     public class BookStartedDomainEvent : BookDomainEvent
     {
-        public BookStartedDomainEvent(string bookId) : base(bookId)
+        public BookStartedDomainEvent(string bookId, string ownerId) : base(bookId, ownerId)
         {
         }
     }

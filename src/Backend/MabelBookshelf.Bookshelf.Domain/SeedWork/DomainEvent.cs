@@ -12,7 +12,6 @@ namespace MabelBookshelf.Bookshelf.Domain.SeedWork
         }
 
         public DateTimeOffset Timestamp { get; }
-        public long StreamPosition { get; }
         public Guid EventId { get; }
     }
 }

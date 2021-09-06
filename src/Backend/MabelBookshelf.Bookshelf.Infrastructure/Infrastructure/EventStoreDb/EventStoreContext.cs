@@ -27,8 +27,7 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Infrastructure
             await _client.AppendToStreamAsync(
                 streamName,
                 StreamState.NoStream,
-                eventData
-            );
+                eventData, cancellationToken: token);
 
             value.ClearEvents();
             return value;
@@ -40,8 +39,7 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Infrastructure
             await _client.AppendToStreamAsync(
                 streamName,
                 new StreamRevision((ulong)(value.Version - eventData.Count)),
-                eventData
-            );
+                eventData, cancellationToken: token);
 
             value.ClearEvents();
             return value;
@@ -52,7 +50,7 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Infrastructure
             var result = _client.ReadStreamAsync(
                 Direction.Forwards,
                 streamName,
-                StreamPosition.Start);
+                StreamPosition.Start, cancellationToken: token);
 
             if (await result.ReadState == ReadState.StreamNotFound) return null;
 
@@ -81,7 +79,7 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Infrastructure
                 Direction.Forwards,
                 streamId,
                 StreamPosition.Start,
-                1);
+                1, cancellationToken: token);
 
             if (await result.ReadState == ReadState.StreamNotFound)
                 return false;
