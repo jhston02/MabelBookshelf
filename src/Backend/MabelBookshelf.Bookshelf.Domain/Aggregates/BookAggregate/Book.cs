@@ -52,8 +52,6 @@ namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookAggregate
 
         public void MarkAsNotFinished()
         {
-            if (Status == BookStatus.Finished)
-                throw new BookDomainException("Already finished this book");
             var @event = new NotFinishDomainEvent(Id);
             When(@event);
         }

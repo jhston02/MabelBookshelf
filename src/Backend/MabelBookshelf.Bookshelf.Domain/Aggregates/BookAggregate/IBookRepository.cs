@@ -7,5 +7,6 @@ namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookAggregate
     {
         Task<Book> AddAsync(Book book);
         Task<Book> GetAsync(string bookId);
+        Task<Book> UpdateAsync(Book book);
     }
 }
