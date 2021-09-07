@@ -60,8 +60,6 @@ namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookshelfAggregate
 
         public override void Apply(DomainEvent @event)
         {
-            if (@event.StreamPosition != Version) 
-                throw new ArgumentException("Event is not in order!");
             switch (@event)
             {
                 case AddedBookToBookshelfDomainEvent domainEvent:
@@ -74,6 +72,9 @@ namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookshelfAggregate
                     Apply(domainEvent);
                     break;
                 case RenamedBookshelfDomainEvent domainEvent:
+                    Apply(domainEvent);
+                    break;
+                case BookshelfDeletedDomainEvent domainEvent:
                     Apply(domainEvent);
                     break;
                 default:
