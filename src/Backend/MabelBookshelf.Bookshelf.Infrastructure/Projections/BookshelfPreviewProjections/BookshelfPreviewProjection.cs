@@ -77,16 +77,34 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Projections.BookshelfPreviewPr
 
         private async Task Apply(BookshelfCreatedDomainEvent domainEvent, ulong streamPosition)
         {
-            var bookshelfPreview = new ChronologicalBookshelfPreview()
-            {
-                StreamPosition = streamPosition,
-                Id = domainEvent.BookshelfId.ToString(),
-                Name = domainEvent.Name,
-                OwnerId = domainEvent.OwnerId,
-                Books = new List<BookPreview>(),
-                Categories = new List<string>()
-            };
-            
+            //Relying on the secret upsert tech is easier than doing the stream position stuff 
+            //from what I can tell in Mongo still new so might be coming back to this later
+            var id = domainEvent.BookshelfId.ToString();
+            var filterDefinition = Builders<ChronologicalBookshelfPreview>.Filter.Eq(p => p.Id, id);
+            var updateDefinition = Builders<ChronologicalBookshelfPreview>.Update
+                .SetOnInsert(x => x.StreamPosition, streamPosition)
+                .SetOnInsert(x => x.Id, id)
+                .SetOnInsert(x => x.Name, domainEvent.Name)
+                .SetOnInsert(x => x.Categories, new List<string>())
+                .SetOnInsert(x => x.Books, new List<BookPreview>())
+                .SetOnInsert(x => x.OwnerId, domainEvent.OwnerId);
+
+            var options = new UpdateOptions() {IsUpsert = true};
+            await previewCollection.UpdateOneAsync(filterDefinition, updateDefinition, options);
+        }
+
+        private async Task Apply(RenamedBookshelfDomainEvent domainEvent, ulong streamPosition)
+        {
+            var filterDefinition =
+                Builders<ChronologicalBookshelfPreview>.Filter.Eq(p => p.Id, domainEvent.BookshelfId.ToString())
+                & Builders<ChronologicalBookshelfPreview>.Filter.Lt(p => p.StreamPosition, streamPosition);
+
+            var updateDefinition = Builders<ChronologicalBookshelfPreview>.Update.Set(x => x.Name, domainEvent.NewName);
+            await previewCollection.UpdateOneAsync(filterDefinition, updateDefinition);
+        }
+
+        private async Task Apply(BookshelfDeletedDomainEvent domainEvent, ulong streamPosition)
+        {
             
         }
 
