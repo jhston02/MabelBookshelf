@@ -78,8 +78,7 @@ namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookshelfAggregate
                     Apply(domainEvent);
                     break;
                 default:
-                    throw new ArgumentException("Invalid event type");
-                    break;
+                    throw new ArgumentException("Event is not in order!");
             }
 
             Version++;
