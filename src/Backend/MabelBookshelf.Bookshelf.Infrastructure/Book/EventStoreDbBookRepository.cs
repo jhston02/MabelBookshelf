@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Linq.Expressions;
+using System.Threading.Tasks;
 using EventStore.Client;
 using MabelBookshelf.Bookshelf.Domain.Aggregates.BookAggregate;
 using MabelBookshelf.Bookshelf.Domain.SeedWork;
@@ -42,8 +43,8 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Book
         {
             try
             {
-                return await _context.WriteToStreamAsync<Domain.Aggregates.BookAggregate.Book, string>(
-                    book, GetKey(book.Id));
+                return await _context.WriteToStreamAsync<Domain.Aggregates.BookAggregate.Book, string>(book,
+                    GetKey(book.Id));
             }
             catch (WrongExpectedVersionException)
             {

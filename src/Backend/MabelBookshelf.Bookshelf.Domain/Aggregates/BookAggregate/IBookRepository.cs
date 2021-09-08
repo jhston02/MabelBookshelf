@@ -10,6 +10,5 @@ namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookAggregate
         Task<Book> GetAsync(string bookId);
         Task<Book> UpdateAsync(Book book);
         Task<bool> Exists(string bookId);
-        
     }
 }
