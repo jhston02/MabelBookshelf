@@ -56,5 +56,10 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Book
         {
             return PrependStreamName + bookId;
         }
+
+        public async Task<bool> Exists(string bookId)
+        {
+           return await  _context.StreamExists(PrependStreamName + bookId);
+        }
     }
 }

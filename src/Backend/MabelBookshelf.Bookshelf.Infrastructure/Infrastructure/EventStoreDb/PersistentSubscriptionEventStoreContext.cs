@@ -12,7 +12,7 @@ using MabelBookshelf.Bookshelf.Infrastructure.Interfaces;
 
 namespace MabelBookshelf.Bookshelf.Infrastructure.Infrastructure
 {
-    public class PersistentSubscriptionEventStoreContext : IDisposable
+    public class  PersistentSubscriptionEventStoreContext : IDisposable
     {
         private readonly ITypeCache _cache;
         private readonly EventStorePersistentSubscriptionsClient _client;
