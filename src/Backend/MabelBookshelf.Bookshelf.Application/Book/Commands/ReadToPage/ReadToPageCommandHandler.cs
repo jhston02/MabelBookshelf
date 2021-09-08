@@ -18,7 +18,7 @@ namespace MabelBookshelf.Bookshelf.Application.Book.Commands
         {
             var book = _repository.GetAsync(request.BookId) ?? throw new ArgumentException("Book does not exist");
             book.Result.ReadToPage(request.PageNumber);
-            await _repository.UpdateAsync(Bookshelf.Result);
+            await _repository.UpdateAsync(book.Result);
             await _repository.UnitOfWork.SaveChangesAsync();
             return true;
         }

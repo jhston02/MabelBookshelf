@@ -38,6 +38,19 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Book
                 GetKey(bookId));
         }
 
+        public async Task<Domain.Aggregates.BookAggregate.Book> UpdateAsync(Domain.Aggregates.BookAggregate.Book book)
+        {
+            try
+            {
+                return await _context.WriteToStreamAsync<Domain.Aggregates.BookAggregate.Book, string>(
+                    book, GetKey(book.Id));
+            }
+            catch (WrongExpectedVersionException)
+            {
+                throw new BookDomainException("Book was modified multiple times");
+            }
+        }
+
         private string GetKey(string bookId)
         {
             return PrependStreamName + bookId;
