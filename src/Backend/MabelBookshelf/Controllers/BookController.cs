@@ -5,6 +5,7 @@ using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.Extensions.Logging;
 
 namespace MabelBookshelf.Controllers
 {
@@ -47,8 +48,24 @@ namespace MabelBookshelf.Controllers
             var result = await _mediator.Send(command);
             if (result)
                 return Ok();
-            else
-                return new ObjectResult(ProblemDetailsFactory.CreateProblemDetails(this.HttpContext, statusCode: 400))
+            return new ObjectResult(ProblemDetailsFactory.CreateProblemDetails(this.HttpContext, statusCode: 400))
+                {
+                    ContentTypes = {"application/problem+json"},
+                    StatusCode = 400
+                };
+        }
+        
+        [Route("readtopage")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [HttpPatch]
+        public async Task<ActionResult> ReadToPage([FromBody] ReadToPageRequest request)
+        {
+            var command = new ReadToPageCommand(request.BookId, request.PageNumber);
+            var result = await _mediator.Send(command);
+            if (result)
+                return Ok();
+            return new ObjectResult(ProblemDetailsFactory.CreateProblemDetails(this.HttpContext, statusCode: 400))
                 {
                     ContentTypes = {"application/problem+json"},
                     StatusCode = 400
