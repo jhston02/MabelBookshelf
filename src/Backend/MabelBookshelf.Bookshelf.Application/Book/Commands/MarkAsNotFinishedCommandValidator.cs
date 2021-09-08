@@ -13,7 +13,6 @@ namespace MabelBookshelf.Bookshelf.Application.Book.Commands
             {
                 try
                 {
-
                     if (!await repository.Exists(x))
                     {
                         context.AddFailure("Book doesn't exist");
