@@ -4,6 +4,7 @@ using MabelBookshelf.Models;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.WebUtilities;
 
 namespace MabelBookshelf.Controllers
 {
@@ -34,6 +35,24 @@ namespace MabelBookshelf.Controllers
                 ContentTypes = { "application/problem+json" },
                 StatusCode = 400
             };
+        }
+
+        [Route("marknotfinished")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+        [HttpPatch]
+        public async Task<ActionResult> MarkAsNotFinished([FromBody] MarkAsNotFinishedRequest request)
+        {
+            var command = new MarkAsNotFinishedCommand(request.BookId);
+            var result = await _mediator.Send(command);
+            if (result)
+                return Ok();
+            else
+                return new ObjectResult(ProblemDetailsFactory.CreateProblemDetails(this.HttpContext, statusCode: 400))
+                {
+                    ContentTypes = {"application/problem+json"},
+                    StatusCode = 400
+                };
         }
     }
 }
