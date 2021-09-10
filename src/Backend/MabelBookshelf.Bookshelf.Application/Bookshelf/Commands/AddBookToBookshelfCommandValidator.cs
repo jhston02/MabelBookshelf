@@ -14,7 +14,7 @@ namespace MabelBookshelf.Bookshelf.Application.Bookshelf.Commands
             {
                 try
                 {
-                    if (!await repository.Exists(x, token)) context.AddFailure("Book doesn't exist");
+                    if (!await repository.ExistsAsync(x, token)) context.AddFailure("Book doesn't exist");
                 }
                 catch (ArgumentException e)
                 {

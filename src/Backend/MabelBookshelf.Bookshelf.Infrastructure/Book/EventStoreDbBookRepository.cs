@@ -55,7 +55,7 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Book
             }
         }
 
-        public async Task<bool> Exists(string bookId, CancellationToken token = default)
+        public async Task<bool> ExistsAsync(string bookId, CancellationToken token = default)
         {
             return await _context.StreamExists(PrependStreamName + bookId, token);
         }
