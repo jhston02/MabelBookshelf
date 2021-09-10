@@ -52,5 +52,23 @@ namespace MabelBookshelf.Controllers
                 StatusCode = 400
             };
         }
+
+        [Route("add")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+        [HttpPost]
+        public async Task<ActionResult> AddBookToBookshelf([FromBody] AddBookToBookshelfRequest request)
+        {
+            var command = new AddBookToBookshelfCommand(request.BookId, request.BookShelfId);
+            var result = await _mediator.Send(command);
+            if (result)
+                return Ok();
+            else
+                return new ObjectResult(ProblemDetailsFactory.CreateProblemDetails(this.HttpContext, statusCode: 400))
+                {
+                    ContentTypes = {"application/problem+json"},
+                    StatusCode = 400
+                };
+        }
     }
 }

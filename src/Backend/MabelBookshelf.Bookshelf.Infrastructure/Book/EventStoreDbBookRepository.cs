@@ -1,4 +1,5 @@
 ﻿using System.Threading;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using EventStore.Client;
 using MabelBookshelf.Bookshelf.Domain.Aggregates.BookAggregate;
@@ -39,9 +40,27 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Book
                 GetKey(bookId), token);
         }
 
+        public async Task<Domain.Aggregates.BookAggregate.Book> UpdateAsync(Domain.Aggregates.BookAggregate.Book book, CancellationToken token = default)
+        {
+            try
+            {
+                return await _context.WriteToStreamAsync<Domain.Aggregates.BookAggregate.Book, string>(book,
+                    GetKey(book.Id), token);
+            }
+            catch (WrongExpectedVersionException)
+            {
+                throw new BookDomainException("Book was modified multiple times");
+            }
+        }
+
         private string GetKey(string bookId)
         {
             return PrependStreamName + bookId;
+        }
+
+        public async Task<bool> Exists(string bookId, CancellationToken token = default)
+        {
+           return await  _context.StreamExists(PrependStreamName + bookId, token);
         }
     }
 }

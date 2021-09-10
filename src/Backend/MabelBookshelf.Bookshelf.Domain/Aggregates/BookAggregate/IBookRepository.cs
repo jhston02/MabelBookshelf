@@ -8,5 +8,7 @@ namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookAggregate
     {
         Task<Book> AddAsync(Book book, CancellationToken token = default);
         Task<Book> GetAsync(string bookId, CancellationToken token = default);
+        Task<bool> Exists(string bookId, CancellationToken token = default);
+        Task<Book> UpdateAsync(Book book, CancellationToken token = default);
     }
 }
