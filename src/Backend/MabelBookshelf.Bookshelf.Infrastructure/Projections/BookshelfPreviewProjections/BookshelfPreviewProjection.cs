@@ -24,7 +24,7 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Projections.BookshelfPreviewPr
         {
             database = client.GetDatabase(configuration.DatabaseName + $"_v{configuration.Version}");
             positionCollection = database.GetCollection<IdentifiableProjectionPosition>("projection_position");
-            previewCollection = database.GetCollection<ChronologicalBookshelfPreview>("bookshelf_preview");
+            previewCollection = database.GetCollection<ChronologicalBookshelfPreview>(configuration.CollectionName);
             bookPreviewCollection = database.GetCollection<StandaloneBook>("book_preview");
         }
 
@@ -87,6 +87,7 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Projections.BookshelfPreviewPr
             var updateDefinition = Builders<StandaloneBook>.Update
                 .SetOnInsert(x => x.Id, book.Id)
                 .SetOnInsert(x => x.ExternalBookId, book.ExternalBookId)
+                .SetOnInsert(x => x.BookId, book.BookId)
                 .SetOnInsert(x => x.Categories, book.Categories);
 
             var options = new UpdateOptions { IsUpsert = true };
@@ -196,5 +197,6 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Projections.BookshelfPreviewPr
     {
         public string DatabaseName { get; set; }
         public int Version { get; set; } = 1;
+        public string CollectionName { get; set; }
     }
 }

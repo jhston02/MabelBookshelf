@@ -20,15 +20,15 @@ namespace MabelBookshelf.Controllers
         }
 
         [Route("create")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BookInfoDto), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         [HttpPost]
         public async Task<ActionResult> CreateBook([FromBody] CreateNewBookRequest request)
         {
             var command = new CreateBookCommand(request.ExternalId, "test");
             var result = await _mediator.Send(command);
-            if (result)
-                return Ok();
+            if (result != null)
+                return Ok(new BookInfoDto() { Id = result });
             return new ObjectResult(ProblemDetailsFactory.CreateProblemDetails(HttpContext, 400))
             {
                 ContentTypes = { "application/problem+json" },
