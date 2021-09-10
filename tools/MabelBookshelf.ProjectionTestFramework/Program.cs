@@ -23,7 +23,8 @@ namespace MabelBookshelf.ProjectionTestFramework
         private static IProjectionService GetProjectionService()
         {
             var projectionService = new MongoBookshelfPreviewProjection(new MongoClient("mongodb://localhost:27017"),
-                new BookshelfPreviewConfiguration { DatabaseName = "test", Version = 1, CollectionName = "bookshelf_preview"});
+                new BookshelfPreviewConfiguration
+                    { DatabaseName = "test", Version = 1, CollectionName = "bookshelf_preview" });
             return projectionService;
         }
     }

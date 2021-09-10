@@ -135,7 +135,8 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.BookshelfPreview.Projections
         private async Task Apply(AddedBookToBookshelfDomainEvent domainEvent, ulong streamPosition)
         {
             //Pull from master list for owner
-            var book = (BookPreview) await bookPreviewCollection.AsQueryable().FirstOrDefaultAsync(x => x.Id == domainEvent.BookId);
+            var book = (BookPreview)await bookPreviewCollection.AsQueryable()
+                .FirstOrDefaultAsync(x => x.Id == domainEvent.BookId);
 
             //If we have this book (which we should add it to specific shelf
             if (book != null)

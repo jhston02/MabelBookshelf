@@ -28,7 +28,7 @@ namespace MabelBookshelf.Controllers
             var command = new CreateBookCommand(request.ExternalId, "temp");
             var result = await _mediator.Send(command);
             if (result != null)
-                return Ok(new BookInfoDto() { Id = result });
+                return Ok(new BookInfoDto { Id = result });
             return new ObjectResult(ProblemDetailsFactory.CreateProblemDetails(HttpContext, 400))
             {
                 ContentTypes = { "application/problem+json" },

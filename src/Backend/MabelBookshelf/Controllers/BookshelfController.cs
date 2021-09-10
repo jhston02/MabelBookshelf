@@ -80,7 +80,8 @@ namespace MabelBookshelf.Controllers
         [ProducesResponseType(typeof(IEnumerable<BookshelfPreview>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         [HttpGet]
-        public async Task<IEnumerable<BookshelfPreview>> GetBookshelfPreviews(uint skip, uint take, CancellationToken token)
+        public async Task<IEnumerable<BookshelfPreview>> GetBookshelfPreviews(uint skip, uint take,
+            CancellationToken token)
         {
             return await _previewQueries.Previews("temp", skip, take, token);
         }

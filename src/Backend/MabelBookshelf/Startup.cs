@@ -18,10 +18,10 @@ using MabelBookshelf.Bookshelf.Domain.SeedWork;
 using MabelBookshelf.Bookshelf.Infrastructure.Book;
 using MabelBookshelf.Bookshelf.Infrastructure.Bookshelf;
 using MabelBookshelf.Bookshelf.Infrastructure.BookshelfPreview;
-using MabelBookshelf.Bookshelf.Infrastructure.Infrastructure;
-using MabelBookshelf.Bookshelf.Infrastructure.Interfaces;
 using MabelBookshelf.Bookshelf.Infrastructure.BookshelfPreview.Projections;
 using MabelBookshelf.Bookshelf.Infrastructure.BookshelfPreview.Queries;
+using MabelBookshelf.Bookshelf.Infrastructure.Infrastructure;
+using MabelBookshelf.Bookshelf.Infrastructure.Interfaces;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -111,13 +111,13 @@ namespace MabelBookshelf
             services.AddSingleton<CatchUpSubscriptionEventStoreContext>();
             //TODO: Scan assembly for these
             services.AddSingleton<IProjectionService, MongoBookshelfPreviewProjection>();
-            
-            BsonClassMap.RegisterClassMap<BookshelfPreview>(cm => 
+
+            BsonClassMap.RegisterClassMap<BookshelfPreview>(cm =>
             {
                 cm.AutoMap();
                 cm.SetIgnoreExtraElements(true);
             });
-            
+
             services.AddSingleton<MongoClient>();
             services.AddSingleton(x =>
             {
