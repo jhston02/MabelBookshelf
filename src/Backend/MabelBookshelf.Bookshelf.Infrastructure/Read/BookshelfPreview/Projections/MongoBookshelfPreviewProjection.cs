@@ -132,6 +132,8 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.BookshelfPreview.Projections
             await previewCollection.DeleteOneAsync(filterDefinition);
         }
 
+        //This should be upcasted using a fast store. We know we need a similar thing for actual bookshelves so
+        //lets make it fast
         private async Task Apply(AddedBookToBookshelfDomainEvent domainEvent, ulong streamPosition)
         {
             //Pull from master list for owner
