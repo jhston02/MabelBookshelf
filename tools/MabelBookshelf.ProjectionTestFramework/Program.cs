@@ -1,6 +1,7 @@
 ﻿using System;
 using MabelBookshelf.Bookshelf.Application.Interfaces;
-using MabelBookshelf.Bookshelf.Infrastructure.Projections.BookshelfPreviewProjections;
+using MabelBookshelf.Bookshelf.Infrastructure.BookshelfPreview;
+using MabelBookshelf.Bookshelf.Infrastructure.BookshelfPreview.Projections;
 using MongoDB.Driver;
 
 namespace MabelBookshelf.ProjectionTestFramework
@@ -21,8 +22,8 @@ namespace MabelBookshelf.ProjectionTestFramework
 
         private static IProjectionService GetProjectionService()
         {
-            var projectionService = new BookshelfPreviewProjection(new MongoClient("mongodb://localhost:27017"),
-                new BookshelfPreviewProjectionConfiguration { DatabaseName = "test", Version = 1, CollectionName = "bookshelf_preview"});
+            var projectionService = new MongoBookshelfPreviewProjection(new MongoClient("mongodb://localhost:27017"),
+                new BookshelfPreviewConfiguration { DatabaseName = "test", Version = 1, CollectionName = "bookshelf_preview"});
             return projectionService;
         }
     }

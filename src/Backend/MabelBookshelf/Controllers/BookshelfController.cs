@@ -1,5 +1,9 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using MabelBookshelf.Bookshelf.Application.Bookshelf.Commands;
+using MabelBookshelf.Bookshelf.Application.Bookshelf.Queries.Preview;
+using MabelBookshelf.Bookshelf.Application.Bookshelf.Queries.Preview.Models;
 using MabelBookshelf.Models;
 using MediatR;
 using Microsoft.AspNetCore.Http;
@@ -13,10 +17,12 @@ namespace MabelBookshelf.Controllers
     public class BookshelfController : ControllerBase
     {
         private readonly IMediator _mediator;
+        private readonly IBookshelfPreviewQueries _previewQueries;
 
-        public BookshelfController(IMediator mediator)
+        public BookshelfController(IMediator mediator, IBookshelfPreviewQueries previewQueries)
         {
             _mediator = mediator;
+            _previewQueries = previewQueries;
         }
 
         [Route("create")]
@@ -68,6 +74,15 @@ namespace MabelBookshelf.Controllers
                 ContentTypes = { "application/problem+json" },
                 StatusCode = 400
             };
+        }
+
+        [Route("previews")]
+        [ProducesResponseType(typeof(IEnumerable<BookshelfPreview>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+        [HttpGet]
+        public async Task<IEnumerable<BookshelfPreview>> GetBookshelfPreviews(uint skip, uint take, CancellationToken token)
+        {
+            return await _previewQueries.Previews("temp", skip, take, token);
         }
     }
 }

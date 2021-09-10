@@ -25,12 +25,12 @@ namespace MabelBookshelf.Bookshelf.Application.Infrastructure.ExternalBookServic
         {
             token.ThrowIfCancellationRequested();
             using var responseMessage =
-                await _client.GetAsync(GoogleBooksBaseUri + $"/volumes/{externalBookId}");
+                await _client.GetAsync(GoogleBooksBaseUri + $"/volumes/{externalBookId}", token);
             if (responseMessage.IsSuccessStatusCode)
             {
                 var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
                 var googleBook =
-                    JsonSerializer.Deserialize<GoogleApiBookDto>(await responseMessage.Content.ReadAsStringAsync(),
+                    JsonSerializer.Deserialize<GoogleApiBookDto>(await responseMessage.Content.ReadAsStringAsync(token),
                         options);
                 var externalBook = new ExternalBook(googleBook.Id, googleBook.VolumeInfo.Title,
                     googleBook.VolumeInfo.Authors.ToArray(),
@@ -83,7 +83,7 @@ namespace MabelBookshelf.Bookshelf.Application.Infrastructure.ExternalBookServic
             public int PrintedPageCount { get; set; }
             public string PrintType { get; set; }
             public List<string> Categories { get; set; }
-            public int AverageRating { get; set; }
+            public double AverageRating { get; set; }
             public int RatingsCount { get; set; }
             public string MaturityRating { get; set; }
             public bool AllowAnonLogging { get; set; }

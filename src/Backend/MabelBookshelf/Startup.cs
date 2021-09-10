@@ -6,6 +6,8 @@ using Hellang.Middleware.ProblemDetails;
 using Hellang.Middleware.ProblemDetails.Mvc;
 using MabelBookshelf.BackgroundWorkers;
 using MabelBookshelf.Bookshelf.Application.Bookshelf.Commands;
+using MabelBookshelf.Bookshelf.Application.Bookshelf.Queries.Preview;
+using MabelBookshelf.Bookshelf.Application.Bookshelf.Queries.Preview.Models;
 using MabelBookshelf.Bookshelf.Application.Infrastructure.Behaviors;
 using MabelBookshelf.Bookshelf.Application.Infrastructure.ExternalBookServices;
 using MabelBookshelf.Bookshelf.Application.Interfaces;
@@ -15,9 +17,11 @@ using MabelBookshelf.Bookshelf.Domain.Aggregates.BookshelfAggregate;
 using MabelBookshelf.Bookshelf.Domain.SeedWork;
 using MabelBookshelf.Bookshelf.Infrastructure.Book;
 using MabelBookshelf.Bookshelf.Infrastructure.Bookshelf;
+using MabelBookshelf.Bookshelf.Infrastructure.BookshelfPreview;
 using MabelBookshelf.Bookshelf.Infrastructure.Infrastructure;
 using MabelBookshelf.Bookshelf.Infrastructure.Interfaces;
-using MabelBookshelf.Bookshelf.Infrastructure.Projections.BookshelfPreviewProjections;
+using MabelBookshelf.Bookshelf.Infrastructure.BookshelfPreview.Projections;
+using MabelBookshelf.Bookshelf.Infrastructure.BookshelfPreview.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -27,6 +31,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
+using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
 
 namespace MabelBookshelf
@@ -105,14 +110,22 @@ namespace MabelBookshelf
             services.AddSingleton<PersistentSubscriptionEventStoreContext>();
             services.AddSingleton<CatchUpSubscriptionEventStoreContext>();
             //TODO: Scan assembly for these
-            services.AddSingleton<IProjectionService, BookshelfPreviewProjection>();
+            services.AddSingleton<IProjectionService, MongoBookshelfPreviewProjection>();
+            
+            BsonClassMap.RegisterClassMap<BookshelfPreview>(cm => 
+            {
+                cm.AutoMap();
+                cm.SetIgnoreExtraElements(true);
+            });
+            
             services.AddSingleton<MongoClient>();
             services.AddSingleton(x =>
             {
-                var settings = new BookshelfPreviewProjectionConfiguration();
+                var settings = new BookshelfPreviewConfiguration();
                 Configuration.GetSection("BookshelfPreviewProjectionConfiguration").Bind(settings);
                 return settings;
             });
+            services.AddScoped<IBookshelfPreviewQueries, MongoBookshelfPreviewQueries>();
         }
 
         private void ConfigureProblemDetails(ProblemDetailsOptions options)

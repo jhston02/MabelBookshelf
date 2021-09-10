@@ -7,12 +7,13 @@ using MabelBookshelf.Bookshelf.Application.Interfaces;
 using MabelBookshelf.Bookshelf.Application.Models;
 using MabelBookshelf.Bookshelf.Domain.Aggregates.BookAggregate.Events;
 using MabelBookshelf.Bookshelf.Domain.Aggregates.BookshelfAggregate.Events;
+using MabelBookshelf.Bookshelf.Infrastructure.BookshelfPreview.Models;
 using MongoDB.Driver;
 using MongoDB.Driver.Linq;
 
-namespace MabelBookshelf.Bookshelf.Infrastructure.Projections.BookshelfPreviewProjections
+namespace MabelBookshelf.Bookshelf.Infrastructure.BookshelfPreview.Projections
 {
-    public class BookshelfPreviewProjection : IProjectionService
+    public class MongoBookshelfPreviewProjection : IProjectionService
     {
         private const string PositionKey = "position";
         private readonly IMongoCollection<StandaloneBook> bookPreviewCollection;
@@ -20,7 +21,7 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Projections.BookshelfPreviewPr
         private readonly IMongoCollection<IdentifiableProjectionPosition> positionCollection;
         private readonly IMongoCollection<ChronologicalBookshelfPreview> previewCollection;
 
-        public BookshelfPreviewProjection(MongoClient client, BookshelfPreviewProjectionConfiguration configuration)
+        public MongoBookshelfPreviewProjection(MongoClient client, BookshelfPreviewConfiguration configuration)
         {
             database = client.GetDatabase(configuration.DatabaseName + $"_v{configuration.Version}");
             positionCollection = database.GetCollection<IdentifiableProjectionPosition>("projection_position");
@@ -134,7 +135,7 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Projections.BookshelfPreviewPr
         private async Task Apply(AddedBookToBookshelfDomainEvent domainEvent, ulong streamPosition)
         {
             //Pull from master list for owner
-            var book = await bookPreviewCollection.AsQueryable().FirstOrDefaultAsync(x => x.Id == domainEvent.BookId);
+            var book = (BookPreview) await bookPreviewCollection.AsQueryable().FirstOrDefaultAsync(x => x.Id == domainEvent.BookId);
 
             //If we have this book (which we should add it to specific shelf
             if (book != null)
@@ -144,7 +145,7 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Projections.BookshelfPreviewPr
                     & Builders<ChronologicalBookshelfPreview>.Filter.Lt(p => p.StreamPosition, streamPosition);
 
                 var updateDefinition = Builders<ChronologicalBookshelfPreview>.Update
-                    .PushEach(x => x.Books, new List<StandaloneBook> { book }, -15)
+                    .PushEach(x => x.Books, new List<BookPreview> { book }, -15)
                     .Set(x => x.StreamPosition, streamPosition);
                 await previewCollection.UpdateOneAsync(filterDefinition, updateDefinition);
             }
@@ -180,23 +181,11 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Projections.BookshelfPreviewPr
             public string Id { get; }
         }
 
-        private class ChronologicalBookshelfPreview : BookshelfPreview
-        {
-            public ulong StreamPosition { get; set; }
-        }
-
         private class StandaloneBook : BookPreview
         {
             public string Id { get; set; }
         }
 
         #endregion
-    }
-
-    public class BookshelfPreviewProjectionConfiguration
-    {
-        public string DatabaseName { get; set; }
-        public int Version { get; set; } = 1;
-        public string CollectionName { get; set; }
     }
 }
