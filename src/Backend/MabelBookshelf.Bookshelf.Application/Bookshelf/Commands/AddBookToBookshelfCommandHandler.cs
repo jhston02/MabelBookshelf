@@ -17,10 +17,10 @@ namespace MabelBookshelf.Bookshelf.Application.Bookshelf.Commands
 
         public async Task<bool> Handle(AddBookToBookshelfCommand request, CancellationToken cancellationToken)
         {
-            var bookshelf = _repository.GetAsync(request.ShelfId) ??
+            var bookshelf = _repository.GetAsync(request.ShelfId, token: cancellationToken) ??
                             throw new ArgumentException("Bookshelf does not exist");
             bookshelf.Result.AddBook(request.BookId);
-            await _repository.UpdateAsync(bookshelf.Result);
+            await _repository.UpdateAsync(bookshelf.Result, cancellationToken);
             await _repository.UnitOfWork.SaveChangesAsync();
             return true;
         }
