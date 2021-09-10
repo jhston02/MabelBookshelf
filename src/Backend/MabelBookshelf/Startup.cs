@@ -17,6 +17,7 @@ using MabelBookshelf.Bookshelf.Infrastructure.Book;
 using MabelBookshelf.Bookshelf.Infrastructure.Bookshelf;
 using MabelBookshelf.Bookshelf.Infrastructure.Infrastructure;
 using MabelBookshelf.Bookshelf.Infrastructure.Interfaces;
+using MabelBookshelf.Bookshelf.Infrastructure.Projections.BookshelfPreviewProjections;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -26,6 +27,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
+using MongoDB.Driver;
 
 namespace MabelBookshelf
 {
@@ -102,6 +104,15 @@ namespace MabelBookshelf
             });
             services.AddSingleton<PersistentSubscriptionEventStoreContext>();
             services.AddSingleton<CatchUpSubscriptionEventStoreContext>();
+            //TODO: Scan assembly for these
+            services.AddSingleton<IProjectionService, BookshelfPreviewProjection>();
+            services.AddSingleton<MongoClient>();
+            services.AddSingleton<BookshelfPreviewProjectionConfiguration>(x =>
+            {
+                var settings = new BookshelfPreviewProjectionConfiguration();
+                Configuration.GetSection("BookshelfPreviewProjectionConfiguration").Bind(settings);
+                return settings;
+            });
         }
 
         private void ConfigureProblemDetails(ProblemDetailsOptions options)
