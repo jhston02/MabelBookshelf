@@ -24,7 +24,8 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Infrastructure
             _existenceCache = new HashSet<string>();
         }
 
-        public async Task<T> CreateStreamAsync<T, TV>(T value, string streamName, CancellationToken token = default) where T : AggregateRoot<TV>
+        public async Task<T> CreateStreamAsync<T, TV>(T value, string streamName, CancellationToken token = default)
+            where T : AggregateRoot<TV>
         {
             token.ThrowIfCancellationRequested();
             var result = await _context.CreateStreamAsync<T, TV>(value, streamName, token);
@@ -32,7 +33,8 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Infrastructure
             return result;
         }
 
-        public async Task<T> WriteToStreamAsync<T, TV>(T value, string streamName, CancellationToken token = default) where T : AggregateRoot<TV>
+        public async Task<T> WriteToStreamAsync<T, TV>(T value, string streamName, CancellationToken token = default)
+            where T : AggregateRoot<TV>
         {
             token.ThrowIfCancellationRequested();
             var result = await _context.WriteToStreamAsync<T, TV>(value, streamName, token);
@@ -40,7 +42,8 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Infrastructure
             return result;
         }
 
-        public async Task<T> ReadFromStreamAsync<T, TV>(string streamName, CancellationToken token = default) where T : AggregateRoot<TV>
+        public async Task<T> ReadFromStreamAsync<T, TV>(string streamName, CancellationToken token = default)
+            where T : AggregateRoot<TV>
         {
             token.ThrowIfCancellationRequested();
             if (_cache.ContainsKey(streamName))

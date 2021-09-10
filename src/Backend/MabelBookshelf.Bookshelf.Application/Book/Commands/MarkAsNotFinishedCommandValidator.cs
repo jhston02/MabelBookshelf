@@ -9,14 +9,11 @@ namespace MabelBookshelf.Bookshelf.Application.Book.Commands
         public MarkAsNotFinishedCommandValidator(IBookRepository repository)
         {
             RuleFor(x => x.BookId).NotNull();
-            RuleFor(x => x.BookId).CustomAsync(async (x, context, _) =>
+            RuleFor(x => x.BookId).CustomAsync(async (x, context, token) =>
             {
                 try
                 {
-                    if (!await repository.Exists(x))
-                    {
-                        context.AddFailure("Book doesn't exist");
-                    }
+                    if (!await repository.Exists(x, token)) context.AddFailure("Book doesn't exist");
                 }
                 catch (ArgumentException e)
                 {
@@ -24,5 +21,5 @@ namespace MabelBookshelf.Bookshelf.Application.Book.Commands
                 }
             });
         }
-        }
     }
+}

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MabelBookshelf.Bookshelf.Application.Bookshelf.Queries.Preview.Models;
@@ -8,18 +9,16 @@ using MabelBookshelf.Bookshelf.Domain.Aggregates.BookAggregate.Events;
 using MabelBookshelf.Bookshelf.Domain.Aggregates.BookshelfAggregate.Events;
 using MongoDB.Driver;
 using MongoDB.Driver.Linq;
-using System.Linq;
 
 namespace MabelBookshelf.Bookshelf.Infrastructure.Projections.BookshelfPreviewProjections
 {
     public class BookshelfPreviewProjection : IProjectionService
     {
+        private const string PositionKey = "position";
+        private readonly IMongoCollection<StandaloneBook> bookPreviewCollection;
         private readonly IMongoDatabase database;
         private readonly IMongoCollection<IdentifiableProjectionPosition> positionCollection;
         private readonly IMongoCollection<ChronologicalBookshelfPreview> previewCollection;
-        private readonly IMongoCollection<StandaloneBook> bookPreviewCollection;
-        private const string PositionKey = "position";
-        public uint CheckpointInterval => 32;
 
         public BookshelfPreviewProjection(MongoClient client, BookshelfPreviewProjectionConfiguration configuration)
         {
@@ -28,11 +27,13 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Projections.BookshelfPreviewPr
             previewCollection = database.GetCollection<ChronologicalBookshelfPreview>("bookshelf_preview");
             bookPreviewCollection = database.GetCollection<StandaloneBook>("book_preview");
         }
-        
+
+        public uint CheckpointInterval => 32;
+
         public async Task<ProjectionPosition> GetCurrentPositionAsync(CancellationToken token = default)
         {
             var filter = Builders<IdentifiableProjectionPosition>.Filter.Eq("_id", PositionKey);
-            var cursor =  await positionCollection.FindAsync(filter, cancellationToken: token);
+            var cursor = await positionCollection.FindAsync(filter, cancellationToken: token);
             var result = cursor.FirstOrDefault();
             return result;
         }
@@ -65,7 +66,9 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Projections.BookshelfPreviewPr
         public async Task CheckpointAsync(ProjectionPosition position, CancellationToken token = default)
         {
             var filter = Builders<IdentifiableProjectionPosition>.Filter.Eq("_id", PositionKey);
-            await positionCollection.ReplaceOneAsync(filter, new IdentifiableProjectionPosition(PositionKey, position.CommitPosition, position.PreparePosition), cancellationToken: token);
+            await positionCollection.ReplaceOneAsync(filter,
+                new IdentifiableProjectionPosition(PositionKey, position.CommitPosition, position.PreparePosition),
+                cancellationToken: token);
         }
 
         #region apply
@@ -73,7 +76,11 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Projections.BookshelfPreviewPr
         private async Task Apply(BookCreatedDomainEvent domainEvent, ulong streamPosition)
         {
             //Every owner has a secret masterlist bookshelf from which all other bookshelves can pull information
-            var book = new StandaloneBook() { ExternalBookId = domainEvent.ExternalId, Categories = domainEvent.Categories.ToList(), BookId = domainEvent.BookId, Id = domainEvent.BookId };
+            var book = new StandaloneBook
+            {
+                ExternalBookId = domainEvent.ExternalId, Categories = domainEvent.Categories.ToList(),
+                BookId = domainEvent.BookId, Id = domainEvent.BookId
+            };
             //Note we are not checking the streamPosition because this is strictly additive. 
             //If it was not we would have to get very fancy indeed
             var filterDefinition = Builders<StandaloneBook>.Filter.Eq(p => p.Id, domainEvent.BookId);
@@ -82,7 +89,7 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Projections.BookshelfPreviewPr
                 .SetOnInsert(x => x.ExternalBookId, book.ExternalBookId)
                 .SetOnInsert(x => x.Categories, book.Categories);
 
-            var options = new UpdateOptions() {IsUpsert = true};
+            var options = new UpdateOptions { IsUpsert = true };
             await bookPreviewCollection.UpdateOneAsync(filterDefinition, updateDefinition, options);
         }
 
@@ -99,7 +106,7 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Projections.BookshelfPreviewPr
                 .SetOnInsert(x => x.Books, new List<BookPreview>())
                 .SetOnInsert(x => x.OwnerId, domainEvent.OwnerId);
 
-            var options = new UpdateOptions() {IsUpsert = true};
+            var options = new UpdateOptions { IsUpsert = true };
             await previewCollection.UpdateOneAsync(filterDefinition, updateDefinition, options);
         }
 
@@ -134,13 +141,14 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Projections.BookshelfPreviewPr
                 var filterDefinition =
                     Builders<ChronologicalBookshelfPreview>.Filter.Eq(p => p.Id, domainEvent.BookshelfId.ToString())
                     & Builders<ChronologicalBookshelfPreview>.Filter.Lt(p => p.StreamPosition, streamPosition);
-                
-                var updateDefinition = Builders<ChronologicalBookshelfPreview>.Update.PushEach(x => x.Books, new List<StandaloneBook>() {book}, slice:-15)
+
+                var updateDefinition = Builders<ChronologicalBookshelfPreview>.Update
+                    .PushEach(x => x.Books, new List<StandaloneBook> { book }, -15)
                     .Set(x => x.StreamPosition, streamPosition);
                 await previewCollection.UpdateOneAsync(filterDefinition, updateDefinition);
             }
         }
-        
+
         private async Task Apply(RemovedBookFromBookshelfDomainEvent domainEvent, ulong streamPosition)
         {
             var filterDefinition =
@@ -150,7 +158,7 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Projections.BookshelfPreviewPr
             var bookFiler = Builders<BookPreview>.Filter.Eq(x => x.BookId, domainEvent.BookId);
 
 
-                var updateDefinition = Builders<ChronologicalBookshelfPreview>.Update
+            var updateDefinition = Builders<ChronologicalBookshelfPreview>.Update
                 .Set(x => x.StreamPosition, streamPosition)
                 .PullFilter(x => x.Books, bookFiler);
             await previewCollection.UpdateOneAsync(filterDefinition, updateDefinition);
@@ -162,12 +170,13 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Projections.BookshelfPreviewPr
 
         private class IdentifiableProjectionPosition : ProjectionPosition
         {
-            public string Id { get; set; }
-
-            public IdentifiableProjectionPosition(string id, ulong commitPosition, ulong preparePosition) : base(commitPosition, preparePosition)
+            public IdentifiableProjectionPosition(string id, ulong commitPosition, ulong preparePosition) : base(
+                commitPosition, preparePosition)
             {
                 Id = id;
             }
+
+            public string Id { get; }
         }
 
         private class ChronologicalBookshelfPreview : BookshelfPreview
@@ -179,9 +188,10 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Projections.BookshelfPreviewPr
         {
             public string Id { get; set; }
         }
+
         #endregion
     }
-    
+
     public class BookshelfPreviewProjectionConfiguration
     {
         public string DatabaseName { get; set; }

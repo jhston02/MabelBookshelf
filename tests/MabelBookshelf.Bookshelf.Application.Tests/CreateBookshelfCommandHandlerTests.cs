@@ -28,19 +28,20 @@ namespace MabelBookshelf.Bookshelf.Application.Tests
             public IUnitOfWork UnitOfWork => new MockUnitOfWork();
 
             public Task<Domain.Aggregates.BookshelfAggregate.Bookshelf> AddAsync(
-                Domain.Aggregates.BookshelfAggregate.Bookshelf bookshelf, CancellationToken token= default)
+                Domain.Aggregates.BookshelfAggregate.Bookshelf bookshelf, CancellationToken token = default)
             {
                 Bookshelfs.Add(bookshelf);
                 return Task.FromResult(bookshelf);
             }
 
-            public Task<Domain.Aggregates.BookshelfAggregate.Bookshelf> GetAsync(Guid id, bool includeSoftDeletes, CancellationToken token= default)
+            public Task<Domain.Aggregates.BookshelfAggregate.Bookshelf> GetAsync(Guid id, bool includeSoftDeletes,
+                CancellationToken token = default)
             {
                 throw new NotImplementedException();
             }
 
             public Task<Domain.Aggregates.BookshelfAggregate.Bookshelf> UpdateAsync(
-                Domain.Aggregates.BookshelfAggregate.Bookshelf bookshelf, CancellationToken token= default)
+                Domain.Aggregates.BookshelfAggregate.Bookshelf bookshelf, CancellationToken token = default)
             {
                 throw new NotImplementedException();
             }

@@ -9,15 +9,15 @@ namespace MabelBookshelf.ProjectionTestFramework
 {
     public class DataGenerator
     {
-        string[] authors = new[] { "Tolkien", "Herbert", "Banks", "Heinlein", "Clark" };
-        private string[] categories = new[] { "sci fi", "fantasy", "biography" };
-        private Faker<BookCreatedDomainEvent> bookFake;
-        private Faker<BookshelfCreatedDomainEvent> bookshelfFake;
+        private readonly string[] authors = { "Tolkien", "Herbert", "Banks", "Heinlein", "Clark" };
+        private readonly Faker<BookCreatedDomainEvent> bookFake;
 
-        private List<string> bookIds = new List<string>();
-        private List<Guid> bookshelfIds = new List<Guid>();
-        private List<(Guid, string)> booksOnShelves = new List<(Guid, string)>();
-        
+        private readonly List<string> bookIds = new();
+        private readonly Faker<BookshelfCreatedDomainEvent> bookshelfFake;
+        private readonly List<Guid> bookshelfIds = new();
+        private readonly List<(Guid, string)> booksOnShelves = new();
+        private readonly string[] categories = { "sci fi", "fantasy", "biography" };
+
         public DataGenerator()
         {
             bookFake = new AutoFaker<BookCreatedDomainEvent>()
@@ -39,7 +39,7 @@ namespace MabelBookshelf.ProjectionTestFramework
                     "test"
                 ));
         }
-        
+
         public IEnumerable<BookCreatedDomainEvent> GetBookCreatedDomainEvents(int count)
         {
             var books = bookFake.Generate(count);
@@ -63,39 +63,30 @@ namespace MabelBookshelf.ProjectionTestFramework
         public IEnumerable<RenamedBookshelfDomainEvent> GetBookshelfRenamedDomainEvents()
         {
             foreach (var bookshelfId in bookshelfIds)
-            {
                 yield return new RenamedBookshelfDomainEvent(bookshelfId, "new name", "oldName", "test");
-            }
         }
 
         public IEnumerable<BookshelfDeletedDomainEvent> GetBookshelfDeletedDomainEvents()
         {
-            foreach (var bookshelfId in bookshelfIds)
-            {
-                yield return new BookshelfDeletedDomainEvent(bookshelfId, "test");
-            }
+            foreach (var bookshelfId in bookshelfIds) yield return new BookshelfDeletedDomainEvent(bookshelfId, "test");
         }
 
         //Not the greatest method but it will do for now
         public IEnumerable<AddedBookToBookshelfDomainEvent> GetAddedBookToBookshelfDomainEvents(int numberPerShelf,
             int totalShelves)
         {
-            for(int i =0; i<totalShelves; i++)
+            for (var i = 0; i < totalShelves; i++)
+            for (var j = 0; j < numberPerShelf; j++)
             {
-                for (int j = 0; j < numberPerShelf; j++)
-                {
-                    booksOnShelves.Add((bookshelfIds[i], bookIds[j]));
-                    yield return new AddedBookToBookshelfDomainEvent(bookshelfIds[i], bookIds[j], "test");
-                } 
+                booksOnShelves.Add((bookshelfIds[i], bookIds[j]));
+                yield return new AddedBookToBookshelfDomainEvent(bookshelfIds[i], bookIds[j], "test");
             }
         }
 
         public IEnumerable<RemovedBookFromBookshelfDomainEvent> GetRemovedBookFromBookshelfDomainEvents()
         {
             foreach (var combination in booksOnShelves)
-            {
                 yield return new RemovedBookFromBookshelfDomainEvent(combination.Item1, combination.Item2, "test");
-            }
         }
     }
 }

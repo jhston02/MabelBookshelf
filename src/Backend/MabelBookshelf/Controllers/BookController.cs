@@ -4,7 +4,6 @@ using MabelBookshelf.Models;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.WebUtilities;
 
 namespace MabelBookshelf.Controllers
 {
@@ -47,12 +46,11 @@ namespace MabelBookshelf.Controllers
             var result = await _mediator.Send(command);
             if (result)
                 return Ok();
-            else
-                return new ObjectResult(ProblemDetailsFactory.CreateProblemDetails(this.HttpContext, statusCode: 400))
-                {
-                    ContentTypes = {"application/problem+json"},
-                    StatusCode = 400
-                };
+            return new ObjectResult(ProblemDetailsFactory.CreateProblemDetails(HttpContext, 400))
+            {
+                ContentTypes = { "application/problem+json" },
+                StatusCode = 400
+            };
         }
     }
 }

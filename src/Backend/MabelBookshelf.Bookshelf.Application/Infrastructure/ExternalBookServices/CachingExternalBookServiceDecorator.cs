@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using MabelBookshelf.Bookshelf.Application.Interfaces;
@@ -20,6 +18,7 @@ namespace MabelBookshelf.Bookshelf.Application.Infrastructure.ExternalBookServic
             _cache = cache;
             _inner = inner;
         }
+
         public async Task<ExternalBook> GetBookAsync(string externalBookId, CancellationToken token = default)
         {
             token.ThrowIfCancellationRequested();

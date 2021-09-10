@@ -5,17 +5,16 @@ using MongoDB.Driver;
 
 namespace MabelBookshelf.ProjectionTestFramework
 {
-    class Program
+    internal class Program
     {
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             var test = new ProjectionTester(10000);
             var projection = GetProjectionService();
             var results = test.TestProjection(projection).Result;
             foreach (var result in results)
-            {
-                Console.WriteLine($"Entity {result.domainEvent}, Finished in {result.time}, Throughput {result.entityCount / result.time.Seconds} per second");
-            }
+                Console.WriteLine(
+                    $"Entity {result.domainEvent}, Finished in {result.time}, Throughput {result.entityCount / result.time.Seconds} per second");
 
             Console.ReadLine();
         }
@@ -23,7 +22,7 @@ namespace MabelBookshelf.ProjectionTestFramework
         private static IProjectionService GetProjectionService()
         {
             var projectionService = new BookshelfPreviewProjection(new MongoClient("mongodb://localhost:27017"),
-                new BookshelfPreviewProjectionConfiguration() { DatabaseName = "test", Version = 1 });
+                new BookshelfPreviewProjectionConfiguration { DatabaseName = "test", Version = 1 });
             return projectionService;
         }
     }

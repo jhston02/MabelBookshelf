@@ -7,18 +7,18 @@ namespace MabelBookshelf.Bookshelf.Application.Book.Commands
 {
     public class MarkAsNotFinishedCommandHandler : IRequestHandler<MarkAsNotFinishedCommand, bool>
     {
-        private IBookRepository _repository;
+        private readonly IBookRepository _repository;
 
         public MarkAsNotFinishedCommandHandler(IBookRepository repository)
         {
-            this._repository = repository;
+            _repository = repository;
         }
-        
+
         public async Task<bool> Handle(MarkAsNotFinishedCommand request, CancellationToken cancellationToken)
         {
-            var book = _repository.GetAsync(request.BookId);
+            var book = _repository.GetAsync(request.BookId, cancellationToken);
             book.Result.MarkAsNotFinished();
-            await _repository.UpdateAsync(book.Result);
+            await _repository.UpdateAsync(book.Result, cancellationToken);
             await _repository.UnitOfWork.SaveChangesAsync();
             return true;
         }

@@ -63,12 +63,11 @@ namespace MabelBookshelf.Controllers
             var result = await _mediator.Send(command);
             if (result)
                 return Ok();
-            else
-                return new ObjectResult(ProblemDetailsFactory.CreateProblemDetails(this.HttpContext, statusCode: 400))
-                {
-                    ContentTypes = {"application/problem+json"},
-                    StatusCode = 400
-                };
+            return new ObjectResult(ProblemDetailsFactory.CreateProblemDetails(HttpContext, 400))
+            {
+                ContentTypes = { "application/problem+json" },
+                StatusCode = 400
+            };
         }
     }
 }

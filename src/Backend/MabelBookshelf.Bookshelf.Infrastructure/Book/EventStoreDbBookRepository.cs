@@ -1,5 +1,4 @@
 ﻿using System.Threading;
-using System.Linq.Expressions;
 using System.Threading.Tasks;
 using EventStore.Client;
 using MabelBookshelf.Bookshelf.Domain.Aggregates.BookAggregate;
@@ -21,7 +20,8 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Book
 
         public IUnitOfWork UnitOfWork => new NoOpUnitOfWork();
 
-        public async Task<Domain.Aggregates.BookAggregate.Book> AddAsync(Domain.Aggregates.BookAggregate.Book book, CancellationToken token = default)
+        public async Task<Domain.Aggregates.BookAggregate.Book> AddAsync(Domain.Aggregates.BookAggregate.Book book,
+            CancellationToken token = default)
         {
             try
             {
@@ -34,13 +34,15 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Book
             }
         }
 
-        public async Task<Domain.Aggregates.BookAggregate.Book> GetAsync(string bookId, CancellationToken token = default)
+        public async Task<Domain.Aggregates.BookAggregate.Book> GetAsync(string bookId,
+            CancellationToken token = default)
         {
             return await _context.ReadFromStreamAsync<Domain.Aggregates.BookAggregate.Book, string>(
                 GetKey(bookId), token);
         }
 
-        public async Task<Domain.Aggregates.BookAggregate.Book> UpdateAsync(Domain.Aggregates.BookAggregate.Book book, CancellationToken token = default)
+        public async Task<Domain.Aggregates.BookAggregate.Book> UpdateAsync(Domain.Aggregates.BookAggregate.Book book,
+            CancellationToken token = default)
         {
             try
             {
@@ -53,14 +55,14 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Book
             }
         }
 
+        public async Task<bool> Exists(string bookId, CancellationToken token = default)
+        {
+            return await _context.StreamExists(PrependStreamName + bookId, token);
+        }
+
         private string GetKey(string bookId)
         {
             return PrependStreamName + bookId;
-        }
-
-        public async Task<bool> Exists(string bookId, CancellationToken token = default)
-        {
-           return await  _context.StreamExists(PrependStreamName + bookId, token);
         }
     }
 }

@@ -21,7 +21,8 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Infrastructure
             _cache = cache;
         }
 
-        public async Task<T> CreateStreamAsync<T, TV>(T value, string streamName, CancellationToken token = default) where T : AggregateRoot<TV>
+        public async Task<T> CreateStreamAsync<T, TV>(T value, string streamName, CancellationToken token = default)
+            where T : AggregateRoot<TV>
         {
             var eventData = GetEventData<T, TV>(value);
             await _client.AppendToStreamAsync(
@@ -33,7 +34,8 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Infrastructure
             return value;
         }
 
-        public async Task<T> WriteToStreamAsync<T, TV>(T value, string streamName, CancellationToken token = default) where T : AggregateRoot<TV>
+        public async Task<T> WriteToStreamAsync<T, TV>(T value, string streamName, CancellationToken token = default)
+            where T : AggregateRoot<TV>
         {
             var eventData = GetEventData<T, TV>(value);
             await _client.AppendToStreamAsync(
@@ -45,7 +47,8 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Infrastructure
             return value;
         }
 
-        public async Task<T> ReadFromStreamAsync<T, TV>(string streamName, CancellationToken token = default) where T : AggregateRoot<TV>
+        public async Task<T> ReadFromStreamAsync<T, TV>(string streamName, CancellationToken token = default)
+            where T : AggregateRoot<TV>
         {
             var result = _client.ReadStreamAsync(
                 Direction.Forwards,

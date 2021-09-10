@@ -56,7 +56,7 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Bookshelf
             }
             catch (WrongExpectedVersionException)
             {
-                throw new ("Bookshelf was modified multiple times");
+                throw new Exception("Bookshelf was modified multiple times");
             }
         }
 

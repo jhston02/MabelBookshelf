@@ -107,7 +107,7 @@ namespace MabelBookshelf
             //TODO: Scan assembly for these
             services.AddSingleton<IProjectionService, BookshelfPreviewProjection>();
             services.AddSingleton<MongoClient>();
-            services.AddSingleton<BookshelfPreviewProjectionConfiguration>(x =>
+            services.AddSingleton(x =>
             {
                 var settings = new BookshelfPreviewProjectionConfiguration();
                 Configuration.GetSection("BookshelfPreviewProjectionConfiguration").Bind(settings);
