@@ -1,5 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using MabelBookshelf.Bookshelf.Domain.SeedWork;
 using MabelBookshelf.Bookshelf.Infrastructure.Interfaces;
@@ -23,38 +24,45 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Infrastructure
             _existenceCache = new HashSet<string>();
         }
 
-        public async Task<T> CreateStreamAsync<T, TV>(T value, string streamName) where T : AggregateRoot<TV>
+        public async Task<T> CreateStreamAsync<T, TV>(T value, string streamName, CancellationToken token = default)
+            where T : AggregateRoot<TV>
         {
-            var result = await _context.CreateStreamAsync<T, TV>(value, streamName);
+            token.ThrowIfCancellationRequested();
+            var result = await _context.CreateStreamAsync<T, TV>(value, streamName, token);
             _cache.TryAdd(streamName, result);
             return result;
         }
 
-        public async Task<T> WriteToStreamAsync<T, TV>(T value, string streamName) where T : AggregateRoot<TV>
+        public async Task<T> WriteToStreamAsync<T, TV>(T value, string streamName, CancellationToken token = default)
+            where T : AggregateRoot<TV>
         {
-            var result = await _context.WriteToStreamAsync<T, TV>(value, streamName);
+            token.ThrowIfCancellationRequested();
+            var result = await _context.WriteToStreamAsync<T, TV>(value, streamName, token);
             _cache.AddOrUpdate(streamName, _ => result, (_, _) => result);
             return result;
         }
 
-        public async Task<T> ReadFromStreamAsync<T, TV>(string streamName) where T : AggregateRoot<TV>
+        public async Task<T> ReadFromStreamAsync<T, TV>(string streamName, CancellationToken token = default)
+            where T : AggregateRoot<TV>
         {
+            token.ThrowIfCancellationRequested();
             if (_cache.ContainsKey(streamName))
             {
                 var entity = _cache[streamName];
                 return (T)entity;
             }
 
-            var result = await _context.ReadFromStreamAsync<T, TV>(streamName);
+            var result = await _context.ReadFromStreamAsync<T, TV>(streamName, token);
             _cache.TryAdd(streamName, result);
             return result;
         }
 
-        public async Task<bool> StreamExists(string streamId)
+        public async Task<bool> StreamExists(string streamId, CancellationToken token = default)
         {
+            token.ThrowIfCancellationRequested();
             if (_existenceCache.Contains(streamId) || _cache.ContainsKey(streamId)) return true;
 
-            var result = await _context.StreamExists(streamId);
+            var result = await _context.StreamExists(streamId, token);
             if (result)
                 _existenceCache.Add(streamId);
             return result;

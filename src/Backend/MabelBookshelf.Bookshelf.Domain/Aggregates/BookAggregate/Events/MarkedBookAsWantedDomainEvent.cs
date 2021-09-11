@@ -2,7 +2,7 @@
 {
     public class MarkedBookAsWantedDomainEvent : BookDomainEvent
     {
-        public MarkedBookAsWantedDomainEvent(string bookId) : base(bookId)
+        public MarkedBookAsWantedDomainEvent(string bookId, string ownerId) : base(bookId, ownerId)
         {
         }
     }

@@ -12,7 +12,8 @@ using MabelBookshelf.Bookshelf.Infrastructure.Interfaces;
 
 namespace MabelBookshelf.Bookshelf.Infrastructure.Infrastructure
 {
-    public class  PersistentSubscriptionEventStoreContext : IDisposable
+    //TODO redo this like a human would look at catchup version it's much better than this mess
+    public class PersistentSubscriptionEventStoreContext : IDisposable
     {
         private readonly ITypeCache _cache;
         private readonly EventStorePersistentSubscriptionsClient _client;

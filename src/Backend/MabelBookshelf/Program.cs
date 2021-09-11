@@ -16,7 +16,11 @@ namespace MabelBookshelf
         {
             return Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder => { webBuilder.UseStartup<Startup>(); })
-                .ConfigureServices(services => { services.AddHostedService<PersistentSubscriptionWatcher>(); });
+                .ConfigureServices(services =>
+                {
+                    services.AddHostedService<PersistentSubscriptionWatcher>();
+                    services.AddHostedService<ProjectionManagerService>();
+                });
         }
     }
 }

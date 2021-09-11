@@ -18,7 +18,7 @@ namespace MabelBookshelf.Bookshelf.Application.Bookshelf.Commands
         {
             var bookshelf =
                 new Domain.Aggregates.BookshelfAggregate.Bookshelf(request.Id, request.Name, request.OwnerId);
-            await _repository.AddAsync(bookshelf);
+            await _repository.AddAsync(bookshelf, cancellationToken);
             await _repository.UnitOfWork.SaveChangesAsync();
             return true;
         }

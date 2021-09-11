@@ -1,4 +1,4 @@
-﻿using System.Linq.Expressions;
+﻿using System.Threading;
 using System.Threading.Tasks;
 using EventStore.Client;
 using MabelBookshelf.Bookshelf.Domain.Aggregates.BookAggregate;
@@ -20,12 +20,13 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Book
 
         public IUnitOfWork UnitOfWork => new NoOpUnitOfWork();
 
-        public async Task<Domain.Aggregates.BookAggregate.Book> AddAsync(Domain.Aggregates.BookAggregate.Book book)
+        public async Task<Domain.Aggregates.BookAggregate.Book> AddAsync(Domain.Aggregates.BookAggregate.Book book,
+            CancellationToken token = default)
         {
             try
             {
                 return await _context.CreateStreamAsync<Domain.Aggregates.BookAggregate.Book, string>(book,
-                    GetKey(book.Id));
+                    GetKey(book.Id), token);
             }
             catch (WrongExpectedVersionException)
             {
@@ -33,18 +34,20 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Book
             }
         }
 
-        public async Task<Domain.Aggregates.BookAggregate.Book> GetAsync(string bookId)
+        public async Task<Domain.Aggregates.BookAggregate.Book> GetAsync(string bookId,
+            CancellationToken token = default)
         {
             return await _context.ReadFromStreamAsync<Domain.Aggregates.BookAggregate.Book, string>(
-                GetKey(bookId));
+                GetKey(bookId), token);
         }
 
-        public async Task<Domain.Aggregates.BookAggregate.Book> UpdateAsync(Domain.Aggregates.BookAggregate.Book book)
+        public async Task<Domain.Aggregates.BookAggregate.Book> UpdateAsync(Domain.Aggregates.BookAggregate.Book book,
+            CancellationToken token = default)
         {
             try
             {
                 return await _context.WriteToStreamAsync<Domain.Aggregates.BookAggregate.Book, string>(book,
-                    GetKey(book.Id));
+                    GetKey(book.Id), token);
             }
             catch (WrongExpectedVersionException)
             {
@@ -52,14 +55,14 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Book
             }
         }
 
+        public async Task<bool> ExistsAsync(string bookId, CancellationToken token = default)
+        {
+            return await _context.StreamExists(PrependStreamName + bookId, token);
+        }
+
         private string GetKey(string bookId)
         {
             return PrependStreamName + bookId;
-        }
-
-        public async Task<bool> Exists(string bookId)
-        {
-           return await  _context.StreamExists(PrependStreamName + bookId);
         }
     }
 }

@@ -34,7 +34,7 @@ namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookAggregate
             if (Status == BookStatus.Reading)
                 throw new BookDomainException("Already reading this book");
 
-            var @event = new BookStartedDomainEvent(Id);
+            var @event = new BookStartedDomainEvent(Id, OwnerId);
             When(@event);
         }
 
@@ -46,19 +46,19 @@ namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookAggregate
             if (Status == BookStatus.Dnf)
                 throw new BookDomainException("This book was not finished");
 
-            var @event = new BookFinishedDomainEvent(Id);
+            var @event = new BookFinishedDomainEvent(Id, OwnerId);
             When(@event);
         }
 
         public void MarkAsNotFinished()
         {
-            var @event = new NotFinishDomainEvent(Id);
+            var @event = new NotFinishDomainEvent(Id, OwnerId);
             When(@event);
         }
 
         public void MarkBookAsWanted()
         {
-            var @event = new MarkedBookAsWantedDomainEvent(Id);
+            var @event = new MarkedBookAsWantedDomainEvent(Id, OwnerId);
             When(@event);
         }
 
@@ -70,7 +70,7 @@ namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookAggregate
             if (Status != BookStatus.Reading)
                 StartReading();
 
-            var @event = new ReadToPageDomainEvent(Id, CurrentPageNumber, pageNumber);
+            var @event = new ReadToPageDomainEvent(Id, CurrentPageNumber, pageNumber, OwnerId);
             When(@event);
 
             if (CurrentPageNumber == TotalPages)
@@ -81,7 +81,7 @@ namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookAggregate
         {
             if (IsDeleted)
                 throw new ArgumentException($"Book {Title} is already deleted");
-            var @event = new BookDeletedDomainEvent(Id);
+            var @event = new BookDeletedDomainEvent(Id, OwnerId);
             When(@event);
         }
 

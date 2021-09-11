@@ -29,7 +29,7 @@ namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookshelfAggregate
             if (_booksIds.Contains(bookId))
                 throw new BookshelfDomainException("Book already in bookshelf");
 
-            var @event = new AddedBookToBookshelfDomainEvent(Id, bookId);
+            var @event = new AddedBookToBookshelfDomainEvent(Id, bookId, OwnerId);
             When(@event);
         }
 
@@ -38,13 +38,13 @@ namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookshelfAggregate
             if (!_booksIds.Contains(bookId))
                 throw new BookshelfDomainException("Book not in bookshelf");
 
-            var @event = new RemovedBookFromBookshelfDomainEvent(Id, bookId);
+            var @event = new RemovedBookFromBookshelfDomainEvent(Id, bookId, OwnerId);
             When(@event);
         }
 
         public void Rename(string newName)
         {
-            var @event = new RenamedBookshelfDomainEvent(Id, newName, Name);
+            var @event = new RenamedBookshelfDomainEvent(Id, newName, Name, OwnerId);
             When(@event);
         }
 
@@ -52,7 +52,7 @@ namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookshelfAggregate
         {
             if (IsDeleted)
                 throw new ArgumentException($"Bookshelf {Name} is already deleted");
-            var @event = new BookshelfDeletedDomainEvent(Id);
+            var @event = new BookshelfDeletedDomainEvent(Id, OwnerId);
             When(@event);
         }
 
@@ -78,7 +78,7 @@ namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookshelfAggregate
                     Apply(domainEvent);
                     break;
                 default:
-                    throw new ArgumentException("Event is not in order!");
+                    throw new ArgumentException("Invalid event type");
             }
 
             Version++;

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 using MabelBookshelf.Bookshelf.Application.Interfaces;
 using MabelBookshelf.Bookshelf.Application.Models;
@@ -14,31 +15,27 @@ namespace MabelBookshelf.Bookshelf.Application.Infrastructure.ExternalBookServic
         private const string GoogleBooksBaseUri = "https://www.googleapis.com/books/v1";
         private const string IsbnIdentifier = "ISBN_13";
         private readonly HttpClient _client;
-        private readonly Dictionary<string, ExternalBook> externalBooksCache;
 
         public GoogleApiExternalBookService(HttpClient client)
         {
             _client = client;
-            externalBooksCache = new Dictionary<string, ExternalBook>();
         }
 
-        public async Task<ExternalBook> GetBook(string externalBookId)
+        public async Task<ExternalBook> GetBookAsync(string externalBookId, CancellationToken token = default)
         {
-            if (externalBooksCache.ContainsKey(externalBookId)) return externalBooksCache[externalBookId];
-
+            token.ThrowIfCancellationRequested();
             using var responseMessage =
-                await _client.GetAsync(GoogleBooksBaseUri + $"/volumes/{externalBookId}");
+                await _client.GetAsync(GoogleBooksBaseUri + $"/volumes/{externalBookId}", token);
             if (responseMessage.IsSuccessStatusCode)
             {
                 var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
                 var googleBook =
-                    JsonSerializer.Deserialize<GoogleApiBookDto>(await responseMessage.Content.ReadAsStringAsync(),
+                    JsonSerializer.Deserialize<GoogleApiBookDto>(await responseMessage.Content.ReadAsStringAsync(token),
                         options);
                 var externalBook = new ExternalBook(googleBook.Id, googleBook.VolumeInfo.Title,
                     googleBook.VolumeInfo.Authors.ToArray(),
                     googleBook.VolumeInfo.IndustryIdentifiers.First(x => x.Type == IsbnIdentifier).Identifier,
                     googleBook.VolumeInfo.PageCount, googleBook.VolumeInfo.Categories.ToArray());
-                externalBooksCache[externalBookId] = externalBook;
                 return externalBook;
             }
 
@@ -86,7 +83,7 @@ namespace MabelBookshelf.Bookshelf.Application.Infrastructure.ExternalBookServic
             public int PrintedPageCount { get; set; }
             public string PrintType { get; set; }
             public List<string> Categories { get; set; }
-            public int AverageRating { get; set; }
+            public double AverageRating { get; set; }
             public int RatingsCount { get; set; }
             public string MaturityRating { get; set; }
             public bool AllowAnonLogging { get; set; }

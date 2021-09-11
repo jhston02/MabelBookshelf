@@ -6,7 +6,7 @@ using MediatR;
 
 namespace MabelBookshelf.Bookshelf.Application.Book.Commands
 {
-    public class CreateBookCommandHandler : IRequestHandler<CreateBookCommand, bool>
+    public class CreateBookCommandHandler : IRequestHandler<CreateBookCommand, string>
     {
         private readonly IBookRepository _bookRepository;
         private readonly IExternalBookService bookService;
@@ -17,16 +17,16 @@ namespace MabelBookshelf.Bookshelf.Application.Book.Commands
             _bookRepository = repository;
         }
 
-        public async Task<bool> Handle(CreateBookCommand request, CancellationToken cancellationToken)
+        public async Task<string> Handle(CreateBookCommand request, CancellationToken cancellationToken)
         {
-            var externalBook = await bookService.GetBook(request.ExternalId);
+            var externalBook = await bookService.GetBookAsync(request.ExternalId, cancellationToken);
             var book = new Domain.Aggregates.BookAggregate.Book($"{request.OwnerId}-{externalBook.Isbn}",
                 externalBook.Title, externalBook.Authors, externalBook.Isbn,
                 externalBook.Id, externalBook.TotalPages, request.OwnerId, externalBook.Categories);
 
-            await _bookRepository.AddAsync(book);
+            await _bookRepository.AddAsync(book, cancellationToken);
             await _bookRepository.UnitOfWork.SaveChangesAsync();
-            return true;
+            return book.Id;
         }
     }
 }
