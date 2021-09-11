@@ -33,7 +33,7 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.BookshelfPreview.Projections
 
         public async Task<ProjectionPosition> GetCurrentPositionAsync(CancellationToken token = default)
         {
-            var filter = Builders<IdentifiableProjectionPosition>.Filter.Eq("_id", PositionKey);
+            var filter = Builders<IdentifiableProjectionPosition>.Filter.Eq(x => x.Id, PositionKey);
             var cursor = await positionCollection.FindAsync(filter, cancellationToken: token);
             var result = cursor.FirstOrDefault();
             return result;
@@ -66,9 +66,10 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.BookshelfPreview.Projections
 
         public async Task CheckpointAsync(ProjectionPosition position, CancellationToken token = default)
         {
-            var filter = Builders<IdentifiableProjectionPosition>.Filter.Eq("_id", PositionKey);
+            var filter = Builders<IdentifiableProjectionPosition>.Filter.Eq(x => x.Id, PositionKey);
+            var options = new ReplaceOptions() { IsUpsert = true };
             await positionCollection.ReplaceOneAsync(filter,
-                new IdentifiableProjectionPosition(PositionKey, position.CommitPosition, position.PreparePosition),
+                new IdentifiableProjectionPosition(PositionKey, position.CommitPosition, position.PreparePosition),options,
                 cancellationToken: token);
         }
 
