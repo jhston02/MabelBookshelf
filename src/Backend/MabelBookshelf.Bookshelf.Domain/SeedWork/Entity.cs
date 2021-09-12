@@ -6,8 +6,9 @@ namespace MabelBookshelf.Bookshelf.Domain.SeedWork
     {
         private readonly Action<DomainEvent> whenAction;
 
-        protected Entity(Action<DomainEvent> whenAction)
+        protected Entity(T id, Action<DomainEvent> whenAction)
         {
+            this.Id = id;
             this.whenAction = whenAction;
         }
 
@@ -16,12 +17,12 @@ namespace MabelBookshelf.Bookshelf.Domain.SeedWork
         // ReSharper disable once MemberCanBePrivate.Global
         protected bool Equals(Entity<T> other)
         {
-            if (Id.Equals(other.Id))
+            if (Id != null && Id.Equals(other.Id))
                 return true;
             return false;
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
@@ -31,7 +32,8 @@ namespace MabelBookshelf.Bookshelf.Domain.SeedWork
 
         public override int GetHashCode()
         {
-            return Id.GetHashCode();
+            if (Id != null) return Id.GetHashCode();
+            return 0;
         }
 
         protected void When(DomainEvent @event)

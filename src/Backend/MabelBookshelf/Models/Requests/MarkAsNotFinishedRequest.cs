@@ -4,6 +4,6 @@ namespace MabelBookshelf.Models
 {
     public record MarkAsNotFinishedRequest
     {
-        [Required] public string BookId { get; init; }
+        [Required] public string? BookId { get; init; }
     }
 }

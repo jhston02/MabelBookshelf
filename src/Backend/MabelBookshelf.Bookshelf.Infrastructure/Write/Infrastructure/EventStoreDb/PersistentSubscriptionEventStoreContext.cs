@@ -70,7 +70,7 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Infrastructure.EventStoreDb
             return subscription.SubscriptionId;
         }
 
-        public StreamStatus GetStreamStatus(string subscriptionId)
+        public StreamStatus? GetStreamStatus(string subscriptionId)
         {
             if (_subCache.ContainsKey(subscriptionId))
                 return _subCache[subscriptionId].Item1;

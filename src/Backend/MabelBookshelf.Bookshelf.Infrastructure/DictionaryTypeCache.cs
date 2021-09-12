@@ -17,7 +17,7 @@ namespace MabelBookshelf.Bookshelf.Infrastructure
         {
             if (cache.ContainsKey(name))
                 return cache[name];
-            return null;
+            throw new Exception("Type not found!");
         }
     }
 }

@@ -47,7 +47,7 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Infrastructure.EventStoreDb
             return value;
         }
 
-        public async Task<T> ReadFromStreamAsync<T, TV>(string streamName, CancellationToken token = default)
+        public async Task<T?> ReadFromStreamAsync<T, TV>(string streamName, CancellationToken token = default)
             where T : AggregateRoot<TV>
         {
             var result = _client.ReadStreamAsync(

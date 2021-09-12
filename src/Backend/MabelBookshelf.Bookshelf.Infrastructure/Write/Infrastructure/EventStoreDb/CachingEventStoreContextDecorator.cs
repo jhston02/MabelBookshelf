@@ -9,7 +9,7 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Infrastructure.EventStoreDb
 {
     public class CachingEventStoreContextDecorator : IEventStoreContext
     {
-        private readonly ConcurrentDictionary<string, object> _cache;
+        private readonly ConcurrentDictionary<string, object?> _cache;
 
         private readonly IEventStoreContext _context;
 
@@ -20,7 +20,7 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Infrastructure.EventStoreDb
         public CachingEventStoreContextDecorator(IEventStoreContext context)
         {
             _context = context;
-            _cache = new ConcurrentDictionary<string, object>();
+            _cache = new ConcurrentDictionary<string, object?>();
             _existenceCache = new HashSet<string>();
         }
 
@@ -42,14 +42,14 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Infrastructure.EventStoreDb
             return result;
         }
 
-        public async Task<T> ReadFromStreamAsync<T, TV>(string streamName, CancellationToken token = default)
+        public async Task<T?> ReadFromStreamAsync<T, TV>(string streamName, CancellationToken token = default)
             where T : AggregateRoot<TV>
         {
             token.ThrowIfCancellationRequested();
             if (_cache.ContainsKey(streamName))
             {
                 var entity = _cache[streamName];
-                return (T)entity;
+                return (T?)entity;
             }
 
             var result = await _context.ReadFromStreamAsync<T, TV>(streamName, token);

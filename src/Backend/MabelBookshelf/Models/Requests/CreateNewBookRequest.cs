@@ -4,6 +4,6 @@ namespace MabelBookshelf.Models
 {
     public record CreateNewBookRequest
     {
-        [Required] public string ExternalId { get; init; }
+        [Required] public string? ExternalId { get; init; }
     }
 }

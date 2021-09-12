@@ -36,7 +36,7 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Bookshelf
             }
         }
 
-        public async Task<Domain.Aggregates.BookshelfAggregate.Bookshelf> GetAsync(Guid id,
+        public async Task<Domain.Aggregates.BookshelfAggregate.Bookshelf?> GetAsync(Guid id,
             bool includeSoftDeletes = false, CancellationToken token = default)
         {
             var bookshelf = await _context.ReadFromStreamAsync<Domain.Aggregates.BookshelfAggregate.Bookshelf, Guid>(
@@ -46,7 +46,7 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Bookshelf
             return bookshelf;
         }
 
-        public async Task<Domain.Aggregates.BookshelfAggregate.Bookshelf> UpdateAsync(
+        public async Task<Domain.Aggregates.BookshelfAggregate.Bookshelf?> UpdateAsync(
             Domain.Aggregates.BookshelfAggregate.Bookshelf bookshelf, CancellationToken token = default)
         {
             try

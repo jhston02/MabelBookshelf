@@ -17,8 +17,12 @@ namespace MabelBookshelf.Bookshelf.Application.Book.Commands
         public async Task<bool> Handle(MarkAsNotFinishedCommand request, CancellationToken cancellationToken)
         {
             var book = _repository.GetAsync(request.BookId, cancellationToken);
-            book.Result.MarkAsNotFinished();
-            await _repository.UpdateAsync(book.Result, cancellationToken);
+            if (book.Result != null)
+            {
+                book.Result.MarkAsNotFinished();
+                await _repository.UpdateAsync(book.Result, cancellationToken);
+            }
+
             await _repository.UnitOfWork.SaveChangesAsync();
             return true;
         }

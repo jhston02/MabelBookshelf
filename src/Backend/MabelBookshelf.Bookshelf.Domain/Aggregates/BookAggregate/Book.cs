@@ -5,9 +5,17 @@ namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookAggregate
 {
     public class Book : AggregateRoot<string>
     {
-        public Book(string id, string title, string[] authors, string isbn, string externalId, int totalPages,
-            string ownerId, string[] categories)
+        public Book(string? id, string? title, string[]? authors, string? isbn, string? externalId, int totalPages,
+            string? ownerId, string[]? categories)
         {
+            if (id == null) throw new ArgumentNullException(nameof(id));
+            if (title == null) throw new ArgumentNullException(nameof(title));
+            if (authors == null) throw new ArgumentNullException(nameof(authors));
+            if (isbn == null) throw new ArgumentNullException(nameof(isbn));
+            if (externalId == null) throw new ArgumentNullException(nameof(externalId));
+            if (ownerId == null) throw new ArgumentNullException(nameof(ownerId));
+            if (categories == null) throw new ArgumentNullException(nameof(categories));
+            
             var @event = new BookCreatedDomainEvent(id, title, authors, isbn, externalId, totalPages, ownerId,
                 categories);
             When(@event);
@@ -17,15 +25,15 @@ namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookAggregate
         {
         }
 
-        public string Title { get; private set; }
-        public string[] Authors { get; private set; }
-        public string Isbn { get; private set; }
-        public string ExternalId { get; private set; }
+        public string Title { get; private set; } = null!;
+        public string[] Authors { get; private set; } = null!;
+        public string Isbn { get; private set; } = null!;
+        public string ExternalId { get; private set; } = null!;
         public BookStatus Status { get; private set; }
         public int TotalPages { get; private set; }
         public int CurrentPageNumber { get; private set; }
-        public string OwnerId { get; private set; }
-        public string[] Categories { get; private set; }
+        public string OwnerId { get; private set; } = null!;
+        public string[] Categories { get; private set; } = null!;
 
         public void StartReading()
         {

@@ -17,8 +17,12 @@ namespace MabelBookshelf.Bookshelf.Application.Bookshelf.Commands
         public async Task<bool> Handle(DeleteBookshelfCommand request, CancellationToken cancellationToken)
         {
             var bookshelf = await _bookshelfRepository.GetAsync(request.Id, token: cancellationToken);
-            bookshelf.Delete();
-            await _bookshelfRepository.UpdateAsync(bookshelf, cancellationToken);
+            if (bookshelf != null)
+            {
+                bookshelf.Delete();
+                await _bookshelfRepository.UpdateAsync(bookshelf, cancellationToken);
+            }
+
             return true;
         }
     }

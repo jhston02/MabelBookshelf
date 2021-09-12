@@ -6,11 +6,12 @@ namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookshelfAggregate
 {
     public class Bookshelf : AggregateRoot<Guid>
     {
-        private List<string> _booksIds;
+        private List<string> _booksIds = null!;
 
         public Bookshelf(Guid id, string name, string ownerId)
         {
             if (name == null) throw new ArgumentNullException(nameof(name));
+            if (ownerId == null) throw new ArgumentNullException(nameof(ownerId));
             var @event = new BookshelfCreatedDomainEvent(id, name, ownerId);
             When(@event);
         }
@@ -19,12 +20,13 @@ namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookshelfAggregate
         {
         }
 
-        public string Name { get; private set; }
+        public string Name { get; private set; } = null!;
         public IReadOnlyCollection<string> Books => _booksIds;
-        public string OwnerId { get; private set; }
+        public string OwnerId { get; private set; } = null!;
 
         public void AddBook(string bookId)
         {
+            if (bookId == null) throw new ArgumentNullException(nameof(bookId));
             if (_booksIds.Contains(bookId))
                 throw new BookshelfDomainException("Book already in bookshelf");
 
@@ -34,6 +36,7 @@ namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookshelfAggregate
 
         public void RemoveBook(string bookId)
         {
+            if (bookId == null) throw new ArgumentNullException(nameof(bookId));
             if (!_booksIds.Contains(bookId))
                 throw new BookshelfDomainException("Book not in bookshelf");
 
@@ -43,6 +46,7 @@ namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookshelfAggregate
 
         public void Rename(string newName)
         {
+            if (newName == null) throw new ArgumentNullException(nameof(newName));
             var @event = new RenamedBookshelfDomainEvent(Id, newName, Name, OwnerId);
             When(@event);
         }

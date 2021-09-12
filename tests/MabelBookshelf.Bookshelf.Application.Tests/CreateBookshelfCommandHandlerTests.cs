@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -34,14 +35,14 @@ namespace MabelBookshelf.Bookshelf.Application.Tests
                 return Task.FromResult(bookshelf);
             }
 
-            public Task<Domain.Aggregates.BookshelfAggregate.Bookshelf> GetAsync(Guid id, bool includeSoftDeletes,
+            public Task<Domain.Aggregates.BookshelfAggregate.Bookshelf?> GetAsync(Guid id, bool includeSoftDeletes,
                 CancellationToken token = default)
             {
                 throw new NotImplementedException();
             }
 
-            public Task<Domain.Aggregates.BookshelfAggregate.Bookshelf> UpdateAsync(
-                Domain.Aggregates.BookshelfAggregate.Bookshelf bookshelf, CancellationToken token = default)
+            public Task<Domain.Aggregates.BookshelfAggregate.Bookshelf?> UpdateAsync(
+                Domain.Aggregates.BookshelfAggregate.Bookshelf? bookshelf, CancellationToken token = default)
             {
                 throw new NotImplementedException();
             }

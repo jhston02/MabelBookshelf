@@ -5,7 +5,7 @@ namespace MabelBookshelf.Bookshelf.Application.Bookshelf.Commands
 {
     public record CreateBookshelfCommand : IRequest<bool>
     {
-        public CreateBookshelfCommand(Guid id, string name, string ownerId)
+        public CreateBookshelfCommand(Guid id, string? name, string ownerId)
         {
             Id = id;
             Name = name ?? throw new ArgumentNullException(nameof(name));
