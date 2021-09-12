@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Xml.Schema;
 using MabelBookshelf.Bookshelf.Application.Bookshelf.Queries.Preview.Models;
 using MabelBookshelf.Bookshelf.Application.Interfaces;
 using MabelBookshelf.Bookshelf.Application.Models;
@@ -71,7 +72,7 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.BookshelfPreview.Projections
             var filter = Builders<IdentifiableProjectionPosition>.Filter.Eq(x => x.Id, PositionKey);
             var options = new ReplaceOptions() { IsUpsert = true };
             await positionCollection.ReplaceOneAsync(filter,
-                new IdentifiableProjectionPosition(position.CommitPosition, position.PreparePosition) { Id = PositionKey },options,
+                new IdentifiableProjectionPosition(PositionKey, position.CommitPosition, position.PreparePosition),options,
                 cancellationToken: token);
         }
 
@@ -80,10 +81,9 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.BookshelfPreview.Projections
         private async Task Apply(BookCreatedDomainEvent domainEvent, ulong streamPosition)
         {
             //Every owner has a secret masterlist bookshelf from which all other bookshelves can pull information
-            var book = new StandaloneBook(domainEvent.BookId, domainEvent.ExternalId, domainEvent.Categories.ToList())
-            {
-                Id = domainEvent.BookId
-            };
+            var book = new StandaloneBook(domainEvent.BookId, domainEvent.BookId, domainEvent.ExternalId,
+                domainEvent.Categories.ToList());
+            
             //Note we are not checking the streamPosition because this is strictly additive. 
             //If it was not we would have to get very fancy indeed
             var filterDefinition = Builders<StandaloneBook>.Filter.Eq(p => p.Id, domainEvent.BookId);
@@ -176,16 +176,12 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.BookshelfPreview.Projections
         #region wrappers
 
         private record IdentifiableProjectionPosition
-            (ulong CommitPosition, ulong PreparePosition) : ProjectionPosition(CommitPosition,
-                PreparePosition)
-        {
-            public string Id { get; init; }
-        }
+            (string Id, ulong CommitPosition, ulong PreparePosition) : ProjectionPosition(CommitPosition,
+                PreparePosition);
 
-        private record StandaloneBook(string BookId, string ExternalBookId, List<string> Categories) : BookPreview(BookId, ExternalBookId, Categories)
-        {
-            public string Id { get; init; }
-        }
+        private record StandaloneBook
+            (string Id, string BookId, string ExternalBookId, List<string> Categories) : BookPreview(BookId,
+                ExternalBookId, Categories);
 
         #endregion
     }
