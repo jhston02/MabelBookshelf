@@ -2,8 +2,8 @@ using System.ComponentModel.DataAnnotations;
 
 namespace MabelBookshelf.Models
 {
-    public class MarkAsNotFinishedRequest
+    public record MarkAsNotFinishedRequest
     {
-        [Required] public string BookId { get; set; }
+        [Required] public string BookId { get; init; }
     }
 }

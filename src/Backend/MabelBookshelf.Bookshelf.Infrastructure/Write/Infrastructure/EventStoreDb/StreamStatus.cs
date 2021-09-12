@@ -1,4 +1,4 @@
-﻿namespace MabelBookshelf.Bookshelf.Infrastructure.Infrastructure
+﻿namespace MabelBookshelf.Bookshelf.Infrastructure.Infrastructure.EventStoreDb
 {
     public class StreamStatus
     {

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using MabelBookshelf.Bookshelf.Infrastructure.Infrastructure;
+using MabelBookshelf.Bookshelf.Infrastructure.Infrastructure.EventStoreDb;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;

@@ -3,7 +3,7 @@ using MediatR;
 
 namespace MabelBookshelf.Bookshelf.Application.Book.Commands
 {
-    public class CreateBookCommand : IRequest<string>
+    public record CreateBookCommand : IRequest<string>
     {
         public CreateBookCommand(string externalId, string ownerId)
         {

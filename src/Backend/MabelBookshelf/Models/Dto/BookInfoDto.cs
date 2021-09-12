@@ -1,7 +1,4 @@
 ﻿namespace MabelBookshelf.Models
 {
-    public class BookInfoDto
-    {
-        public string Id { get; set; }
-    }
+    public record BookInfoDto(string Id);
 }

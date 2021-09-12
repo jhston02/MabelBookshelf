@@ -1,10 +1,8 @@
 ﻿using System;
-using MabelBookshelf.Bookshelf.Domain.Aggregates.BookAggregate.Events;
 using MabelBookshelf.Bookshelf.Domain.SeedWork;
 
 namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookAggregate
 {
-    //TODO: check isbn format
     public class Book : AggregateRoot<string>
     {
         public Book(string id, string title, string[] authors, string isbn, string externalId, int totalPages,

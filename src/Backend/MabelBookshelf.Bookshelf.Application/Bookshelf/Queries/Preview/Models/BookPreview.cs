@@ -2,10 +2,5 @@
 
 namespace MabelBookshelf.Bookshelf.Application.Bookshelf.Queries.Preview.Models
 {
-    public class BookPreview
-    {
-        public string BookId { get; set; }
-        public string ExternalBookId { get; set; }
-        public List<string> Categories { get; set; }
-    }
+    public record BookPreview(string BookId, string ExternalBookId, List<string> Categories);
 }

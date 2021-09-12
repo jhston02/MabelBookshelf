@@ -10,7 +10,7 @@ using EventStore.Client;
 using MabelBookshelf.Bookshelf.Domain.SeedWork;
 using MabelBookshelf.Bookshelf.Infrastructure.Interfaces;
 
-namespace MabelBookshelf.Bookshelf.Infrastructure.Infrastructure
+namespace MabelBookshelf.Bookshelf.Infrastructure.Infrastructure.EventStoreDb
 {
     //TODO redo this like a human would look at catchup version it's much better than this mess
     public class PersistentSubscriptionEventStoreContext : IDisposable

@@ -5,9 +5,11 @@ using System.Threading.Tasks;
 using MabelBookshelf.Bookshelf.Application.Bookshelf.Queries.Preview.Models;
 using MabelBookshelf.Bookshelf.Application.Interfaces;
 using MabelBookshelf.Bookshelf.Application.Models;
-using MabelBookshelf.Bookshelf.Domain.Aggregates.BookAggregate.Events;
-using MabelBookshelf.Bookshelf.Domain.Aggregates.BookshelfAggregate.Events;
+using MabelBookshelf.Bookshelf.Domain.Aggregates.BookAggregate;
+using MabelBookshelf.Bookshelf.Domain.Aggregates.BookshelfAggregate;
 using MabelBookshelf.Bookshelf.Infrastructure.BookshelfPreview.Models;
+using MabelBookshelf.Bookshelf.Infrastructure.Interfaces;
+using MabelBookshelf.Bookshelf.Infrastructure.Models;
 using MongoDB.Driver;
 using MongoDB.Driver.Linq;
 
@@ -69,7 +71,7 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.BookshelfPreview.Projections
             var filter = Builders<IdentifiableProjectionPosition>.Filter.Eq(x => x.Id, PositionKey);
             var options = new ReplaceOptions() { IsUpsert = true };
             await positionCollection.ReplaceOneAsync(filter,
-                new IdentifiableProjectionPosition(PositionKey, position.CommitPosition, position.PreparePosition),options,
+                new IdentifiableProjectionPosition(position.CommitPosition, position.PreparePosition) { Id = PositionKey },options,
                 cancellationToken: token);
         }
 
@@ -78,10 +80,9 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.BookshelfPreview.Projections
         private async Task Apply(BookCreatedDomainEvent domainEvent, ulong streamPosition)
         {
             //Every owner has a secret masterlist bookshelf from which all other bookshelves can pull information
-            var book = new StandaloneBook
+            var book = new StandaloneBook(domainEvent.BookId, domainEvent.ExternalId, domainEvent.Categories.ToList())
             {
-                ExternalBookId = domainEvent.ExternalId, Categories = domainEvent.Categories.ToList(),
-                BookId = domainEvent.BookId, Id = domainEvent.BookId
+                Id = domainEvent.BookId
             };
             //Note we are not checking the streamPosition because this is strictly additive. 
             //If it was not we would have to get very fancy indeed
@@ -174,20 +175,16 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.BookshelfPreview.Projections
 
         #region wrappers
 
-        private class IdentifiableProjectionPosition : ProjectionPosition
+        private record IdentifiableProjectionPosition
+            (ulong CommitPosition, ulong PreparePosition) : ProjectionPosition(CommitPosition,
+                PreparePosition)
         {
-            public IdentifiableProjectionPosition(string id, ulong commitPosition, ulong preparePosition) : base(
-                commitPosition, preparePosition)
-            {
-                Id = id;
-            }
-
-            public string Id { get; }
+            public string Id { get; init; }
         }
 
-        private class StandaloneBook : BookPreview
+        private record StandaloneBook(string BookId, string ExternalBookId, List<string> Categories) : BookPreview(BookId, ExternalBookId, Categories)
         {
-            public string Id { get; set; }
+            public string Id { get; init; }
         }
 
         #endregion

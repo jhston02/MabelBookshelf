@@ -5,9 +5,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using MabelBookshelf.Bookshelf.Application.Interfaces;
 using MabelBookshelf.Bookshelf.Application.Models;
-using MabelBookshelf.Bookshelf.Domain.Aggregates.BookAggregate.Events;
-using MabelBookshelf.Bookshelf.Domain.Aggregates.BookshelfAggregate.Events;
+using MabelBookshelf.Bookshelf.Domain.Aggregates.BookAggregate;
+using MabelBookshelf.Bookshelf.Domain.Aggregates.BookshelfAggregate;
 using MabelBookshelf.Bookshelf.Domain.SeedWork;
+using MabelBookshelf.Bookshelf.Infrastructure.Interfaces;
+using MabelBookshelf.Bookshelf.Infrastructure.Models;
 
 namespace MabelBookshelf.ProjectionTestFramework
 {

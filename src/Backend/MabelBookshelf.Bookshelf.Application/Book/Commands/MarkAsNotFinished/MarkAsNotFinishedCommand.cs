@@ -1,12 +1,13 @@
+using System;
 using MediatR;
 
 namespace MabelBookshelf.Bookshelf.Application.Book.Commands
 {
-    public class MarkAsNotFinishedCommand : IRequest<bool>
+    public record MarkAsNotFinishedCommand : IRequest<bool>
     {
         public MarkAsNotFinishedCommand(string bookId)
         {
-            BookId = bookId;
+            BookId = bookId ?? throw new ArgumentNullException(nameof(bookId));
         }
 
         public string BookId { get; }

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using MabelBookshelf.Bookshelf.Infrastructure.Interfaces;
 
-namespace MabelBookshelf.Bookshelf.Infrastructure.Infrastructure
+namespace MabelBookshelf.Bookshelf.Infrastructure
 {
     public class DictionaryTypeCache : ITypeCache
     {

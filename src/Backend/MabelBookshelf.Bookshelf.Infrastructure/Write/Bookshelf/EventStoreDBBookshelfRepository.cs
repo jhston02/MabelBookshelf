@@ -6,6 +6,7 @@ using MabelBookshelf.Bookshelf.Domain.Aggregates.BookAggregate;
 using MabelBookshelf.Bookshelf.Domain.Aggregates.BookshelfAggregate;
 using MabelBookshelf.Bookshelf.Domain.SeedWork;
 using MabelBookshelf.Bookshelf.Infrastructure.Infrastructure;
+using MabelBookshelf.Bookshelf.Infrastructure.Infrastructure.EventStoreDb;
 using MabelBookshelf.Bookshelf.Infrastructure.Interfaces;
 
 namespace MabelBookshelf.Bookshelf.Infrastructure.Bookshelf
@@ -42,7 +43,7 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Bookshelf
             var bookshelf = await _context.ReadFromStreamAsync<Domain.Aggregates.BookshelfAggregate.Bookshelf, Guid>(
                 GetKey(id), token);
             if (!includeSoftDeletes)
-                bookshelf = bookshelf.IsDeleted ? null : bookshelf;
+                bookshelf = bookshelf?.IsDeleted ?? true ? null : bookshelf;
             return bookshelf;
         }
 

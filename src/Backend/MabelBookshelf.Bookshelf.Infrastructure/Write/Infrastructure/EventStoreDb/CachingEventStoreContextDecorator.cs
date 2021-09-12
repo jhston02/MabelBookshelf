@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using MabelBookshelf.Bookshelf.Domain.SeedWork;
 using MabelBookshelf.Bookshelf.Infrastructure.Interfaces;
 
-namespace MabelBookshelf.Bookshelf.Infrastructure.Infrastructure
+namespace MabelBookshelf.Bookshelf.Infrastructure.Infrastructure.EventStoreDb
 {
     public class CachingEventStoreContextDecorator : IEventStoreContext
     {

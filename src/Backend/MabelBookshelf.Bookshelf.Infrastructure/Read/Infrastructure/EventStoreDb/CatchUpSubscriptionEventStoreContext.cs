@@ -8,8 +8,9 @@ using EventStore.Client;
 using MabelBookshelf.Bookshelf.Application.Models;
 using MabelBookshelf.Bookshelf.Domain.SeedWork;
 using MabelBookshelf.Bookshelf.Infrastructure.Interfaces;
+using MabelBookshelf.Bookshelf.Infrastructure.Models;
 
-namespace MabelBookshelf.Bookshelf.Infrastructure.Infrastructure
+namespace MabelBookshelf.Bookshelf.Infrastructure.Infrastructure.EventStoreDb
 {
     public class CatchUpSubscriptionEventStoreContext
     {

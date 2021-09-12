@@ -4,6 +4,7 @@ using EventStore.Client;
 using MabelBookshelf.Bookshelf.Domain.Aggregates.BookAggregate;
 using MabelBookshelf.Bookshelf.Domain.SeedWork;
 using MabelBookshelf.Bookshelf.Infrastructure.Infrastructure;
+using MabelBookshelf.Bookshelf.Infrastructure.Infrastructure.EventStoreDb;
 using MabelBookshelf.Bookshelf.Infrastructure.Interfaces;
 
 namespace MabelBookshelf.Bookshelf.Infrastructure.Book

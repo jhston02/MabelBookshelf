@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using MabelBookshelf.Bookshelf.Domain.Aggregates.BookshelfAggregate.Events;
 using MabelBookshelf.Bookshelf.Domain.SeedWork;
 
 namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookshelfAggregate
