@@ -2,10 +2,7 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Xml.Schema;
 using MabelBookshelf.Bookshelf.Application.Bookshelf.Queries.Preview.Models;
-using MabelBookshelf.Bookshelf.Application.Interfaces;
-using MabelBookshelf.Bookshelf.Application.Models;
 using MabelBookshelf.Bookshelf.Domain.Aggregates.BookAggregate;
 using MabelBookshelf.Bookshelf.Domain.Aggregates.BookshelfAggregate;
 using MabelBookshelf.Bookshelf.Infrastructure.BookshelfPreview.Models;
@@ -70,10 +67,11 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.BookshelfPreview.Projections
         public async Task CheckpointAsync(ProjectionPosition position, CancellationToken token = default)
         {
             var filter = Builders<IdentifiableProjectionPosition>.Filter.Eq(x => x.Id, PositionKey);
-            var options = new ReplaceOptions() { IsUpsert = true };
+            var options = new ReplaceOptions { IsUpsert = true };
             await positionCollection.ReplaceOneAsync(filter,
-                new IdentifiableProjectionPosition(PositionKey, position.CommitPosition, position.PreparePosition),options,
-                cancellationToken: token);
+                new IdentifiableProjectionPosition(PositionKey, position.CommitPosition, position.PreparePosition),
+                options,
+                token);
         }
 
         #region apply
@@ -83,7 +81,7 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.BookshelfPreview.Projections
             //Every owner has a secret masterlist bookshelf from which all other bookshelves can pull information
             var book = new StandaloneBook(domainEvent.BookId, domainEvent.BookId, domainEvent.ExternalId,
                 domainEvent.Categories.ToList());
-            
+
             //Note we are not checking the streamPosition because this is strictly additive. 
             //If it was not we would have to get very fancy indeed
             var filterDefinition = Builders<StandaloneBook>.Filter.Eq(p => p.Id, domainEvent.BookId);

@@ -5,7 +5,6 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using EventStore.Client;
-using MabelBookshelf.Bookshelf.Application.Models;
 using MabelBookshelf.Bookshelf.Domain.SeedWork;
 using MabelBookshelf.Bookshelf.Infrastructure.Interfaces;
 using MabelBookshelf.Bookshelf.Infrastructure.Models;

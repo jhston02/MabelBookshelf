@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using MabelBookshelf.Bookshelf.Application.Interfaces;
-using MabelBookshelf.Bookshelf.Infrastructure.Infrastructure;
 using MabelBookshelf.Bookshelf.Infrastructure.Infrastructure.EventStoreDb;
 using MabelBookshelf.Bookshelf.Infrastructure.Interfaces;
 using Microsoft.Extensions.Hosting;

@@ -1,6 +1,5 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
-using MabelBookshelf.Bookshelf.Application.Models;
 using MabelBookshelf.Bookshelf.Infrastructure.Models;
 
 namespace MabelBookshelf.Bookshelf.Infrastructure.Interfaces

@@ -20,7 +20,6 @@ using MabelBookshelf.Bookshelf.Infrastructure.Bookshelf;
 using MabelBookshelf.Bookshelf.Infrastructure.BookshelfPreview;
 using MabelBookshelf.Bookshelf.Infrastructure.BookshelfPreview.Projections;
 using MabelBookshelf.Bookshelf.Infrastructure.BookshelfPreview.Queries;
-using MabelBookshelf.Bookshelf.Infrastructure.Infrastructure;
 using MabelBookshelf.Bookshelf.Infrastructure.Infrastructure.EventStoreDb;
 using MabelBookshelf.Bookshelf.Infrastructure.Interfaces;
 using MediatR;
