@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using MabelBookshelf.Bookshelf.Domain.Aggregates.BookshelfAggregate;
 using MediatR;
@@ -16,12 +17,12 @@ namespace MabelBookshelf.Bookshelf.Application.Bookshelf.Commands
 
         public async Task<bool> Handle(DeleteBookshelfCommand request, CancellationToken cancellationToken)
         {
-            var bookshelf = await _bookshelfRepository.GetAsync(request.Id, token: cancellationToken);
-            if (bookshelf != null)
-            {
-                bookshelf.Delete();
-                await _bookshelfRepository.UpdateAsync(bookshelf, cancellationToken);
-            }
+            var bookshelf = await _bookshelfRepository.GetAsync(request.Id, token: cancellationToken) ?? 
+                            throw new ArgumentException("Invalid bookshelf");
+
+            bookshelf.Delete();
+            await _bookshelfRepository.UpdateAsync(bookshelf, cancellationToken);
+
 
             return true;
         }
