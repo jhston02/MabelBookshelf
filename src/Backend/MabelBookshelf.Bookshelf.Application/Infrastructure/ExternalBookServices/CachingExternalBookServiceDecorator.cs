@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using MabelBookshelf.Bookshelf.Application.Interfaces;
-using MabelBookshelf.Bookshelf.Application.Models;
+using MabelBookshelf.Bookshelf.Domain.Shared;
 using Microsoft.Extensions.Caching.Memory;
 
 namespace MabelBookshelf.Bookshelf.Application.Infrastructure.ExternalBookServices

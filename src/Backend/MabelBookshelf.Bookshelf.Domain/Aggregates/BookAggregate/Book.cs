@@ -5,19 +5,12 @@ namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookAggregate
 {
     public class Book : AggregateRoot<string>
     {
-        public Book(string? id, string? title, string[]? authors, string? isbn, string? externalId, int totalPages,
-            string? ownerId, string[]? categories)
+        public Book(string? id, string? ownerId, VolumeInfo info)
         {
-            if (id == null) throw new ArgumentNullException(nameof(id));
-            if (title == null) throw new ArgumentNullException(nameof(title));
-            if (authors == null) throw new ArgumentNullException(nameof(authors));
-            if (isbn == null) throw new ArgumentNullException(nameof(isbn));
-            if (externalId == null) throw new ArgumentNullException(nameof(externalId));
-            if (ownerId == null) throw new ArgumentNullException(nameof(ownerId));
-            if (categories == null) throw new ArgumentNullException(nameof(categories));
-            
-            var @event = new BookCreatedDomainEvent(id, title, authors, isbn, externalId, totalPages, ownerId,
-                categories);
+            var @event = new BookCreatedDomainEvent(id ?? throw new ArgumentNullException(nameof(id)), info.Title,
+                info.Authors, info.Isbn, info.ExternalId, info.TotalPages,
+                ownerId ?? throw new ArgumentNullException(nameof(ownerId)),
+                info.Categories);
             When(@event);
         }
 
@@ -25,15 +18,10 @@ namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookAggregate
         {
         }
 
-        public string Title { get; private set; } = null!;
-        public string[] Authors { get; private set; } = null!;
-        public string Isbn { get; private set; } = null!;
-        public string ExternalId { get; private set; } = null!;
+        public VolumeInfo VolumeInfo { get; private set; } = null!;
         public BookStatus Status { get; private set; }
-        public int TotalPages { get; private set; }
         public int CurrentPageNumber { get; private set; }
         public string OwnerId { get; private set; } = null!;
-        public string[] Categories { get; private set; } = null!;
 
         public void StartReading()
         {
@@ -70,7 +58,7 @@ namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookAggregate
 
         public void ReadToPage(int pageNumber)
         {
-            if (pageNumber <= 0 || pageNumber > TotalPages)
+            if (pageNumber <= 0 || pageNumber > VolumeInfo.TotalPages)
                 throw new BookDomainException("Please enter valid page number");
 
             if (Status != BookStatus.Reading)
@@ -79,14 +67,14 @@ namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookAggregate
             var @event = new ReadToPageDomainEvent(Id, CurrentPageNumber, pageNumber, OwnerId);
             When(@event);
 
-            if (CurrentPageNumber == TotalPages)
+            if (CurrentPageNumber == VolumeInfo.TotalPages)
                 FinishReading();
         }
 
         public override void Delete()
         {
             if (IsDeleted)
-                throw new ArgumentException($"Book {Title} is already deleted");
+                throw new ArgumentException($"Book {VolumeInfo.Title} is already deleted");
             var @event = new BookDeletedDomainEvent(Id, OwnerId);
             When(@event);
         }
@@ -153,14 +141,10 @@ namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookAggregate
         private void Apply(BookCreatedDomainEvent @event)
         {
             Id = @event.BookId;
-            Title = @event.Title;
-            Authors = @event.Authors;
-            Isbn = @event.Isbn;
-            ExternalId = @event.ExternalId;
-            TotalPages = @event.TotalPages;
+            VolumeInfo = new VolumeInfo(@event.Title, @event.Authors, @event.Isbn, @event.ExternalId, @event.TotalPages,
+                @event.Categories);
             Status = BookStatus.Want;
             OwnerId = @event.OwnerId;
-            Categories = @event.Categories;
             IsDeleted = false;
             CurrentPageNumber = 0;
         }

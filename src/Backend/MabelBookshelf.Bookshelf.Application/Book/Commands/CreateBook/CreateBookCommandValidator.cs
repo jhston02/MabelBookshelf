@@ -1,6 +1,6 @@
 ﻿using System;
 using FluentValidation;
-using MabelBookshelf.Bookshelf.Application.Interfaces;
+using MabelBookshelf.Bookshelf.Domain.Shared;
 
 namespace MabelBookshelf.Bookshelf.Application.Book.Commands
 {

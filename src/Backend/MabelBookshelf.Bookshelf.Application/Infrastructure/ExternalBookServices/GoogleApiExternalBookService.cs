@@ -5,8 +5,7 @@ using System.Net.Http;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using MabelBookshelf.Bookshelf.Application.Interfaces;
-using MabelBookshelf.Bookshelf.Application.Models;
+using MabelBookshelf.Bookshelf.Domain.Shared;
 
 namespace MabelBookshelf.Bookshelf.Application.Infrastructure.ExternalBookServices
 {

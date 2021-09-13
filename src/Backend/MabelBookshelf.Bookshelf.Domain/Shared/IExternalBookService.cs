@@ -1,8 +1,7 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
-using MabelBookshelf.Bookshelf.Application.Models;
 
-namespace MabelBookshelf.Bookshelf.Application.Interfaces
+namespace MabelBookshelf.Bookshelf.Domain.Shared
 {
     public interface IExternalBookService
     {

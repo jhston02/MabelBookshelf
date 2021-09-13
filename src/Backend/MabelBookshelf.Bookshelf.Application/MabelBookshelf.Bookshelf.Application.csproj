@@ -16,4 +16,8 @@
         <ProjectReference Include="..\MabelBookshelf.Bookshelf.Domain\MabelBookshelf.Bookshelf.Domain.csproj"/>
     </ItemGroup>
 
+    <ItemGroup>
+        <Folder Include="Models"/>
+    </ItemGroup>
+
 </Project>

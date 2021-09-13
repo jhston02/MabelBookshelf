@@ -1,5 +1,8 @@
 using System;
+using System.Threading;
+using System.Threading.Tasks;
 using MabelBookshelf.Bookshelf.Domain.Aggregates.BookAggregate;
+using MabelBookshelf.Bookshelf.Domain.Shared;
 using Xunit;
 
 namespace MabelBookshelf.Bookshelf.Domain.Tests
@@ -8,8 +11,8 @@ namespace MabelBookshelf.Bookshelf.Domain.Tests
     {
         private Book GetBook(BookStatus status)
         {
-            var book = new Book(Guid.NewGuid().ToString(), "blah", new[] { "test" }, "blah", "blah", 500, "0",
-                new[] { "test" });
+            var book = new Book(Guid.NewGuid().ToString(), "0",
+                VolumeInfo.FromExternalId("blah", new MockExternalBooksService()).Result);
             if (status == BookStatus.Reading)
                 book.ReadToPage(1);
             else if (status == BookStatus.Dnf)
@@ -65,13 +68,6 @@ namespace MabelBookshelf.Bookshelf.Domain.Tests
         }
 
         [Fact]
-        public void FinishedBook_GoToDidNotFinish_ThrowException()
-        {
-            var book = GetBook(BookStatus.Finished);
-            Assert.Throws<BookDomainException>(() => book.MarkAsNotFinished());
-        }
-
-        [Fact]
         public void NewBook_ReadPagesLessThanMax_OnPageNumber()
         {
             var book = GetBook(BookStatus.Reading);
@@ -107,6 +103,15 @@ namespace MabelBookshelf.Bookshelf.Domain.Tests
             var book = GetBook(BookStatus.Want);
             book.ReadToPage(200);
             Assert.Equal(BookStatus.Reading, book.Status);
+        }
+
+        private class MockExternalBooksService : IExternalBookService
+        {
+            public Task<ExternalBook> GetBookAsync(string externalBookId, CancellationToken token = default)
+            {
+                var book = new ExternalBook("blah", "blah", new[] { "test" }, "blah", 500, new[] { "test" });
+                return Task.FromResult(book);
+            }
         }
     }
 }

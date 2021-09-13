@@ -1,7 +1,8 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
-using MabelBookshelf.Bookshelf.Application.Interfaces;
 using MabelBookshelf.Bookshelf.Domain.Aggregates.BookAggregate;
+using MabelBookshelf.Bookshelf.Domain.Shared;
 using MediatR;
 
 namespace MabelBookshelf.Bookshelf.Application.Book.Commands
@@ -19,10 +20,11 @@ namespace MabelBookshelf.Bookshelf.Application.Book.Commands
 
         public async Task<string> Handle(CreateBookCommand request, CancellationToken cancellationToken)
         {
-            var externalBook = await bookService.GetBookAsync(request.ExternalId, cancellationToken);
-            var book = new Domain.Aggregates.BookAggregate.Book($"{request.OwnerId}-{externalBook.Isbn}",
-                externalBook.Title, externalBook.Authors, externalBook.Isbn,
-                externalBook.Id, externalBook.TotalPages, request.OwnerId, externalBook.Categories);
+            var volumeInfo = await VolumeInfo.FromExternalId(
+                request.ExternalId ?? throw new ArgumentException("External Id cannot be null"), bookService,
+                cancellationToken);
+            var book = new Domain.Aggregates.BookAggregate.Book($"{request.OwnerId}-{volumeInfo.Isbn}", request.OwnerId,
+                volumeInfo);
 
             await _bookRepository.AddAsync(book, cancellationToken);
             await _bookRepository.UnitOfWork.SaveChangesAsync();

@@ -8,7 +8,7 @@ namespace MabelBookshelf.Bookshelf.Domain.SeedWork
 
         protected Entity(T id, Action<DomainEvent> whenAction)
         {
-            this.Id = id;
+            Id = id;
             this.whenAction = whenAction;
         }
 
