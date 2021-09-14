@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using MabelBookshelf.Bookshelf.Application.Exceptions;
 using MabelBookshelf.Bookshelf.Domain.Aggregates.BookshelfAggregate;
 
 namespace MabelBookshelf.Bookshelf.Application.Bookshelf.Commands
@@ -13,7 +14,7 @@ namespace MabelBookshelf.Bookshelf.Application.Bookshelf.Commands
                 if (bookshelf == null)
                     context.AddFailure(nameof(DeleteBookshelfCommand.Id), "Bookshelf does not exist");
                 else if (x != bookshelf.OwnerId)
-                    context.AddFailure(nameof(DeleteBookshelfCommand.OwnerId), "Unauthorized");
+                    throw new UnauthorizedException();
             });
         }
     }

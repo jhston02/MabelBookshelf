@@ -65,7 +65,7 @@ namespace MabelBookshelf.Controllers
         [HttpPost]
         public async Task<ActionResult> AddBookToBookshelf([FromBody] AddBookToBookshelfRequest request)
         {
-            var command = new AddBookToBookshelfCommand(request.BookId, request.BookShelfId);
+            var command = new AddBookToBookshelfCommand(request.BookId, request.BookShelfId, "temp");
             var result = await _mediator.Send(command);
             if (result)
                 return Ok();

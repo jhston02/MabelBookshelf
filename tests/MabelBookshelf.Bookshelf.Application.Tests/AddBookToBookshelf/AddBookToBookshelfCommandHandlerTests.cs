@@ -9,29 +9,33 @@ using Xunit;
 
 namespace MabelBookshelf.Bookshelf.Application.Tests
 {
-    public class DeleteBookshelfCommandHandlerTests
+    public class AddBookToBookshelfCommandHandlerTests
     {
         [Fact]
-        public async Task DeleteBookshelfCommandHandler_BookshelfExistsIsValid_IsDeleted()
+        public async Task ValidBookValidBookshelf_BookAddedToBookshelf()
         {
             var id = Guid.NewGuid();
+            var bookdId = "hey";
+            var ownerId = "owner";
             var repository = new MockBookshelfRepository(new List<Domain.Aggregates.BookshelfAggregate.Bookshelf>()
                 { new Domain.Aggregates.BookshelfAggregate.Bookshelf(id, "test", "test") });
-            var command = new DeleteBookshelfCommand(id, "test");
-            var commandHandler = new DeleteBookshelfCommandHandler(repository);
+            var command = new AddBookToBookshelfCommand(bookdId, id, ownerId);
+            var commandHandler = new AddBookToBookshelfCommandHandler(repository);
             var result = await commandHandler.Handle(command, CancellationToken.None);
             var bookshelf = repository.Bookshelves.FirstOrDefault();
-            Assert.True(bookshelf is { IsDeleted: true });
+            Assert.True(bookshelf?.Books.FirstOrDefault(x=> x == bookdId) != null);
         }
-
+        
         [Fact]
-        public async Task DeleteBookshelfCommandHandler_BookshelfNotExists_ThrowsException()
+        public async Task ValidBookInValidBookshelf_BookshelfNotAdded_ThrowsArgumentException()
         {
             var id = Guid.NewGuid();
+            var bookdId = "hey";
+            var ownerId = "owner";
             var repository = new MockBookshelfRepository(new List<Domain.Aggregates.BookshelfAggregate.Bookshelf>());
-            var command = new DeleteBookshelfCommand(id, "test");
-            var commandHandler = new DeleteBookshelfCommandHandler(repository);
-            await Assert.ThrowsAnyAsync<ArgumentException>(async ()=> await commandHandler.Handle(command, CancellationToken.None));
+            var command = new AddBookToBookshelfCommand(bookdId, id, ownerId);
+            var commandHandler = new AddBookToBookshelfCommandHandler(repository);
+            await Assert.ThrowsAnyAsync<ArgumentException>(async () => await commandHandler.Handle(command, CancellationToken.None));
         }
     }
 }

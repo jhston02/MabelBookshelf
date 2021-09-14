@@ -1,6 +1,7 @@
 ﻿#nullable enable
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MabelBookshelf.Bookshelf.Domain.Aggregates.BookshelfAggregate;
@@ -29,13 +30,16 @@ namespace MabelBookshelf.Bookshelf.Application.Tests.Mocks
         public Task<Domain.Aggregates.BookshelfAggregate.Bookshelf?> GetAsync(Guid id, bool includeSoftDeletes,
             CancellationToken token = default)
         {
-            throw new NotImplementedException();
+            return Task.FromResult(Bookshelves.FirstOrDefault(x => x.Id == id));
         }
 
         public Task<Domain.Aggregates.BookshelfAggregate.Bookshelf?> UpdateAsync(
             Domain.Aggregates.BookshelfAggregate.Bookshelf? bookshelf, CancellationToken token = default)
         {
-            throw new NotImplementedException();
+            var oldBookshelf = Bookshelves.FirstOrDefault(x => bookshelf != null && x.Id == bookshelf.Id);
+            if (oldBookshelf != null) Bookshelves.Remove(oldBookshelf);
+            if (bookshelf != null) Bookshelves.Add(bookshelf);
+            return Task.FromResult(bookshelf);
         }
         
         private class MockUnitOfWork : IUnitOfWork
