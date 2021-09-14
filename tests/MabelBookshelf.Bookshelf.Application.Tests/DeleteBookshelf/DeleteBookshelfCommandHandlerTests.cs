@@ -17,7 +17,7 @@ namespace MabelBookshelf.Bookshelf.Application.Tests
             var id = Guid.NewGuid();
             var repository = new MockBookshelfRepository(new List<Domain.Aggregates.BookshelfAggregate.Bookshelf>()
                 { new Domain.Aggregates.BookshelfAggregate.Bookshelf(id, "test", "test") });
-            var command = new DeleteBookshelfCommand(id, "test");
+            var command = new DeleteBookshelfCommand(id);
             var commandHandler = new DeleteBookshelfCommandHandler(repository);
             var result = await commandHandler.Handle(command, CancellationToken.None);
             var bookshelf = repository.Bookshelves.FirstOrDefault();
@@ -29,7 +29,7 @@ namespace MabelBookshelf.Bookshelf.Application.Tests
         {
             var id = Guid.NewGuid();
             var repository = new MockBookshelfRepository(new List<Domain.Aggregates.BookshelfAggregate.Bookshelf>());
-            var command = new DeleteBookshelfCommand(id, "test");
+            var command = new DeleteBookshelfCommand(id);
             var commandHandler = new DeleteBookshelfCommandHandler(repository);
             await Assert.ThrowsAnyAsync<ArgumentException>(async ()=> await commandHandler.Handle(command, CancellationToken.None));
         }

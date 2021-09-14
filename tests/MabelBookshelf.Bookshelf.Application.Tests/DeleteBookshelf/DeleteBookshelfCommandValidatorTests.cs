@@ -17,7 +17,7 @@ namespace MabelBookshelf.Bookshelf.Application.Tests
             var repository = new MockBookshelfRepository(new List<Domain.Aggregates.BookshelfAggregate.Bookshelf>()
                 { new Domain.Aggregates.BookshelfAggregate.Bookshelf(id, "test", owner) });
             var validator = new DeleteBookshelfCommandValidator(repository);
-            var command = new DeleteBookshelfCommand(id, owner);
+            var command = new DeleteBookshelfCommand(id);
             Assert.True(validator.Validate(command).IsValid);
         }
         
@@ -25,22 +25,9 @@ namespace MabelBookshelf.Bookshelf.Application.Tests
         public void InvalidDeleteBookshelfCommand_NotBookshelfId_IsInvalid()
         {
             var id = Guid.NewGuid();
-            var owner = "test";
             var repository = new MockBookshelfRepository(new List<Domain.Aggregates.BookshelfAggregate.Bookshelf>());
             var validator = new DeleteBookshelfCommandValidator(repository);
-            var command = new DeleteBookshelfCommand(id, owner);
-            Assert.False(validator.Validate(command).IsValid);
-        }
-        
-        [Fact]
-        public void InvalidDeleteBookshelfCommand_WrongOwnerId_IsInvalid()
-        {
-            var id = Guid.NewGuid();
-            var owner = "test";
-            var repository = new MockBookshelfRepository(new List<Domain.Aggregates.BookshelfAggregate.Bookshelf>()
-                { new Domain.Aggregates.BookshelfAggregate.Bookshelf(id, "test", owner) });
-            var validator = new DeleteBookshelfCommandValidator(repository);
-            var command = new DeleteBookshelfCommand(id, "badOwner");
+            var command = new DeleteBookshelfCommand(id);
             Assert.False(validator.Validate(command).IsValid);
         }
     }

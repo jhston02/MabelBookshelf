@@ -24,8 +24,39 @@ namespace MabelBookshelf.Bookshelf.Application.Tests
             var bookshelfRepository = new MockBookshelfRepository(new List<Domain.Aggregates.BookshelfAggregate.Bookshelf>()
                 { new Domain.Aggregates.BookshelfAggregate.Bookshelf(id, "test", "test") });
             var validator = new AddBookToBookshelfCommandValidator(bookRepository, bookshelfRepository);
-            var command = new AddBookToBookshelfCommand(bookId, id, owner);
+            var command = new AddBookToBookshelfCommand(bookId, id);
             Assert.True((await validator.ValidateAsync(command)).IsValid);
+        }
+        
+        [Fact]
+        public async Task InvalidCommand_BookDoesNotExist_Invalid()
+        {
+            var id = Guid.NewGuid();
+            var owner = "test";
+            var bookId = "hey";
+            var bookRepository = new MockBookRepository(new List<Domain.Aggregates.BookAggregate.Book>());
+            var bookshelfRepository = new MockBookshelfRepository(new List<Domain.Aggregates.BookshelfAggregate.Bookshelf>()
+                { new Domain.Aggregates.BookshelfAggregate.Bookshelf(id, "test", "test") });
+            var validator = new AddBookToBookshelfCommandValidator(bookRepository, bookshelfRepository);
+            var command = new AddBookToBookshelfCommand(bookId, id);
+            Assert.False((await validator.ValidateAsync(command)).IsValid);
+        }
+        
+        [Fact]
+        public async Task InvalidCommand_BookshelfDoesNotExist_Invalid()
+        {
+            var id = Guid.NewGuid();
+            var owner = "test";
+            var bookId = "hey";
+            var bookRepository = new MockBookRepository(new List<Domain.Aggregates.BookAggregate.Book>()
+            {
+                new Domain.Aggregates.BookAggregate.Book(bookId, owner,
+                    await VolumeInfo.FromExternalId("blah", new MockExternalBookService()))
+            });
+            var bookshelfRepository = new MockBookshelfRepository(new List<Domain.Aggregates.BookshelfAggregate.Bookshelf>());
+            var validator = new AddBookToBookshelfCommandValidator(bookRepository, bookshelfRepository);
+            var command = new AddBookToBookshelfCommand(bookId, id);
+            Assert.False((await validator.ValidateAsync(command)).IsValid);
         }
     }
 }

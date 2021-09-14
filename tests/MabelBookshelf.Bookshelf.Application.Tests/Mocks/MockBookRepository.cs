@@ -30,7 +30,7 @@ namespace MabelBookshelf.Bookshelf.Application.Tests.Mocks
 
         public Task<bool> ExistsAsync(string bookId, CancellationToken token = default)
         {
-            throw new System.NotImplementedException();
+            return Task.FromResult(Books.Any(x => x.Id == bookId));
         }
 
         public Task<Domain.Aggregates.BookAggregate.Book?> UpdateAsync(Domain.Aggregates.BookAggregate.Book book, CancellationToken token = default)

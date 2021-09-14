@@ -16,10 +16,9 @@ namespace MabelBookshelf.Bookshelf.Application.Tests
         {
             var id = Guid.NewGuid();
             var bookdId = "hey";
-            var ownerId = "owner";
             var repository = new MockBookshelfRepository(new List<Domain.Aggregates.BookshelfAggregate.Bookshelf>()
                 { new Domain.Aggregates.BookshelfAggregate.Bookshelf(id, "test", "test") });
-            var command = new AddBookToBookshelfCommand(bookdId, id, ownerId);
+            var command = new AddBookToBookshelfCommand(bookdId, id);
             var commandHandler = new AddBookToBookshelfCommandHandler(repository);
             var result = await commandHandler.Handle(command, CancellationToken.None);
             var bookshelf = repository.Bookshelves.FirstOrDefault();
@@ -31,9 +30,8 @@ namespace MabelBookshelf.Bookshelf.Application.Tests
         {
             var id = Guid.NewGuid();
             var bookdId = "hey";
-            var ownerId = "owner";
             var repository = new MockBookshelfRepository(new List<Domain.Aggregates.BookshelfAggregate.Bookshelf>());
-            var command = new AddBookToBookshelfCommand(bookdId, id, ownerId);
+            var command = new AddBookToBookshelfCommand(bookdId, id);
             var commandHandler = new AddBookToBookshelfCommandHandler(repository);
             await Assert.ThrowsAnyAsync<ArgumentException>(async () => await commandHandler.Handle(command, CancellationToken.None));
         }

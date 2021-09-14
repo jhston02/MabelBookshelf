@@ -48,7 +48,7 @@ namespace MabelBookshelf.Controllers
         [HttpPost]
         public async Task<ActionResult> DeleteBookshelf([FromBody] DeleteBookshelfRequest request)
         {
-            var command = new DeleteBookshelfCommand(request.Id, "temp");
+            var command = new DeleteBookshelfCommand(request.Id);
             var result = await _mediator.Send(command);
             if (result)
                 return Ok();
@@ -65,7 +65,7 @@ namespace MabelBookshelf.Controllers
         [HttpPost]
         public async Task<ActionResult> AddBookToBookshelf([FromBody] AddBookToBookshelfRequest request)
         {
-            var command = new AddBookToBookshelfCommand(request.BookId, request.BookShelfId, "temp");
+            var command = new AddBookToBookshelfCommand(request.BookId, request.BookShelfId);
             var result = await _mediator.Send(command);
             if (result)
                 return Ok();

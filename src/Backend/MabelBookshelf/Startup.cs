@@ -8,7 +8,6 @@ using MabelBookshelf.BackgroundWorkers;
 using MabelBookshelf.Bookshelf.Application.Bookshelf.Commands;
 using MabelBookshelf.Bookshelf.Application.Bookshelf.Queries.Preview;
 using MabelBookshelf.Bookshelf.Application.Bookshelf.Queries.Preview.Models;
-using MabelBookshelf.Bookshelf.Application.Exceptions;
 using MabelBookshelf.Bookshelf.Application.Infrastructure.Behaviors;
 using MabelBookshelf.Bookshelf.Application.Infrastructure.ExternalBookServices;
 using MabelBookshelf.Bookshelf.Domain.Aggregates.BookAggregate;
@@ -148,7 +147,6 @@ namespace MabelBookshelf
             options.MapToStatusCode<ArgumentException>(400);
             options.MapToStatusCode<BookshelfDomainException>(400);
             options.MapToStatusCode<BookDomainException>(400);
-            options.MapToStatusCode<UnauthorizedException>(403);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

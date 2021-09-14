@@ -5,13 +5,11 @@ namespace MabelBookshelf.Bookshelf.Application.Bookshelf.Commands
 {
     public record DeleteBookshelfCommand : IRequest<bool>
     {
-        public DeleteBookshelfCommand(Guid id, string ownerId)
+        public DeleteBookshelfCommand(Guid id)
         {
             Id = id;
-            OwnerId = ownerId ?? throw new ArgumentNullException(nameof(ownerId));
         }
 
         public Guid Id { get; }
-        public string OwnerId { get; }
     }
 }
