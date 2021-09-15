@@ -32,7 +32,6 @@ namespace MabelBookshelf.Bookshelf.Application.Tests
         public async Task InvalidCommand_BookDoesNotExist_Invalid()
         {
             var id = Guid.NewGuid();
-            var owner = "test";
             var bookId = "hey";
             var bookRepository = new MockBookRepository(new List<Domain.Aggregates.BookAggregate.Book>());
             var bookshelfRepository = new MockBookshelfRepository(new List<Domain.Aggregates.BookshelfAggregate.Bookshelf>()

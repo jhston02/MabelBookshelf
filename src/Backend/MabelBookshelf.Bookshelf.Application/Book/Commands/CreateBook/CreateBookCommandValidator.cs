@@ -8,7 +8,6 @@ namespace MabelBookshelf.Bookshelf.Application.Book.Commands
     {
         public CreateBookCommandValidator(IExternalBookService bookService)
         {
-            //TODO: Read layer check if isbn + owner already a combo
             RuleFor(x => x.ExternalId).CustomAsync(async (x, context, token) =>
             {
                 try

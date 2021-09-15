@@ -20,7 +20,8 @@ namespace MabelBookshelf.Bookshelf.Application.Tests.Mocks
         
         public Task<Domain.Aggregates.BookAggregate.Book> AddAsync(Domain.Aggregates.BookAggregate.Book book, CancellationToken token = default)
         {
-            throw new System.NotImplementedException();
+            Books.Add(book);
+            return Task.FromResult(book);
         }
 
         public Task<Domain.Aggregates.BookAggregate.Book?> GetAsync(string bookId, CancellationToken token = default)
@@ -35,7 +36,10 @@ namespace MabelBookshelf.Bookshelf.Application.Tests.Mocks
 
         public Task<Domain.Aggregates.BookAggregate.Book?> UpdateAsync(Domain.Aggregates.BookAggregate.Book book, CancellationToken token = default)
         {
-            throw new System.NotImplementedException();
+            var oldBook = Books.FirstOrDefault(x => book != null && x.Id == book.Id);
+            if (oldBook != null) Books.Remove(oldBook);
+            if (book != null) Books.Add(book);
+            return Task.FromResult(book);
         }
         
         private class MockUnitOfWork : IUnitOfWork

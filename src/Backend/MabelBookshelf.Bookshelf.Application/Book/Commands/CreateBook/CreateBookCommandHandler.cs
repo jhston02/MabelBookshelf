@@ -21,7 +21,7 @@ namespace MabelBookshelf.Bookshelf.Application.Book.Commands
         public async Task<string> Handle(CreateBookCommand request, CancellationToken cancellationToken)
         {
             var volumeInfo = await VolumeInfo.FromExternalId(
-                request.ExternalId ?? throw new ArgumentException("External Id cannot be null"), bookService,
+                request.ExternalId, bookService,
                 cancellationToken);
             var book = new Domain.Aggregates.BookAggregate.Book($"{request.OwnerId}-{volumeInfo.Isbn}", request.OwnerId,
                 volumeInfo);

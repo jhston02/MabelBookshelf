@@ -15,11 +15,11 @@ namespace MabelBookshelf.Bookshelf.Application.Tests
     public class CreateBookshelfCommandHandlerTests
     {
         [Fact]
-        public void CreateBookshelfCommandHandler_ValidCommand_AddsBookshelfToRepository()
+        public async Task CreateBookshelfCommandHandler_ValidCommand_AddsBookshelfToRepository()
         {
             var mockRepo = new MockBookshelfRepository(new List<Domain.Aggregates.BookshelfAggregate.Bookshelf>());
             var handler = new CreateBookshelfCommandHandler(mockRepo);
-            handler.Handle(new CreateBookshelfCommand(Guid.NewGuid(), "test", 4.ToString()), CancellationToken.None);
+            await handler.Handle(new CreateBookshelfCommand(Guid.NewGuid(), "test", 4.ToString()), CancellationToken.None);
             var bookshelf = mockRepo.Bookshelves.FirstOrDefault(x => x.Name == "test");
             Assert.NotNull(bookshelf);
         }
