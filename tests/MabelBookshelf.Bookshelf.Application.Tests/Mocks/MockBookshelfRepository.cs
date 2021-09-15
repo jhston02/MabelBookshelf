@@ -9,17 +9,17 @@ using MabelBookshelf.Bookshelf.Domain.SeedWork;
 
 namespace MabelBookshelf.Bookshelf.Application.Tests.Mocks
 {
-
     internal class MockBookshelfRepository : IBookshelfRepository
     {
         public readonly List<Domain.Aggregates.BookshelfAggregate.Bookshelf> Bookshelves;
-        public IUnitOfWork UnitOfWork => new MockUnitOfWork();
 
         public MockBookshelfRepository(List<Domain.Aggregates.BookshelfAggregate.Bookshelf> bookshelves)
         {
             Bookshelves = bookshelves;
         }
-        
+
+        public IUnitOfWork UnitOfWork => new MockUnitOfWork();
+
         public Task<Domain.Aggregates.BookshelfAggregate.Bookshelf> AddAsync(
             Domain.Aggregates.BookshelfAggregate.Bookshelf bookshelf, CancellationToken token = default)
         {
@@ -41,7 +41,7 @@ namespace MabelBookshelf.Bookshelf.Application.Tests.Mocks
             if (bookshelf != null) Bookshelves.Add(bookshelf);
             return Task.FromResult(bookshelf);
         }
-        
+
         private class MockUnitOfWork : IUnitOfWork
         {
             public Task SaveChangesAsync()
@@ -50,6 +50,4 @@ namespace MabelBookshelf.Bookshelf.Application.Tests.Mocks
             }
         }
     }
-
-
 }

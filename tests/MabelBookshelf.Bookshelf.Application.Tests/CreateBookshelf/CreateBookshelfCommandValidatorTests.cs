@@ -14,7 +14,7 @@ namespace MabelBookshelf.Bookshelf.Application.Tests
             var result = validator.Validate(new CreateBookshelfCommand(Guid.NewGuid(), "nice name", "test"));
             Assert.True(result.IsValid);
         }
-        
+
         [Fact]
         public void InValidCommand_ContainsCurseWord_ValidatorReturnsInvalid()
         {

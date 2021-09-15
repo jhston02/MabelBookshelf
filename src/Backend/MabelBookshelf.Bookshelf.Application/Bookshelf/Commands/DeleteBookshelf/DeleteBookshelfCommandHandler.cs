@@ -17,7 +17,7 @@ namespace MabelBookshelf.Bookshelf.Application.Bookshelf.Commands
 
         public async Task<bool> Handle(DeleteBookshelfCommand request, CancellationToken cancellationToken)
         {
-            var bookshelf = await _bookshelfRepository.GetAsync(request.Id, token: cancellationToken) ?? 
+            var bookshelf = await _bookshelfRepository.GetAsync(request.Id, token: cancellationToken) ??
                             throw new ArgumentException("Invalid bookshelf");
 
             bookshelf.Delete();

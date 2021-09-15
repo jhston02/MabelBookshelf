@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Threading;
 using System.Threading.Tasks;
 using MabelBookshelf.Bookshelf.Application.Book.Commands;
 using MabelBookshelf.Bookshelf.Application.Tests.Mocks;
@@ -16,16 +15,18 @@ namespace MabelBookshelf.Bookshelf.Application.Tests
             var mockExternalBookService = new MockExternalBookService();
             var mockRepo =
                 new MockBookRepository(
-                    new List<Domain.Aggregates.BookAggregate.Book>() { new Domain.Aggregates.BookAggregate.Book("test",
+                    new List<Domain.Aggregates.BookAggregate.Book>
+                    {
+                        new("test",
                             "test", await VolumeInfo.FromExternalId("test", mockExternalBookService)
                         )
                     });
-            
+
             var command = new MarkAsNotFinishedCommand("test");
             var validator = new MarkAsNotFinishedCommandValidator(mockRepo);
             Assert.True((await validator.ValidateAsync(command)).IsValid);
         }
-        
+
         [Fact]
         public void InvalidMarkBookAsNotFinished_WrongId_IsInvalid()
         {

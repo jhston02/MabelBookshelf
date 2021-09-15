@@ -6,8 +6,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using MabelBookshelf.Bookshelf.Application.Bookshelf.Commands;
 using MabelBookshelf.Bookshelf.Application.Tests.Mocks;
-using MabelBookshelf.Bookshelf.Domain.Aggregates.BookshelfAggregate;
-using MabelBookshelf.Bookshelf.Domain.SeedWork;
 using Xunit;
 
 namespace MabelBookshelf.Bookshelf.Application.Tests
@@ -19,7 +17,8 @@ namespace MabelBookshelf.Bookshelf.Application.Tests
         {
             var mockRepo = new MockBookshelfRepository(new List<Domain.Aggregates.BookshelfAggregate.Bookshelf>());
             var handler = new CreateBookshelfCommandHandler(mockRepo);
-            await handler.Handle(new CreateBookshelfCommand(Guid.NewGuid(), "test", 4.ToString()), CancellationToken.None);
+            await handler.Handle(new CreateBookshelfCommand(Guid.NewGuid(), "test", 4.ToString()),
+                CancellationToken.None);
             var bookshelf = mockRepo.Bookshelves.FirstOrDefault(x => x.Name == "test");
             Assert.NotNull(bookshelf);
         }
@@ -27,7 +26,8 @@ namespace MabelBookshelf.Bookshelf.Application.Tests
         [Theory]
         [InlineData(null, "test")]
         [InlineData("test", null)]
-        public async Task CreateBookshelfCommandHandler_InvalidCommand_ThrowsArgumentException(string? name, string? ownerId)
+        public async Task CreateBookshelfCommandHandler_InvalidCommand_ThrowsArgumentException(string? name,
+            string? ownerId)
         {
             var mockRepo = new MockBookshelfRepository(new List<Domain.Aggregates.BookshelfAggregate.Bookshelf>());
             var handler = new CreateBookshelfCommandHandler(mockRepo);
@@ -35,6 +35,5 @@ namespace MabelBookshelf.Bookshelf.Application.Tests
                 await handler.Handle(new CreateBookshelfCommand(Guid.NewGuid(), name, ownerId),
                     CancellationToken.None));
         }
-
     }
 }

@@ -29,7 +29,7 @@ namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookAggregate
             CancellationToken cancellationToken = default)
         {
             var externalBook = await service.GetBookAsync(externalId, cancellationToken);
-            
+
             return new VolumeInfo(externalBook.Id, externalBook.Authors, externalBook.Isbn, externalId,
                 externalBook.TotalPages, externalBook.Categories);
         }

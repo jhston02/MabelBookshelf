@@ -7,7 +7,8 @@ namespace MabelBookshelf.Bookshelf.Application.Bookshelf.Commands
 {
     public class AddBookToBookshelfCommandValidator : AbstractValidator<AddBookToBookshelfCommand>
     {
-        public AddBookToBookshelfCommandValidator(IBookRepository bookRepository, IBookshelfRepository bookshelfRepository)
+        public AddBookToBookshelfCommandValidator(IBookRepository bookRepository,
+            IBookshelfRepository bookshelfRepository)
         {
             RuleFor(x => x.BookId).NotNull();
             RuleFor(x => x.ShelfId).NotNull();
@@ -26,7 +27,7 @@ namespace MabelBookshelf.Bookshelf.Application.Bookshelf.Commands
             {
                 try
                 {
-                    var bookshelf = await bookshelfRepository.GetAsync(x, token:token);
+                    var bookshelf = await bookshelfRepository.GetAsync(x, token: token);
                     if (bookshelf == null) context.AddFailure("Bookshelf doesn't exist");
                 }
                 catch (ArgumentException e)

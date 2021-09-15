@@ -1,5 +1,4 @@
-﻿using System.Threading;
-using MabelBookshelf.Bookshelf.Application.Book.Commands;
+﻿using MabelBookshelf.Bookshelf.Application.Book.Commands;
 using MabelBookshelf.Bookshelf.Application.Tests.Mocks;
 using Xunit;
 
@@ -15,7 +14,7 @@ namespace MabelBookshelf.Bookshelf.Application.Tests
             var validator = new CreateBookCommandValidator(mockExternalBookService);
             Assert.True(validator.Validate(command).IsValid);
         }
-        
+
         [Fact]
         public void InvalidCreateBookCommand_WrongExternalId_IsInvalid()
         {

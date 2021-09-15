@@ -5,7 +5,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MabelBookshelf.Bookshelf.Application.Book.Commands;
-using MabelBookshelf.Bookshelf.Application.Bookshelf.Commands;
 using MabelBookshelf.Bookshelf.Application.Tests.Mocks;
 using Xunit;
 
@@ -27,12 +26,14 @@ namespace MabelBookshelf.Bookshelf.Application.Tests
         [Theory]
         [InlineData(null, "test")]
         [InlineData("test", null)]
-        public async Task CreateBookCommandHandler_InvalidCommand_ThrowsArgumentException(string? externalId, string? ownerId)
+        public async Task CreateBookCommandHandler_InvalidCommand_ThrowsArgumentException(string? externalId,
+            string? ownerId)
         {
             var mockRepo = new MockBookRepository(new List<Domain.Aggregates.BookAggregate.Book>());
             var mockExternalBookService = new MockExternalBookService();
             var handler = new CreateBookCommandHandler(mockExternalBookService, mockRepo);
-            await Assert.ThrowsAsync<ArgumentNullException>(async () => await handler.Handle(new CreateBookCommand(externalId, ownerId!), CancellationToken.None));
+            await Assert.ThrowsAsync<ArgumentNullException>(async () =>
+                await handler.Handle(new CreateBookCommand(externalId, ownerId!), CancellationToken.None));
         }
     }
 }

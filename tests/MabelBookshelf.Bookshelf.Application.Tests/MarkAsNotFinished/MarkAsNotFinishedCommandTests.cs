@@ -17,7 +17,9 @@ namespace MabelBookshelf.Bookshelf.Application.Tests
             var mockExternalBookService = new MockExternalBookService();
             var mockRepo =
                 new MockBookRepository(
-                    new List<Domain.Aggregates.BookAggregate.Book>() { new Domain.Aggregates.BookAggregate.Book("test",
+                    new List<Domain.Aggregates.BookAggregate.Book>
+                    {
+                        new("test",
                             "test", await VolumeInfo.FromExternalId("test", mockExternalBookService)
                         )
                     });

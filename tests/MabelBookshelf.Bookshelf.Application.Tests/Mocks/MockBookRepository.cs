@@ -11,14 +11,16 @@ namespace MabelBookshelf.Bookshelf.Application.Tests.Mocks
     public class MockBookRepository : IBookRepository
     {
         public List<Domain.Aggregates.BookAggregate.Book> Books;
-        public IUnitOfWork UnitOfWork => new MockUnitOfWork();
 
         public MockBookRepository(List<Domain.Aggregates.BookAggregate.Book> books)
         {
-            this.Books = books;
+            Books = books;
         }
-        
-        public Task<Domain.Aggregates.BookAggregate.Book> AddAsync(Domain.Aggregates.BookAggregate.Book book, CancellationToken token = default)
+
+        public IUnitOfWork UnitOfWork => new MockUnitOfWork();
+
+        public Task<Domain.Aggregates.BookAggregate.Book> AddAsync(Domain.Aggregates.BookAggregate.Book book,
+            CancellationToken token = default)
         {
             Books.Add(book);
             return Task.FromResult(book);
@@ -34,14 +36,15 @@ namespace MabelBookshelf.Bookshelf.Application.Tests.Mocks
             return Task.FromResult(Books.Any(x => x.Id == bookId));
         }
 
-        public Task<Domain.Aggregates.BookAggregate.Book?> UpdateAsync(Domain.Aggregates.BookAggregate.Book book, CancellationToken token = default)
+        public Task<Domain.Aggregates.BookAggregate.Book?> UpdateAsync(Domain.Aggregates.BookAggregate.Book book,
+            CancellationToken token = default)
         {
             var oldBook = Books.FirstOrDefault(x => book != null && x.Id == book.Id);
             if (oldBook != null) Books.Remove(oldBook);
             if (book != null) Books.Add(book);
             return Task.FromResult(book);
         }
-        
+
         private class MockUnitOfWork : IUnitOfWork
         {
             public Task SaveChangesAsync()
