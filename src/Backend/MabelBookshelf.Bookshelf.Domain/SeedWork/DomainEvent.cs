@@ -3,7 +3,7 @@ using MediatR;
 
 namespace MabelBookshelf.Bookshelf.Domain.SeedWork
 {
-    public abstract class DomainEvent : INotification
+    public abstract record DomainEvent : INotification
     {
         protected DomainEvent()
         {

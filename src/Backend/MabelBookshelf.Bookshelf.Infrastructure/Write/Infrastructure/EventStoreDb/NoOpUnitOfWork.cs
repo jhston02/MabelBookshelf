@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using MabelBookshelf.Bookshelf.Domain.SeedWork;
 
-namespace MabelBookshelf.Bookshelf.Infrastructure.Infrastructure
+namespace MabelBookshelf.Bookshelf.Infrastructure.Infrastructure.EventStoreDb
 {
     internal class NoOpUnitOfWork : IUnitOfWork
     {

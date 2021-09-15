@@ -5,7 +5,7 @@ using EventStore.Client;
 using MabelBookshelf.Bookshelf.Domain.Aggregates.BookAggregate;
 using MabelBookshelf.Bookshelf.Domain.Aggregates.BookshelfAggregate;
 using MabelBookshelf.Bookshelf.Domain.SeedWork;
-using MabelBookshelf.Bookshelf.Infrastructure.Infrastructure;
+using MabelBookshelf.Bookshelf.Infrastructure.Infrastructure.EventStoreDb;
 using MabelBookshelf.Bookshelf.Infrastructure.Interfaces;
 
 namespace MabelBookshelf.Bookshelf.Infrastructure.Bookshelf
@@ -36,17 +36,17 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Bookshelf
             }
         }
 
-        public async Task<Domain.Aggregates.BookshelfAggregate.Bookshelf> GetAsync(Guid id,
+        public async Task<Domain.Aggregates.BookshelfAggregate.Bookshelf?> GetAsync(Guid id,
             bool includeSoftDeletes = false, CancellationToken token = default)
         {
             var bookshelf = await _context.ReadFromStreamAsync<Domain.Aggregates.BookshelfAggregate.Bookshelf, Guid>(
                 GetKey(id), token);
             if (!includeSoftDeletes)
-                bookshelf = bookshelf.IsDeleted ? null : bookshelf;
+                bookshelf = bookshelf?.IsDeleted ?? true ? null : bookshelf;
             return bookshelf;
         }
 
-        public async Task<Domain.Aggregates.BookshelfAggregate.Bookshelf> UpdateAsync(
+        public async Task<Domain.Aggregates.BookshelfAggregate.Bookshelf?> UpdateAsync(
             Domain.Aggregates.BookshelfAggregate.Bookshelf bookshelf, CancellationToken token = default)
         {
             try

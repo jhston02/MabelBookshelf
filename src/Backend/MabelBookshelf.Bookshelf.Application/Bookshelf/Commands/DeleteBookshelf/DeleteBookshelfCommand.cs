@@ -3,15 +3,13 @@ using MediatR;
 
 namespace MabelBookshelf.Bookshelf.Application.Bookshelf.Commands
 {
-    public class DeleteBookshelfCommand : IRequest<bool>
+    public record DeleteBookshelfCommand : IRequest<bool>
     {
-        public DeleteBookshelfCommand(Guid id, string ownerId)
+        public DeleteBookshelfCommand(Guid id)
         {
             Id = id;
-            OwnerId = ownerId;
         }
 
         public Guid Id { get; }
-        public string OwnerId { get; }
     }
 }

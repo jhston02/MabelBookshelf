@@ -8,7 +8,7 @@ using EventStore.Client;
 using MabelBookshelf.Bookshelf.Domain.SeedWork;
 using MabelBookshelf.Bookshelf.Infrastructure.Interfaces;
 
-namespace MabelBookshelf.Bookshelf.Infrastructure.Infrastructure
+namespace MabelBookshelf.Bookshelf.Infrastructure.Infrastructure.EventStoreDb
 {
     public class EventStoreContext : IEventStoreContext
     {
@@ -47,7 +47,7 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Infrastructure
             return value;
         }
 
-        public async Task<T> ReadFromStreamAsync<T, TV>(string streamName, CancellationToken token = default)
+        public async Task<T?> ReadFromStreamAsync<T, TV>(string streamName, CancellationToken token = default)
             where T : AggregateRoot<TV>
         {
             var result = _client.ReadStreamAsync(

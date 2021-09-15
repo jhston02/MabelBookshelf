@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using AutoBogus;
 using Bogus;
-using MabelBookshelf.Bookshelf.Domain.Aggregates.BookAggregate.Events;
-using MabelBookshelf.Bookshelf.Domain.Aggregates.BookshelfAggregate.Events;
+using MabelBookshelf.Bookshelf.Domain.Aggregates.BookAggregate;
+using MabelBookshelf.Bookshelf.Domain.Aggregates.BookshelfAggregate;
 
 namespace MabelBookshelf.ProjectionTestFramework
 {

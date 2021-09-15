@@ -48,7 +48,7 @@ namespace MabelBookshelf.Controllers
         [HttpPost]
         public async Task<ActionResult> DeleteBookshelf([FromBody] DeleteBookshelfRequest request)
         {
-            var command = new DeleteBookshelfCommand(request.Id, "temp");
+            var command = new DeleteBookshelfCommand(request.Id);
             var result = await _mediator.Send(command);
             if (result)
                 return Ok();

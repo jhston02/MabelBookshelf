@@ -34,10 +34,4 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.BookshelfPreview.Queries
             return await result.ToListAsync(token);
         }
     }
-
-    public class MongoBookshelfPreviewQueriesConfiguration
-    {
-        public string DatabaseName { get; set; }
-        public string ContainerName { get; set; }
-    }
 }

@@ -9,7 +9,7 @@ namespace MabelBookshelf.Bookshelf.Domain.SeedWork
         public bool IsDeleted { get; protected set; }
         public IReadOnlyCollection<DomainEvent> DomainEvents => _domainEvents;
 
-        public T Id { get; protected set; }
+        public T Id { get; protected set; } = default!;
 
         private void AddEvent(DomainEvent @event)
         {
@@ -31,12 +31,12 @@ namespace MabelBookshelf.Bookshelf.Domain.SeedWork
         // ReSharper disable once MemberCanBePrivate.Global
         protected bool Equals(Entity<T> other)
         {
-            if (Id.Equals(other.Id))
+            if (Id != null && Id.Equals(other.Id))
                 return true;
             return false;
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
@@ -46,7 +46,8 @@ namespace MabelBookshelf.Bookshelf.Domain.SeedWork
 
         public override int GetHashCode()
         {
-            return Id.GetHashCode();
+            if (Id != null) return Id.GetHashCode();
+            return 0;
         }
 
         protected void When(DomainEvent @event)

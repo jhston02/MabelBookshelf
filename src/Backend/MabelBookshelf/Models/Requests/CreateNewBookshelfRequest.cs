@@ -3,10 +3,10 @@ using System.ComponentModel.DataAnnotations;
 
 namespace MabelBookshelf.Models
 {
-    public class CreateNewBookshelfRequest
+    public record CreateNewBookshelfRequest
     {
-        [Required] public Guid Id { get; set; }
+        [Required] public Guid Id { get; init; }
 
-        [Required] public string Name { get; set; }
+        [Required] [MaxLength(50)] public string? Name { get; init; }
     }
 }

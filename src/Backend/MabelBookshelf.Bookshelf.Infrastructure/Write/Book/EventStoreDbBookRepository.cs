@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using EventStore.Client;
 using MabelBookshelf.Bookshelf.Domain.Aggregates.BookAggregate;
 using MabelBookshelf.Bookshelf.Domain.SeedWork;
-using MabelBookshelf.Bookshelf.Infrastructure.Infrastructure;
+using MabelBookshelf.Bookshelf.Infrastructure.Infrastructure.EventStoreDb;
 using MabelBookshelf.Bookshelf.Infrastructure.Interfaces;
 
 namespace MabelBookshelf.Bookshelf.Infrastructure.Book
@@ -34,14 +34,14 @@ namespace MabelBookshelf.Bookshelf.Infrastructure.Book
             }
         }
 
-        public async Task<Domain.Aggregates.BookAggregate.Book> GetAsync(string bookId,
+        public async Task<Domain.Aggregates.BookAggregate.Book?> GetAsync(string bookId,
             CancellationToken token = default)
         {
             return await _context.ReadFromStreamAsync<Domain.Aggregates.BookAggregate.Book, string>(
                 GetKey(bookId), token);
         }
 
-        public async Task<Domain.Aggregates.BookAggregate.Book> UpdateAsync(Domain.Aggregates.BookAggregate.Book book,
+        public async Task<Domain.Aggregates.BookAggregate.Book?> UpdateAsync(Domain.Aggregates.BookAggregate.Book book,
             CancellationToken token = default)
         {
             try

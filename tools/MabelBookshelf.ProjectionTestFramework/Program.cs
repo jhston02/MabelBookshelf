@@ -1,7 +1,7 @@
 ﻿using System;
-using MabelBookshelf.Bookshelf.Application.Interfaces;
 using MabelBookshelf.Bookshelf.Infrastructure.BookshelfPreview;
 using MabelBookshelf.Bookshelf.Infrastructure.BookshelfPreview.Projections;
+using MabelBookshelf.Bookshelf.Infrastructure.Interfaces;
 using MongoDB.Driver;
 
 namespace MabelBookshelf.ProjectionTestFramework
