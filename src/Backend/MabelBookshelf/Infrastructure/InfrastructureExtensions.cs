@@ -1,9 +1,6 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using EventStore.Client;
-using FluentValidation;
 using MabelBookshelf.BackgroundWorkers;
-using MabelBookshelf.Bookshelf.Application.Bookshelf.Commands;
 using MabelBookshelf.Bookshelf.Application.Bookshelf.Queries.Preview;
 using MabelBookshelf.Bookshelf.Application.Bookshelf.Queries.Preview.Models;
 using MabelBookshelf.Bookshelf.Domain.Aggregates.BookAggregate;
@@ -35,14 +32,14 @@ namespace MabelBookshelf.Infrastructure
                     .Create(connectionString);
                 return new EventStoreClient(settings);
             });
-            
+
             services.AddSingleton(_ =>
             {
                 var settings = EventStoreClientSettings
                     .Create(connectionString);
                 return new EventStorePersistentSubscriptionsClient(settings);
             });
-            
+
             services.AddScoped<IEventStoreContext, EventStoreContext>();
             services.Decorate<IEventStoreContext, CachingEventStoreContextDecorator>();
         }
@@ -55,7 +52,7 @@ namespace MabelBookshelf.Infrastructure
                 configuration.GetSection("PersistantSubscriptionSettings").Bind(settings);
                 return settings;
             });
-            
+
             services.AddSingleton(_ =>
             {
                 var settings = EventStoreClientSettings
@@ -67,12 +64,12 @@ namespace MabelBookshelf.Infrastructure
         public static void AddProjectionsAndQueries(this IServiceCollection services, IConfiguration configuration)
         {
             services
-            .Scan(scan => scan
-                .FromAssemblyOf<MongoBookshelfPreviewProjection>()
-                .AddClasses(classes => classes.AssignableTo<IProjectionService>())
-                .AsImplementedInterfaces()
-                .WithSingletonLifetime());
-            
+                .Scan(scan => scan
+                    .FromAssemblyOf<MongoBookshelfPreviewProjection>()
+                    .AddClasses(classes => classes.AssignableTo<IProjectionService>())
+                    .AsImplementedInterfaces()
+                    .WithSingletonLifetime());
+
             services.SetupMongo(configuration);
             services.SetupQueries();
         }

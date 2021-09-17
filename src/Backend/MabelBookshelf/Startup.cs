@@ -1,29 +1,12 @@
 using System;
 using System.Linq;
-using EventStore.Client;
 using FluentValidation;
 using Hellang.Middleware.ProblemDetails;
 using Hellang.Middleware.ProblemDetails.Mvc;
-using MabelBookshelf.BackgroundWorkers;
-using MabelBookshelf.Bookshelf.Application.Bookshelf.Commands;
-using MabelBookshelf.Bookshelf.Application.Bookshelf.Queries.Preview;
-using MabelBookshelf.Bookshelf.Application.Bookshelf.Queries.Preview.Models;
-using MabelBookshelf.Bookshelf.Application.Infrastructure.Behaviors;
-using MabelBookshelf.Bookshelf.Application.Infrastructure.ExternalBookServices;
 using MabelBookshelf.Bookshelf.Domain.Aggregates.BookAggregate;
 using MabelBookshelf.Bookshelf.Domain.Aggregates.BookshelfAggregate;
-using MabelBookshelf.Bookshelf.Domain.SeedWork;
-using MabelBookshelf.Bookshelf.Domain.Shared;
-using MabelBookshelf.Bookshelf.Infrastructure;
-using MabelBookshelf.Bookshelf.Infrastructure.Book;
-using MabelBookshelf.Bookshelf.Infrastructure.Bookshelf;
-using MabelBookshelf.Bookshelf.Infrastructure.BookshelfPreview;
-using MabelBookshelf.Bookshelf.Infrastructure.BookshelfPreview.Projections;
-using MabelBookshelf.Bookshelf.Infrastructure.BookshelfPreview.Queries;
 using MabelBookshelf.Bookshelf.Infrastructure.Infrastructure.EventStoreDb;
-using MabelBookshelf.Bookshelf.Infrastructure.Interfaces;
 using MabelBookshelf.Infrastructure;
-using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -32,8 +15,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
-using MongoDB.Bson.Serialization;
-using MongoDB.Driver;
 
 namespace MabelBookshelf
 {

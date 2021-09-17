@@ -58,6 +58,9 @@ namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookAggregate
 
         public void ReadToPage(int pageNumber)
         {
+            if (Status == BookStatus.Dnf || Status == BookStatus.Finished)
+                throw new BookDomainException($"Cannot change page number if Book is {Status}");
+
             if (pageNumber <= 0 || pageNumber > VolumeInfo.TotalPages)
                 throw new BookDomainException("Please enter valid page number");
 
