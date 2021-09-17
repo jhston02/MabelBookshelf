@@ -22,6 +22,7 @@ using MabelBookshelf.Bookshelf.Infrastructure.BookshelfPreview.Projections;
 using MabelBookshelf.Bookshelf.Infrastructure.BookshelfPreview.Queries;
 using MabelBookshelf.Bookshelf.Infrastructure.Infrastructure.EventStoreDb;
 using MabelBookshelf.Bookshelf.Infrastructure.Interfaces;
+using MabelBookshelf.Infrastructure;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -69,67 +70,21 @@ namespace MabelBookshelf
         private void ConfigureBookshelfDomainServices(IServiceCollection services)
         {
             services.AddMemoryCache();
-            services.AddSingleton(_ =>
-            {
-                var settings = EventStoreClientSettings
-                    .Create(Configuration.GetConnectionString("EventStoreDbConnectionString"));
-                return new EventStoreClient(settings);
-            });
-
-            services.AddMediatR(typeof(Startup), typeof(CreateBookshelfCommand), typeof(Entity<>),
-                typeof(EventStoreDbBookshelfRepository));
-            AssemblyScanner.FindValidatorsInAssembly(typeof(CreateBookshelfCommand).Assembly)
-                .ForEach(item => services.AddScoped(item.InterfaceType, item.ValidatorType));
-            services.AddScoped(typeof(IPipelineBehavior<,>), typeof(ValidationPipelineBehavior<,>));
-            services.AddScoped<IBookshelfRepository, EventStoreDbBookshelfRepository>();
-            services.AddSingleton<IExternalBookService, GoogleApiExternalBookService>();
-            services.AddScoped<IBookRepository, EventStoreDbBookRepository>();
-            services.AddScoped<IEventStoreContext, EventStoreContext>();
-            services.Decorate<IEventStoreContext, CachingEventStoreContextDecorator>();
-            services.Decorate<IExternalBookService, CachingExternalBookServiceDecorator>();
+            services.AddEventStore(Configuration);
+            services.AddMediatR();
+            services.AddRepositories();
+            services.AddExternalBookService();
             services.AddSingleton<ProfanityFilter.ProfanityFilter>();
-            services.AddHttpClient<GoogleApiExternalBookService>();
-            services.AddSingleton<ITypeCache>(_ =>
-            {
-                var types = typeof(BookCreatedDomainEvent).Assembly.GetTypes()
-                    .Where(x => x.IsSubclassOf(typeof(DomainEvent)));
-                return new DictionaryTypeCache(types.ToDictionary(x => x.Name, x => x));
-            });
-            services.AddSingleton(_ =>
-            {
-                var settings = new PersistantSubscriptionSettings();
-                Configuration.GetSection("PersistantSubscriptionSettings").Bind(settings);
-                return settings;
-            });
-            services.AddSingleton(_ =>
-            {
-                var settings = EventStoreClientSettings
-                    .Create(Configuration.GetConnectionString("EventStoreDbConnectionString"));
-                return new EventStorePersistentSubscriptionsClient(settings);
-            });
-            services.AddSingleton<PersistentSubscriptionEventStoreContext>();
+            services.AddTypeCache();
+            services.AddPersistentSubscriptions(Configuration);
+            services.AddCatchupSubscriptions();
+            services.AddProjectionsAndQueries(Configuration);
             services.AddSingleton<CatchUpSubscriptionEventStoreContext>();
-            //TODO: Scan assembly for these
-            services.AddSingleton<IProjectionService, MongoBookshelfPreviewProjection>();
-
-            BsonClassMap.RegisterClassMap<BookshelfPreview>(cm =>
-            {
-                cm.AutoMap();
-                cm.SetIgnoreExtraElements(true);
-            });
-
-            services.AddSingleton<MongoClient>();
-            services.AddSingleton(x =>
-            {
-                var settings = new BookshelfPreviewConfiguration();
-                Configuration.GetSection("BookshelfPreviewProjectionConfiguration").Bind(settings);
-                return settings;
-            });
-            services.AddScoped<IBookshelfPreviewQueries, MongoBookshelfPreviewQueries>();
         }
 
         private void ConfigureProblemDetails(ProblemDetailsOptions options)
         {
+            options.IncludeExceptionDetails = (x, y) => false;
             // Custom mapping function for FluentValidation's ValidationException.
             options.Map<ValidationException>((ctx, ex) =>
             {
@@ -144,9 +99,21 @@ namespace MabelBookshelf
                 return factory.CreateValidationProblemDetails(ctx, errors);
             });
 
-            options.MapToStatusCode<ArgumentException>(400);
-            options.MapToStatusCode<BookshelfDomainException>(400);
-            options.MapToStatusCode<BookDomainException>(400);
+            options.Map<ArgumentException>((ctx, ex) =>
+            {
+                var factory = ctx.RequestServices.GetRequiredService<ProblemDetailsFactory>();
+                return factory.CreateProblemDetails(ctx, 400, detail: ex.Message);
+            });
+            options.Map<BookshelfDomainException>((ctx, ex) =>
+            {
+                var factory = ctx.RequestServices.GetRequiredService<ProblemDetailsFactory>();
+                return factory.CreateProblemDetails(ctx, 400, detail: ex.Message);
+            });
+            options.Map<BookDomainException>((ctx, ex) =>
+            {
+                var factory = ctx.RequestServices.GetRequiredService<ProblemDetailsFactory>();
+                return factory.CreateProblemDetails(ctx, 400, detail: ex.Message);
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
