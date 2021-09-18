@@ -1,7 +1,9 @@
 ﻿using System.Threading.Tasks;
 using MabelBookshelf.Bookshelf.Application.Book.Commands;
+using MabelBookshelf.Bookshelf.Application.Book.Commands.StartReading;
 using MabelBookshelf.Models;
 using MediatR;
+using MediatR.Pipeline;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -43,6 +45,23 @@ namespace MabelBookshelf.Controllers
         public async Task<ActionResult> MarkAsNotFinished([FromBody] MarkAsNotFinishedRequest request)
         {
             var command = new MarkAsNotFinishedCommand(request.BookId);
+            var result = await _mediator.Send(command);
+            if (result)
+                return Ok();
+            return new ObjectResult(ProblemDetailsFactory.CreateProblemDetails(HttpContext, 400))
+            {
+                ContentTypes = { "application/problem+json" },
+                StatusCode = 400
+            };
+        }
+
+        [Route("startreading")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+        [HttpPatch]
+        public async Task<ActionResult> StartReading([FromBody] StartReadingRequest request)
+        {
+            var command = new StartReadingCommand(request.Id);
             var result = await _mediator.Send(command);
             if (result)
                 return Ok();
