@@ -3,29 +3,29 @@
     <PropertyGroup>
         <TargetFramework>net5.0</TargetFramework>
         <Nullable>enable</Nullable>
+        <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="EventStore.Client.Grpc.PersistentSubscriptions" Version="21.2.0"/>
-        <PackageReference Include="EventStore.Client.Grpc.Streams" Version="21.2.0"/>
-        <PackageReference Include="Hellang.Middleware.ProblemDetails" Version="6.1.0"/>
-        <PackageReference Include="MediatR" Version="9.0.0"/>
-        <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="9.0.0"/>
-        <PackageReference Include="Microsoft.AspNetCore.ApiAuthorization.IdentityServer" Version="5.0.9"/>
-        <PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.2.0"/>
-        <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="5.0.9"/>
-        <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning" Version="5.0.0"/>
-        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.9"/>
-        <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="5.0.9"/>
-        <PackageReference Include="MongoDB.Driver" Version="2.13.1"/>
-        <PackageReference Include="Scrutor" Version="3.3.0"/>
-        <PackageReference Include="Swashbuckle.AspNetCore" Version="5.6.3"/>
+        <PackageReference Include="EventStore.Client.Grpc.PersistentSubscriptions" Version="21.2.0" />
+        <PackageReference Include="EventStore.Client.Grpc.Streams" Version="21.2.0" />
+        <PackageReference Include="Hellang.Middleware.ProblemDetails" Version="6.1.0" />
+        <PackageReference Include="MediatR" Version="9.0.0" />
+        <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="9.0.0" />
+        <PackageReference Include="Microsoft.AspNetCore.ApiAuthorization.IdentityServer" Version="5.0.9" />
+        <PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.2.0" />
+        <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="5.0.9" />
+        <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning" Version="5.0.0" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.9" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="5.0.9" />
+        <PackageReference Include="MongoDB.Driver" Version="2.13.1" />
+        <PackageReference Include="Scrutor" Version="3.3.0" />
+        <PackageReference Include="Swashbuckle.AspNetCore" Version="5.6.3" />
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\MabelBookshelf.Bookshelf.Application\MabelBookshelf.Bookshelf.Application.csproj"/>
-        <ProjectReference Include="..\MabelBookshelf.Bookshelf.Infrastructure\MabelBookshelf.Bookshelf.Infrastructure.csproj"/>
-        <ProjectReference Include="..\MabelBookshelf.Identity.Infrastructure\MabelBookshelf.Identity.Infrastructure.csproj"/>
+        <ProjectReference Include="..\MabelBookshelf.Bookshelf.Application\MabelBookshelf.Bookshelf.Application.csproj" />
+        <ProjectReference Include="..\MabelBookshelf.Bookshelf.Infrastructure\MabelBookshelf.Bookshelf.Infrastructure.csproj" />
     </ItemGroup>
 
 </Project>
