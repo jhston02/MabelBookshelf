@@ -64,5 +64,39 @@ namespace MabelBookshelf.Controllers
                 StatusCode = 400
             };
         }
+        
+        [Route("finish")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+        [HttpPatch]
+        public async Task<ActionResult> Finish([FromBody] FinishRequest request)
+        {
+            var command = new FinishBookCommand(request.Id ?? throw new ArgumentNullException());
+            var result = await _mediator.Send(command);
+            if (result)
+                return Ok();
+            return new ObjectResult(ProblemDetailsFactory.CreateProblemDetails(HttpContext, 400))
+            {
+                ContentTypes = { "application/problem+json" },
+                StatusCode = 400
+            };
+        }
+        
+        [Route("markwanted")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+        [HttpPatch]
+        public async Task<ActionResult> MarkAsWanted([FromBody] MarkAsWantedRequest request)
+        {
+            var command = new MarkBookAsWantedCommand(request.Id ?? throw new ArgumentNullException());
+            var result = await _mediator.Send(command);
+            if (result)
+                return Ok();
+            return new ObjectResult(ProblemDetailsFactory.CreateProblemDetails(HttpContext, 400))
+            {
+                ContentTypes = { "application/problem+json" },
+                StatusCode = 400
+            };
+        }
     }
 }
