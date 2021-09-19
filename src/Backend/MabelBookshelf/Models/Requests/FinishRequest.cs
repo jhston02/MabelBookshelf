@@ -2,7 +2,7 @@
 
 namespace MabelBookshelf.Models
 {
-    public class FinishRequest
+    public record FinishRequest
     {
         [Required] public string? Id { get; init; }
     }

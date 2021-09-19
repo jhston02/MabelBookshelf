@@ -2,7 +2,7 @@
 
 namespace MabelBookshelf.Models
 {
-    public class MarkAsWantedRequest
+    public record MarkAsWantedRequest
     {
         [Required] public string? Id { get; init; }
     }
