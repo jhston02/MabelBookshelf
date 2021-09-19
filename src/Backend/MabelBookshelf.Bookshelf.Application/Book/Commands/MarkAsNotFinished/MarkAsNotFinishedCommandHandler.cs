@@ -1,3 +1,4 @@
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using MabelBookshelf.Bookshelf.Domain.Aggregates.BookAggregate;
@@ -16,14 +17,14 @@ namespace MabelBookshelf.Bookshelf.Application.Book.Commands
 
         public async Task<bool> Handle(MarkAsNotFinishedCommand request, CancellationToken cancellationToken)
         {
-            var book = _repository.GetAsync(request.BookId, cancellationToken);
-            if (book.Result != null)
-            {
-                book.Result.MarkAsNotFinished();
-                await _repository.UpdateAsync(book.Result, cancellationToken);
-            }
+            var book = await _repository.GetAsync(request.BookId, cancellationToken);
 
-            await _repository.UnitOfWork.SaveChangesAsync();
+            if (book == null)
+                throw new ArgumentException("Book not found");
+
+            book.MarkAsNotFinished();
+
+            await _repository.UpdateAsync(book, cancellationToken);
             return true;
         }
     }
