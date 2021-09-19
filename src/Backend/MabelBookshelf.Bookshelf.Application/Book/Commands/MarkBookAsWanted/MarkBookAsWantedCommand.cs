@@ -3,9 +3,9 @@ using MediatR;
 
 namespace MabelBookshelf.Bookshelf.Application.Book.Commands
 {
-    public record StartReadingCommand : IRequest<bool>
+    public class MarkBookAsWantedCommand : IRequest<bool>
     {
-        public StartReadingCommand(string id)
+        public MarkBookAsWantedCommand(string id)
         {
             Id = id ?? throw new ArgumentNullException(nameof(id));
         }

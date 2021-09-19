@@ -83,17 +83,17 @@ namespace MabelBookshelf
             options.Map<ArgumentException>((ctx, ex) =>
             {
                 var factory = ctx.RequestServices.GetRequiredService<ProblemDetailsFactory>();
-                return factory.CreateProblemDetails(ctx, 400, detail: ex.Message);
+                return factory.CreateProblemDetails(ctx, 400, detail: ex.Message, title: "Bad request");
             });
             options.Map<BookshelfDomainException>((ctx, ex) =>
             {
                 var factory = ctx.RequestServices.GetRequiredService<ProblemDetailsFactory>();
-                return factory.CreateProblemDetails(ctx, 400, detail: ex.Message);
+                return factory.CreateProblemDetails(ctx, 400, detail: ex.Message, title: "Bad request");
             });
             options.Map<BookDomainException>((ctx, ex) =>
             {
                 var factory = ctx.RequestServices.GetRequiredService<ProblemDetailsFactory>();
-                return factory.CreateProblemDetails(ctx, 400, detail: ex.Message);
+                return factory.CreateProblemDetails(ctx, 400, detail: ex.Message, title: "Bad request");
             });
         }
 

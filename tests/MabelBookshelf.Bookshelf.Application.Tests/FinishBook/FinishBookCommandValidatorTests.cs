@@ -1,6 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using MabelBookshelf.Bookshelf.Application.Book.Commands;
 using MabelBookshelf.Bookshelf.Application.Tests.Mocks;
@@ -9,10 +7,10 @@ using Xunit;
 
 namespace MabelBookshelf.Bookshelf.Application.Tests
 {
-    public class MarkAsNotFinishedCommandTests
+    public class FinishBookCommandValidatorTests
     {
         [Fact]
-        public async Task MarkAsNotFinishedCommandHandler_ValidCommand_AddsUpdateBookInRepository()
+        public async Task ValidFinishBookCommand_IsValid()
         {
             var mockExternalBookService = new MockExternalBookService();
             var mockRepo =
@@ -24,10 +22,18 @@ namespace MabelBookshelf.Bookshelf.Application.Tests
                         )
                     });
 
-            var handler = new MarkAsNotFinishedCommandHandler(mockRepo);
-            await handler.Handle(new MarkAsNotFinishedCommand("test"), CancellationToken.None);
-            var book = mockRepo.Books.FirstOrDefault(x => x.VolumeInfo.ExternalId == "test");
-            Assert.Equal(BookStatus.Dnf, book.Status);
+            var command = new FinishBookCommand("test");
+            var validator = new FinishBookCommandValidator(mockRepo);
+            Assert.True((await validator.ValidateAsync(command)).IsValid);
+        }
+
+        [Fact]
+        public void InvalidFinishBookCommand_WrongId_IsInvalid()
+        {
+            var mockRepo = new MockBookRepository(new List<Domain.Aggregates.BookAggregate.Book>());
+            var command = new FinishBookCommand("test-test");
+            var validator = new FinishBookCommandValidator(mockRepo);
+            Assert.False(validator.Validate(command).IsValid);
         }
     }
 }

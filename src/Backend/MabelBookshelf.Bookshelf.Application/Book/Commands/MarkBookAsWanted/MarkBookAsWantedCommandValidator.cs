@@ -4,9 +4,9 @@ using MabelBookshelf.Bookshelf.Domain.Aggregates.BookAggregate;
 
 namespace MabelBookshelf.Bookshelf.Application.Book.Commands
 {
-    public class StartReadingCommandValidator : AbstractValidator<StartReadingCommand>
+    public class MarkBookAsWantedCommandValidator : AbstractValidator<MarkBookAsWantedCommand>
     {
-        public StartReadingCommandValidator(IBookRepository repository)
+        public MarkBookAsWantedCommandValidator(IBookRepository repository)
         {
             RuleFor(x => x.Id).NotNull();
             RuleFor(x => x.Id).CustomAsync(async (x, context, token) =>
