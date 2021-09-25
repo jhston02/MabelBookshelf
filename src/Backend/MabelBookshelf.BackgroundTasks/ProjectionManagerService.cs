@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -6,7 +6,7 @@ using MabelBookshelf.Bookshelf.Infrastructure.Infrastructure.EventStoreDb;
 using MabelBookshelf.Bookshelf.Infrastructure.Interfaces;
 using Microsoft.Extensions.Hosting;
 
-namespace MabelBookshelf.BackgroundWorkers
+namespace MabelBookshelf.BackgroundTasks
 {
     public class ProjectionManagerService : IHostedService
     {

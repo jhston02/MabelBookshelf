@@ -64,7 +64,7 @@ namespace MabelBookshelf.Controllers
                 StatusCode = 400
             };
         }
-        
+
         [Route("finish")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
@@ -81,7 +81,7 @@ namespace MabelBookshelf.Controllers
                 StatusCode = 400
             };
         }
-        
+
         [Route("markwanted")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]

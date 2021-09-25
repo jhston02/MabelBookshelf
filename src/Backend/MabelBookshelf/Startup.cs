@@ -3,10 +3,19 @@ using System.Linq;
 using FluentValidation;
 using Hellang.Middleware.ProblemDetails;
 using Hellang.Middleware.ProblemDetails.Mvc;
+using MabelBookshelf.Bookshelf.Application.Bookshelf.Commands;
+using MabelBookshelf.Bookshelf.Application.Bookshelf.Queries.Preview;
+using MabelBookshelf.Bookshelf.Application.Infrastructure.Behaviors;
+using MabelBookshelf.Bookshelf.Application.Infrastructure.ExternalBookServices;
 using MabelBookshelf.Bookshelf.Domain.Aggregates.BookAggregate;
 using MabelBookshelf.Bookshelf.Domain.Aggregates.BookshelfAggregate;
-using MabelBookshelf.Bookshelf.Infrastructure.Infrastructure.EventStoreDb;
-using MabelBookshelf.Infrastructure;
+using MabelBookshelf.Bookshelf.Domain.SeedWork;
+using MabelBookshelf.Bookshelf.Domain.Shared;
+using MabelBookshelf.Bookshelf.Infrastructure.Book;
+using MabelBookshelf.Bookshelf.Infrastructure.Bookshelf;
+using MabelBookshelf.Bookshelf.Infrastructure.BookshelfPreview;
+using MabelBookshelf.Bookshelf.Infrastructure.BookshelfPreview.Queries;
+using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -51,16 +60,26 @@ namespace MabelBookshelf
         private void ConfigureBookshelfDomainServices(IServiceCollection services)
         {
             services.AddMemoryCache();
-            services.AddEventStore(Configuration);
-            services.AddMediatR();
-            services.AddRepositories();
-            services.AddExternalBookService();
+            services.AddEventStore(Configuration.GetConnectionString("EventStoreDbConnectionString"));
+
+            services.AddMediatR(typeof(Startup), typeof(CreateBookshelfCommand), typeof(Entity<>),
+                typeof(EventStoreDbBookshelfRepository));
+            AssemblyScanner.FindValidatorsInAssembly(typeof(CreateBookshelfCommand).Assembly)
+                .ForEach(item => services.AddScoped(item.InterfaceType, item.ValidatorType));
+            services.AddScoped(typeof(IPipelineBehavior<,>), typeof(ValidationPipelineBehavior<,>));
+
+            services.AddHttpClient<GoogleApiExternalBookService>();
+            services.AddSingleton<IExternalBookService, GoogleApiExternalBookService>();
+            services.Decorate<IExternalBookService, CachingExternalBookServiceDecorator>();
+
             services.AddSingleton<ProfanityFilter.ProfanityFilter>();
             services.AddTypeCache();
-            services.AddPersistentSubscriptions(Configuration);
-            services.AddCatchupSubscriptions();
-            services.AddProjectionsAndQueries(Configuration);
-            services.AddSingleton<CatchUpSubscriptionEventStoreContext>();
+            services.AddScoped<IBookshelfPreviewQueries, MongoBookshelfPreviewQueries>();
+            services.AddScoped<IBookshelfRepository, EventStoreDbBookshelfRepository>();
+            services.AddScoped<IBookRepository, EventStoreDbBookRepository>();
+            var settings = new BookshelfPreviewConfiguration();
+            Configuration.GetSection("BookshelfPreviewProjectionConfiguration").Bind(settings);
+            services.AddMongo(settings);
         }
 
         private void ConfigureProblemDetails(ProblemDetailsOptions options)
