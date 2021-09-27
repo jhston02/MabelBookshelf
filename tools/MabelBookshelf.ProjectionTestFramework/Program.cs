@@ -1,7 +1,7 @@
 ﻿using System;
-using MabelBookshelf.Bookshelf.Infrastructure.BookshelfPreview;
-using MabelBookshelf.Bookshelf.Infrastructure.BookshelfPreview.Projections;
-using MabelBookshelf.Bookshelf.Infrastructure.Interfaces;
+using MabelBookshelf.Bookshelf.Query.Interfaces;
+using MabelBookshelf.Bookshelf.Query.MongoDb.Configuration;
+using MabelBookshelf.Bookshelf.Query.MongoDb.Projections;
 using MongoDB.Driver;
 
 namespace MabelBookshelf.ProjectionTestFramework
@@ -23,8 +23,7 @@ namespace MabelBookshelf.ProjectionTestFramework
         private static IProjectionService GetProjectionService()
         {
             var projectionService = new MongoBookshelfPreviewProjection(new MongoClient("mongodb://localhost:27017"),
-                new BookshelfPreviewConfiguration
-                    { DatabaseName = "test", Version = 1, CollectionName = "bookshelf_preview" });
+                new BookshelfPreviewConfiguration("test", 1, "bookshelf_preview"));
             return projectionService;
         }
     }

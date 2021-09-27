@@ -10,7 +10,7 @@ namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookAggregate
             var @event = new BookCreatedDomainEvent(id ?? throw new ArgumentNullException(nameof(id)), info.Title,
                 info.Authors, info.Isbn, info.ExternalId, info.TotalPages,
                 ownerId ?? throw new ArgumentNullException(nameof(ownerId)),
-                info.Categories);
+                info.Categories, BookStatus.Want.ToString());
             When(@event);
         }
 
@@ -28,7 +28,7 @@ namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookAggregate
             if (Status == BookStatus.Reading)
                 throw new BookDomainException("Already reading this book");
 
-            var @event = new BookStartedDomainEvent(Id, OwnerId);
+            var @event = new BookStartedDomainEvent(Id, OwnerId, BookStatus.Reading.ToString());
             When(@event);
         }
 
@@ -40,19 +40,19 @@ namespace MabelBookshelf.Bookshelf.Domain.Aggregates.BookAggregate
             if (Status == BookStatus.Dnf)
                 throw new BookDomainException("This book was not finished");
 
-            var @event = new BookFinishedDomainEvent(Id, OwnerId);
+            var @event = new BookFinishedDomainEvent(Id, OwnerId, BookStatus.Finished.ToString());
             When(@event);
         }
 
         public void MarkAsNotFinished()
         {
-            var @event = new NotFinishDomainEvent(Id, OwnerId);
+            var @event = new NotFinishDomainEvent(Id, OwnerId, BookStatus.Dnf.ToString());
             When(@event);
         }
 
         public void MarkBookAsWanted()
         {
-            var @event = new MarkedBookAsWantedDomainEvent(Id, OwnerId);
+            var @event = new MarkedBookAsWantedDomainEvent(Id, OwnerId, BookStatus.Want.ToString());
             When(@event);
         }
 

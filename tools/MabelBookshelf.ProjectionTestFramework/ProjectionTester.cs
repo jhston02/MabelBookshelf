@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 using MabelBookshelf.Bookshelf.Domain.Aggregates.BookAggregate;
 using MabelBookshelf.Bookshelf.Domain.Aggregates.BookshelfAggregate;
 using MabelBookshelf.Bookshelf.Domain.SeedWork;
-using MabelBookshelf.Bookshelf.Infrastructure.Interfaces;
-using MabelBookshelf.Bookshelf.Infrastructure.Models;
+using MabelBookshelf.Bookshelf.Query.Interfaces;
+using MabelBookshelf.Bookshelf.Query.Models;
 
 namespace MabelBookshelf.ProjectionTestFramework
 {

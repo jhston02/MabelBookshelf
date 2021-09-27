@@ -1,10 +1,7 @@
 ﻿using System.Linq;
 using EventStore.Client;
-using MabelBookshelf.Bookshelf.Application.Bookshelf.Queries.Preview.Models;
 using MabelBookshelf.Bookshelf.Domain.Aggregates.BookAggregate;
 using MabelBookshelf.Bookshelf.Domain.SeedWork;
-using MabelBookshelf.Bookshelf.Infrastructure;
-using MabelBookshelf.Bookshelf.Infrastructure.BookshelfPreview;
 using MabelBookshelf.Bookshelf.Infrastructure.Infrastructure.EventStoreDb;
 using MabelBookshelf.Bookshelf.Infrastructure.Interfaces;
 using MongoDB.Bson.Serialization;

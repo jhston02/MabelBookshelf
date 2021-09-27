@@ -29,7 +29,8 @@ namespace MabelBookshelf.ProjectionTestFramework
                     f.Random.String2(20),
                     f.Random.Int(1200),
                     "test",
-                    new[] { f.PickRandom(categories) }
+                    new[] { f.PickRandom(categories) },
+                    "Want"
                 ));
 
             bookshelfFake = new AutoFaker<BookshelfCreatedDomainEvent>()
